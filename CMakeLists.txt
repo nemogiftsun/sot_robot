@@ -37,11 +37,13 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
-#    src/ur_sot_controller.cpp
+    src/youbot_controller_plugin.cpp
+    src/youbot_sot_controller.cpp
     src/youbot_device.cpp)
 
 set(HEADERS
-#    include/ur_sot_controller.h
+    include/sot_youbot/youbot_controller_plugin.h
+    include/sot_youbot/youbot_sot_controller.h
     include/sot_youbot/youbot_device.h)
 
 add_library(sot_youbot ${HEADERS} ${SOURCES})
