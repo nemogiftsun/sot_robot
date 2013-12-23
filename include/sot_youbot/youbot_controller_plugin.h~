@@ -16,8 +16,8 @@ typedef boost::shared_ptr<pr2_mechanism_model::JointState> YoubotJointPtr;
 
 class YoubotControllerPlugin : public pr2_controller_interface::Controller {
 public:
-    explicit Pr2ControllerPlugin();
-    virtual ~Pr2ControllerPlugin();
+    explicit YoubotControllerPlugin();
+    virtual ~YoubotControllerPlugin();
 
     virtual bool init(pr2_mechanism_model::RobotState *robot,
                       ros::NodeHandle &n);
@@ -56,6 +56,8 @@ private:
             control_msgs::JointTrajectoryControllerState> > controller_state_publisher_;
 
     ros::Publisher cmd_vel_pub_;
+
+    ros::Publisher joint_vel_pub_;
 
     tf::TransformListener listener_;
 

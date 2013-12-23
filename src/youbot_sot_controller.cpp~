@@ -108,7 +108,7 @@ YoubotSotController::startupPython() {
                     "    path.append(p)", *interpreter_);
     runPython (aof, "path.extend(sys.path)", *interpreter_);
     runPython (aof, "sys.path = path", *interpreter_);
-    runPython (aof, "from dynamic_graph.sot.pr2.prologue import robot", *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.youbot.prologue import robot", *interpreter_);
 
     dynamicgraph::rosInit(true);
 

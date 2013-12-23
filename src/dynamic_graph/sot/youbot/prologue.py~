@@ -8,7 +8,7 @@ from dynamic_graph.entity import PyEntityFactoryClass
 
 Device = PyEntityFactoryClass('YoubotDevice')
 
-robot = youbot(name = 'robot', device = Device('SoTYoubot'))
+robot = youbot(name = 'robot', device = Device('SoTyoubot'))
 plug(robot.device.state, robot.dynamic.position)
 
 __all__ = ["robot"]

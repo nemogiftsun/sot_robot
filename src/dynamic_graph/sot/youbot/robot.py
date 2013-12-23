@@ -39,9 +39,12 @@ class youbot(AbstractMobileRobot):
     def __init__(self, name, device = None, tracer = None):
         AbstractMobileRobot.__init__ (self, name, tracer)
         # add operational points
-        self.OperationalPoints.append('waist')
-        self.OperationalPoints.append('arm_joint_5')
         self.OperationalPoints.append('base_joint')
+        self.OperationalPoints.append('arm_joint_1')
+        self.OperationalPoints.append('arm_joint_2')
+        self.OperationalPoints.append('arm_joint_3')      
+        self.OperationalPoints.append('arm_joint_4')
+        self.OperationalPoints.append('arm_joint_5')
 
         # device and dynamic model assignment
         self.device = device

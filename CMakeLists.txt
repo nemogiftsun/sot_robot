@@ -8,17 +8,8 @@ set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/src)
-set(CMAKE_INSTALL_RPATH "${LIBRARY_OUTPUT_PATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
-
-
-set(PROJECT_DESCRIPTION "sot controller for Universal  Robot")
-set(PROJECT_NAME sot_youbot)
-set(PROJECT_URL "")
-set(CXX_DISABLE_WERROR True)
-
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # Search for dependencies.
 ADD_REQUIRED_DEPENDENCY("jrl-mathtools")
@@ -26,6 +17,7 @@ ADD_REQUIRED_DEPENDENCY("jrl-mal")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph-python")
 ADD_REQUIRED_DEPENDENCY("sot-core")
+
 
 # This is required by the Python prologue.
 ADD_REQUIRED_DEPENDENCY("sot-dynamic")
@@ -46,11 +38,17 @@ set(HEADERS
     include/sot_youbot/youbot_sot_controller.h
     include/sot_youbot/youbot_device.h)
 
-add_library(sot_youbot ${HEADERS} ${SOURCES})
+rosbuild_add_library(sot_youbot SHARED ${HEADERS} ${SOURCES})
 
 target_link_libraries(sot_youbot dynamic-graph)
 target_link_libraries(sot_youbot sot-core)
 target_link_libraries(sot_youbot dynamic-graph-python)
+target_link_libraries(sot_youbot ros_bridge)
+target_link_libraries(sot_youbot ros_interpreter)
+
+
+rosbuild_add_library(sot_youbot ${HEADERS} ${SOURCES})
+
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph")
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "sot-core")
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph-python")

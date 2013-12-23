@@ -108,6 +108,8 @@ YoubotDevice::getControl(ControlMap &controlOut) {
     ml::Vector control;
     try {
         control = controlSIN.accessCopy();
+        
+
     }
     catch (...) {
         control.resize(state_.size());
@@ -141,6 +143,7 @@ YoubotDevice::getControl(ControlMap &controlOut) {
     std::vector<double> ffvelocity(6,0.);
     for (int i=0; i<6; ++i)
         ffvelocity[i] = control(i);
+
     controlOut["ffvelocity"].setValues(ffvelocity);
 
     sotDEBUGOUT(25);

@@ -17,11 +17,15 @@
     <rosdoc config="rosdoc.yaml" />
   </export>
 
+  <depend package="pluginlib" />
 
   <rosdep name="sot-core"/>
   <rosdep name="sot-dynamic"/>
 
+
+  <depend package="pr2_controller_manager"/>
   <depend package="pr2_controller_interface"/>
+  <depend package="pr2_mechanism_model"/>
  
   <depend package="controller_interface"/>
   <depend package="controller_manager"/>

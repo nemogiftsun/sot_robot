@@ -1,14 +1,14 @@
-#include "sot_pr2/pr2_device.h"
+#include "sot_youbot/youbot_device.h"
 
 #include <sot/core/debug.hh>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 
-namespace sot_pr2 {
+namespace sot_youbot {
 
-const double Pr2Device::TIMESTEP_DEFAULT = 0.001;
+const double YoubotDevice::TIMESTEP_DEFAULT = 0.001;
 
-Pr2Device::Pr2Device(const std::string &name)
+YoubotDevice::YoubotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),
   timestep_(TIMESTEP_DEFAULT),
   previous_state_(),
@@ -35,11 +35,11 @@ Pr2Device::Pr2Device(const std::string &name)
      sotDEBUGOUT(25);
 }
 
-Pr2Device::~Pr2Device() {
+YoubotDevice::~YoubotDevice() {
 }
 
 void
-Pr2Device::setSensors(SensorMap &sensorsIn) {
+YoubotDevice::setSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
 
@@ -70,22 +70,22 @@ Pr2Device::setSensors(SensorMap &sensorsIn) {
 }
 
 void
-Pr2Device::setupSetSensors(SensorMap &sensorsIn) {
+YoubotDevice::setupSetSensors(SensorMap &sensorsIn) {
     setSensors(sensorsIn);
 }
 
 void
-Pr2Device::nominalSetSensors(SensorMap &sensorsIn) {
+YoubotDevice::nominalSetSensors(SensorMap &sensorsIn) {
     setSensors(sensorsIn);
 }
 
 void
-Pr2Device::cleanupSetSensors(SensorMap &sensorsIn) {
+YoubotDevice::cleanupSetSensors(SensorMap &sensorsIn) {
     setSensors(sensorsIn);
 }
 
 void
-Pr2Device::getControl(ControlMap &controlOut) {
+YoubotDevice::getControl(ControlMap &controlOut) {
     sotDEBUGIN(25);
     std::vector<double> anglesOut;
     anglesOut.resize(state_.size());
@@ -108,6 +108,8 @@ Pr2Device::getControl(ControlMap &controlOut) {
     ml::Vector control;
     try {
         control = controlSIN.accessCopy();
+        
+
     }
     catch (...) {
         control.resize(state_.size());
@@ -141,13 +143,14 @@ Pr2Device::getControl(ControlMap &controlOut) {
     std::vector<double> ffvelocity(6,0.);
     for (int i=0; i<6; ++i)
         ffvelocity[i] = control(i);
+
     controlOut["ffvelocity"].setValues(ffvelocity);
 
     sotDEBUGOUT(25);
 }
 
 void
-Pr2Device::updateRobotState(const std::vector<double> &anglesIn)
+YoubotDevice::updateRobotState(const std::vector<double> &anglesIn)
 {
     sotDEBUGIN(25);
     for (unsigned i=0; i<anglesIn.size(); ++i)
@@ -157,6 +160,6 @@ Pr2Device::updateRobotState(const std::vector<double> &anglesIn)
 }
 
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(Pr2Device,"Pr2Device");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(YoubotDevice,"YoubotDevice");
 
 }

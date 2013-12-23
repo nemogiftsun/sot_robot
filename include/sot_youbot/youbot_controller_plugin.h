@@ -57,6 +57,8 @@ private:
 
     ros::Publisher cmd_vel_pub_;
 
+    ros::Publisher arm_vel_pub_;
+
     tf::TransformListener listener_;
 
     double timeFromStart_;

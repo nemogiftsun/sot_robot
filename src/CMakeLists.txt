@@ -3,7 +3,7 @@ FINDPYTHON()
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 FUNCTION(COMPILE_PLUGIN NAME SOURCES ENTITIES)
-  add_library(${NAME} SHARED ${SOURCES})
+  rosbuild_add_library(${NAME} SHARED ${SOURCES})
   SET_TARGET_PROPERTIES(${NAME} PROPERTIES PREFIX "")
 
   PKG_CONFIG_USE_DEPENDENCY(${NAME} dynamic-graph)
@@ -30,13 +30,13 @@ ENDFUNCTION()
 # Configure prologue to embed robot model directory.
 #CONFIG_FILES(dynamic_graph/sot/pr2/prologue.py)
 
-COMPILE_PLUGIN(youbot_device youbot_device.cpp YoubotDevice)
-PKG_CONFIG_USE_DEPENDENCY(youbot_device "dynamic-graph")
-PKG_CONFIG_USE_DEPENDENCY(youbot_device "sot-core")
-PKG_CONFIG_USE_DEPENDENCY(youbot_device "dynamic-graph-python")
+#COMPILE_PLUGIN(youbot_device youbot_device.cpp YoubotDevice)
+#PKG_CONFIG_USE_DEPENDENCY(youbot_device "dynamic-graph")
+#PKG_CONFIG_USE_DEPENDENCY(youbot_device "sot-core")
+#PKG_CONFIG_USE_DEPENDENCY(youbot_device "dynamic-graph-python")
 
 
 PYTHON_INSTALL("dynamic_graph/sot/youbot" "__init__.py" "${PYTHON_SITELIB}")
 PYTHON_INSTALL("dynamic_graph/sot/youbot" "robot.py" "${PYTHON_SITELIB}")
 #PYTHON_INSTALL("dynamic_graph/sot/pr2" "pr2_tasks.py" "${PYTHON_SITELIB}")
-#PYTHON_INSTALL("dynamic_graph/sot/pr2" "prologue.py" "${PYTHON_SITELIB}")
+PYTHON_INSTALL("dynamic_graph/sot/youbot" "prologue.py" "${PYTHON_SITELIB}")
