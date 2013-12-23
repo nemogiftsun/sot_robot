@@ -11,4 +11,4 @@ srv/lisp/
 srv_gen/
 
 *.cfgc
-
+*~
