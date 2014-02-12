@@ -18,6 +18,7 @@
 #from dynamic_graph.sot.dynamics.abstract_robot import AbstractRobot
 from dynamic_graph.sot.dynamics.mobile_robot import AbstractMobileRobot
 from dynamic_graph.ros.robot_model import RosRobotModel
+from dynamic_graph.sot.core import  SOT,FeaturePosition, Task
 class youbot(AbstractMobileRobot):
     """
     This class instanciates a Ur5 robot.
@@ -54,6 +55,6 @@ class youbot(AbstractMobileRobot):
         self.dimension = self.dynamic.getDimension()
         self.initPosition = (0.,) * self.dimension
         # initialize ur robot
-        self.initializeRobot()
+        self.initializeRobot()        
 __all__ = ["youbot"]
 

@@ -3,6 +3,9 @@
 #include <geometry_msgs/Twist.h>
 #include <brics_actuator/JointVelocities.h>
 #include <brics_actuator/JointValue.h>
+#include <std_msgs/Bool.h>
+#include <stdlib.h> 
+
 
 //boost units for unit assignment
 //#include <boost/units/systems/si/plane_angle.hpp>
@@ -16,7 +19,7 @@ std::ofstream logout;
 
 YoubotControllerPlugin::YoubotControllerPlugin()
     : pr2_controller_interface::Controller(),
-      sot_controller_("SoTYoubot"),
+      sot_controller_("youBot"),
       loop_count_(0),
       robot_(NULL) {
     logout.open("/tmp/out.log", std::ios::out);
@@ -28,8 +31,10 @@ YoubotControllerPlugin::~YoubotControllerPlugin() {
 bool
 YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
     sot_controller_.node_ = n;
-    cmd_vel_pub_ = sot_controller_.node_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    arm_vel_pub_ = sot_controller_.node_.advertise<brics_actuator::JointVelocities>("velocity_command",1);
+    cmd_vel_pub_ = sot_controller_.node_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    arm_vel_pub_ = sot_controller_.node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1);
+    controller_status_pub_ = sot_controller_.node_.advertise<std_msgs::Bool>("/sot_youbot/controller_status",1);
+    jointstate_sub =sot_controller_.node_.subscribe("/joint_states", 1000, &YoubotControllerPlugin::jointstatesub_cb,this);
     // Check initialization
     if (!robot) {
         ROS_ERROR_STREAM("NULL robot pointer");
@@ -105,6 +110,15 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
     return true;
 }
 
+void YoubotControllerPlugin::jointstatesub_cb(const sensor_msgs::JointState &msg )
+{
+ 
+   for(int i = 8; i< 13;i++)
+   {
+     //joints_[i]->position_ = msg.position[i];
+   } 
+}
+
 void
 YoubotControllerPlugin::fillSensors() {
     // Joint values
@@ -115,16 +129,16 @@ YoubotControllerPlugin::fillSensors() {
 
     // Get Odometry
     tf::StampedTransform current_transform;
-    listener_.lookupTransform("base_link", "odom", ros::Time(0), current_transform);
+    listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
     std::vector<double> odom(6);
     tf::Vector3 xyz = current_transform.getOrigin();
     tf::Quaternion q = current_transform.getRotation();
-    odom[0] = -xyz[0];
-    odom[1] = -xyz[1];
+    odom[0] = xyz[0];
+    odom[1] = xyz[1];
     odom[2] = 0.0;
     odom[3] = 0.0;
     odom[4] = 0.0;
-    odom[5] = -std::atan2(2*(q.w()*q.z() + q.x()*q.y()), 1 - 2*(q.y()*q.y() + q.z()*q.z()));
+    odom[5] = std::atan2(2*(q.w()*q.z() + q.x()*q.y()), 1 - 2*(q.y()*q.y() + q.z()*q.z()));
 
     sensorsIn_["odometry"].setValues(odom);
  
@@ -144,6 +158,7 @@ YoubotControllerPlugin::readControl() {
     std::stringstream jointName;
     std::vector <brics_actuator::JointValue> armJointvels;
     armJointvels.resize(5);
+    double arm_abs_vel = 0;
     for (int i = 0; i < 5; i++)
     {
         jointName.str("");
@@ -155,6 +170,8 @@ YoubotControllerPlugin::readControl() {
         armJointvels[i].value = joint_velocity_[i];
 
         armJointvels[i].unit = "s^-1 rad";
+   
+        arm_abs_vel += armJointvels[i].value;
 
      }
     arm_vel_cmd.velocities = armJointvels;
@@ -163,21 +180,15 @@ YoubotControllerPlugin::readControl() {
     // Base controller
     geometry_msgs::Twist base_cmd;
     std::vector<double> vel = controlValues_["ffvelocity"].getValues();
-    if (vel[0] >0 || vel[1] >0 || vel[2] >0 || vel[3] >0 || vel[4] >0 || vel[5] >0){
-      
-    std::cout << "Velocity"<< std::endl;
-    std::cout << vel[0] << std::endl;
-    std::cout << vel[1] << std::endl;
-    std::cout << vel[2] << std::endl;
-    std::cout << vel[3] << std::endl;
-    std::cout << vel[4] << std::endl;
-    std::cout << vel[5] << std::endl;
-}
     base_cmd.linear.x = base_cmd.linear.y = base_cmd.linear.z = 0;
     base_cmd.angular.x = base_cmd.angular.y = base_cmd.angular.z = 0;
     base_cmd.linear.x = vel[0];
     base_cmd.linear.y = vel[1];
+    base_cmd.linear.z = vel[2];
+    base_cmd.angular.x = vel[3];
+    base_cmd.angular.y = vel[4];
     base_cmd.angular.z = vel[5];
+
     cmd_vel_pub_.publish(base_cmd);
 
     // State publishing
@@ -226,13 +237,15 @@ YoubotControllerPlugin::update() {
 
 void
 YoubotControllerPlugin::stopping() {
-    fillSensors();
+    std::cout << "STOPPING" << std::endl;
+
+    /*fillSensors();
     try {
         sot_controller_.cleanupSetSensors(sensorsIn_);
         sot_controller_.getControl(controlValues_);
     }
     catch (std::exception &e) { throw e; }
-    readControl();
+    readControl();*/
 }
 
 

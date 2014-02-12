@@ -31,9 +31,11 @@ workThread(YoubotSotController *actl) {
     ros::waitForShutdown();
 }
 
+
+
 YoubotSotController::YoubotSotController(std::string name)
 : node_(dynamicgraph::rosInit(false,true))
-, device_(name)
+, device_(name+"_device")
 {
     std::cout << "Going through YoubotSotController." << std::endl;
     boost::thread thr(workThread,this);
@@ -64,6 +66,8 @@ YoubotSotController::cleanupSetSensors(SensorMap &sensorsIn) {
 
 void
 YoubotSotController::getControl(ControlMap &controlOut) {
+
+
     try {
         LOG_TRACE("");
         device_.getControl(controlOut);
@@ -78,9 +82,9 @@ YoubotSotController::getControl(ControlMap &controlOut) {
 
 void
 YoubotSotController::runPython(std::ostream &file,
-                            const std::string &command,
+                            const std::string &command,bool print,
                             dynamicgraph::Interpreter &interpreter) {
-    file << ">>> " << command << std::endl;
+    if (print == true){file << ">>> " << command << std::endl;} else{}
     std::string lerr(""),lout(""),lres("");
     interpreter.runCommand(command,lres,lout,lerr);
     if (lres != "None") {
@@ -93,23 +97,42 @@ YoubotSotController::runPython(std::ostream &file,
             throw std::runtime_error(err);
         }
         else
-            file << lres << std::endl;
+            if (print == true){file << lres << std::endl;} else{}
     }
 }
+
+
+
+
 
 void
 YoubotSotController::startupPython() {
     std::ofstream aof(LOG_PYTHON.c_str());
-    runPython (aof, "import sys, os", *interpreter_);
-    runPython (aof, "pythonpath = os.environ['PYTHONPATH']", *interpreter_);
-    runPython (aof, "path = []", *interpreter_);
+    runPython (aof, "import sys, os",true, *interpreter_);
+    runPython (aof, "pythonpath = os.environ['PYTHONPATH']",true, *interpreter_);
+    runPython (aof, "path = []",true, *interpreter_);
     runPython (aof, "for p in pythonpath.split(':'):\n"
                     "  if p not in sys.path:\n"
-                    "    path.append(p)", *interpreter_);
-    runPython (aof, "path.extend(sys.path)", *interpreter_);
-    runPython (aof, "sys.path = path", *interpreter_);
-    runPython (aof, "from dynamic_graph.sot.youbot.prologue import robot", *interpreter_);
+                    "    path.append(p)",true, *interpreter_);
+    runPython (aof, "path.extend(sys.path)",true, *interpreter_);
+    runPython (aof, "sys.path = path",true, *interpreter_);
+    runPython (aof, "from dynamic_graph import plug",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.core import *",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.core import  SOT,FeaturePosition, Task",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.youbot.prologue import robot",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.dyninv import SolverKine",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits",true, *interpreter_);
+    runPython (aof, "import dynamic_graph.sotcollision as sc",true, *interpreter_);
 
+    runPython (aof, "a = sc.SotCollision('sc')",true, *interpreter_);
+    runPython (aof, "dt = 0",true, *interpreter_);
+
+    runPython (aof, "solver = SolverKine('sot_solver')",true, *interpreter_);
+    runPython (aof, "solver.setSize (robot.dynamic.getDimension())",true, *interpreter_);
+    runPython (aof, "robot.device.resize (robot.dynamic.getDimension())",true, *interpreter_);
+
+    //runPython (aof, "plug (solver.control, robot.device.control)",true, *interpreter_);
     dynamicgraph::rosInit(true);
 
     aof.close();

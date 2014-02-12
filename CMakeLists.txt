@@ -7,6 +7,7 @@ include(cmake/python.cmake)
 set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
+#rosbuild_gensrv()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

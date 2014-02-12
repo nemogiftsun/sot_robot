@@ -30,6 +30,7 @@ protected:
 
     void runPython(std::ostream &file,
                    const std::string &command,
+                   bool print,
                    dynamicgraph::Interpreter &interpreter);
 
     virtual void startupPython();

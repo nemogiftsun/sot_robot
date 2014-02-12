@@ -9,6 +9,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <tf/transform_listener.h>
+#include <sensor_msgs/JointState.h>
 
 namespace sot_youbot {
 
@@ -59,7 +60,14 @@ private:
 
     ros::Publisher arm_vel_pub_;
 
+    ros::Publisher controller_status_pub_;
+
     tf::TransformListener listener_;
+
+    ros::Subscriber jointstate_sub;
+
+    void jointstatesub_cb(const sensor_msgs::JointState &msg );
+
 
     double timeFromStart_;
 };

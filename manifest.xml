@@ -19,8 +19,10 @@
 
   <depend package="pluginlib" />
 
+  <rosdep name="std_msgs"/>
   <rosdep name="sot-core"/>
   <rosdep name="sot-dynamic"/>
+  <rosdep name="brics_actuator"/>
 
 
   <depend package="pr2_controller_manager"/>
