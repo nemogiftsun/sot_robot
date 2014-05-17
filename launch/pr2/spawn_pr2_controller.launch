@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <rosparam file="$(find sot_youbot)/robot/pr2_sot_controller.yaml" command="load" />
+    <node pkg="pr2_controller_manager" type="spawner" args="sot_youbot" name="pr2_sot_controller_spawner" />
+</launch>

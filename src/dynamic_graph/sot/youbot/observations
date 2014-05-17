@@ -1,0 +1,5 @@
+* add joint limit constraints
+  - test again
+* simu test with controller
+* stop base movements
+* give error in reference to base link

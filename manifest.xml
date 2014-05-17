@@ -23,7 +23,7 @@
   <rosdep name="sot-core"/>
   <rosdep name="sot-dynamic"/>
   <rosdep name="brics_actuator"/>
-
+  <depend package="angles" />
 
   <depend package="pr2_controller_manager"/>
   <depend package="pr2_controller_interface"/>

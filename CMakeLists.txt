@@ -30,14 +30,19 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
-    src/youbot_controller_plugin.cpp
-    src/youbot_sot_controller.cpp
-    src/youbot_device.cpp)
-
+    src/youbot_controller_plugin_threaded.cpp
+#    src/youbot_sot_controller.cpp
+    src/youbot_device.cpp
+    src/timer_utility.cpp)
+#    src/youbot_controller_node.cpp)
+#    src/yb_controlnode_thread.cpp)
 set(HEADERS
-    include/sot_youbot/youbot_controller_plugin.h
-    include/sot_youbot/youbot_sot_controller.h
-    include/sot_youbot/youbot_device.h)
+    include/sot_youbot/youbot_controller_plugin_threaded.h
+    #include/sot_youbot/youbot_sot_controller.h
+    include/sot_youbot/youbot_device.h
+    include/sot_youbot/timer_utility.hh)
+#    include/sot_youbot/youbot_controller_node.hh)
+#    include/yb_controlnode_thread.hh)
 
 rosbuild_add_library(sot_youbot SHARED ${HEADERS} ${SOURCES})
 
@@ -48,11 +53,22 @@ target_link_libraries(sot_youbot ros_bridge)
 target_link_libraries(sot_youbot ros_interpreter)
 
 
+
 rosbuild_add_library(sot_youbot ${HEADERS} ${SOURCES})
 
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph")
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "sot-core")
 PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph-python")
+
+#rosbuild_add_executable(testdemo src/yb_controlnode_thread.cpp src/youbot_device.cpp src/timer_utility.cpp)
+
+#rosbuild_add_executable(testdemo src/youbot_controller_node.cpp src/youbot_device.cpp src/timer_utility.cpp)
+
+#PKG_CONFIG_USE_DEPENDENCY(testdemo "dynamic-graph")
+#PKG_CONFIG_USE_DEPENDENCY(testdemo "sot-core")
+#PKG_CONFIG_USE_DEPENDENCY(testdemo "dynamic-graph-python")
+#target_link_libraries(testdemo  ros_bridge)
+#target_link_libraries(testdemo  ros_interpreter)
 
 
 ADD_SUBDIRECTORY(src)

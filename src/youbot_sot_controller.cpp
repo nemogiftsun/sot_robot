@@ -64,6 +64,22 @@ YoubotSotController::cleanupSetSensors(SensorMap &sensorsIn) {
     device_.cleanupSetSensors(sensorsIn);
 }
 
+
+void
+YoubotSotController::findControl() {
+
+
+    try {
+        LOG_TRACE("");
+        device_.findControl();
+        LOG_TRACE("");
+    }
+    catch (dynamicgraph::sot::ExceptionAbstract &err) {
+        LOG_TRACE(err.getStringMessage());
+        throw err;
+    }
+}
+
 void
 YoubotSotController::getControl(ControlMap &controlOut) {
 
@@ -119,7 +135,7 @@ YoubotSotController::startupPython() {
     runPython (aof, "from dynamic_graph import plug",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core import *",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core import  SOT,FeaturePosition, Task",true, *interpreter_);
-    runPython (aof, "from dynamic_graph.sot.youbot.prologue import robot",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.pr2.prologue import robot",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.dyninv import SolverKine",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits",true, *interpreter_);

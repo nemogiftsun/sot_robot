@@ -7,7 +7,7 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <stdlib.h> 
-
+#include "angles/angles.h"
 #include <dynamic_graph_bridge/ros_init.hh>
 
 
@@ -210,7 +210,7 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
     boost::thread sampleAndHoldProcess(sampleAndHold,this);
 
     std::cout << "Initialized!!!" << std::endl;
-
+    last_time_ = robot->getTime();
     return true;
 }
 
@@ -256,20 +256,44 @@ YoubotControllerPlugin::fillSensors() {
 void
 YoubotControllerPlugin::readControl() {
     ros::Time time = robot_->getTime();
-    ros::Duration dt = time - last_time_;
+    ros::Duration dt_ = time - last_time_;
     last_time_ = time;
 
     //  Arm controller
     joint_positionsOUT_ = controlValues_["joints"].getValues();
     joint_velocityOUT_ = controlValues_["velocities"].getValues();
     
+    // 
+
+
+
     // arm control
+
     for (unsigned int i=12; i<joints_.size(); ++i) {
-        error[i] = joints_[i]->position_ - joint_positionsOUT_[i];
-
+        //error[i] =  joints_[i]->velocity_ - joint_velocityOUT_[i];
+        //error[i] = joints_[i]->position_ - joint_positionsOUT_[i];
         double errord = joints_[i]->velocity_ - joint_velocityOUT_[i];
+        //double errord = joints_[i]->velocity_ ;
 
-        joints_[i]->commanded_effort_ += pids_[i].updatePid(error[i], errord, dt);
+        if(joints_[i]->joint_->type == urdf::Joint::REVOLUTE)
+        {
+          angles::shortest_angular_distance_with_limits(joint_positionsOUT_[i], joints_[i]->position_, joints_[i]->joint_->limits->lower, joints_[i]->joint_->limits->upper,error[i]);
+
+        }
+        else if(joints_[i]->joint_->type == urdf::Joint::CONTINUOUS)
+        {
+          error[i] = angles::shortest_angular_distance(joint_positionsOUT_[i], joints_[i]->position_);
+        }
+        else //prismatic
+        {
+          error[i] = joints_[i]->position_ - joint_positionsOUT_[i];
+        }
+
+
+        //joints_[i]->commanded_effort_ = pids_[i].updatePid(error[i], dt_);
+        //std::cout << "The commanded effort "<<joints_[i]->joint_->name<<"is "<<pids_[i].updatePid(error[i], dt_)<<std::endl;
+
+        joints_[i]->commanded_effort_ += pids_[i].updatePid(error[i], errord, dt_);
 
     }
 
@@ -329,12 +353,12 @@ YoubotControllerPlugin::starting() {
 
     try {
 
-      {  
+       
 		  {
 		      boost::mutex::scoped_lock lock(rmut);
 		      _holdIn = sensorsIn_;
 		  }
-      cond2.notify_all();}
+      cond2.notify_all();
 
 
 		  {
@@ -368,7 +392,7 @@ YoubotControllerPlugin::update() {
       cond2.notify_all();
 		  {
 		      boost::mutex::scoped_lock lock(wmut);
-          cond3.wait(lock);
+          //cond3.wait(lock);
 		      controlValues_ = _holdOut;
 		  }
 		}

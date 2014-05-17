@@ -10,6 +10,10 @@
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <tf/transform_listener.h>
 #include <sensor_msgs/JointState.h>
+#include <sot_youbot/timer_utility.hh>
+#include <sot_youbot/youbot_device.h>
+
+using namespace timer;
 
 namespace sot_youbot {
 
@@ -26,21 +30,34 @@ public:
     virtual void update();
     virtual void stopping();
 
+    ros::NodeHandle node_;
+
+
 private:
     void fillSensors();
     void readControl();
 
 private:
-    // SoT Controller
-    YoubotSotController sot_controller_;
+    // python interactor methods
+    void runPython(std::ostream &file,
+                   const std::string &command,
+                   bool print,
+                   dynamicgraph::Interpreter &interpreter);
+
+
+    // sot sensor and control map
     SensorMap sensorsIn_;
     ControlMap controlValues_;
 
-    std::vector<double> joint_encoder_;
-    std::vector<double> joint_velocity_;
-    std::vector<double> joint_control_;
+    // joint encoder and velocity vetors
+    std::vector<double> joint_positionsOUT_;
+    std::vector<double> joint_positionsIN_;
+    std::vector<double> joint_velocityOUT_;
+    std::vector<double> joint_velocityIN_;
+
     std::vector<double> error_raw;
     std::vector<double> error;
+    Timer timer;
 
 
     // Pr2 Controller
@@ -51,25 +68,27 @@ private:
     pr2_mechanism_model::RobotState *robot_;
 
     // ROS interface
-    //ros::NodeHandle node_;
     boost::scoped_ptr<
         realtime_tools::RealtimePublisher<
             control_msgs::JointTrajectoryControllerState> > controller_state_publisher_;
 
-    ros::Publisher cmd_vel_pub_;
-
-    ros::Publisher arm_vel_pub_;
-
-    ros::Publisher controller_status_pub_;
+    ros::Publisher cmd_vel_pub_, arm_vel_pub_ ;
 
     tf::TransformListener listener_;
 
-    ros::Subscriber jointstate_sub;
 
-    void jointstatesub_cb(const sensor_msgs::JointState &msg );
+    // SoT controller
+    YoubotSotController sot_controller_;
+
+
+
 
 
     double timeFromStart_;
+
+
+    bool get_control;
+    int count_loop;
 };
 
 }

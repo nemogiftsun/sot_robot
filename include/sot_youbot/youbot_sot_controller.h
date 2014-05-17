@@ -2,8 +2,11 @@
 #define PR2_SOT_CONTROLLER_H
 
 #include <sot_youbot/youbot_device.h>
+#include <sot_youbot/timer_utility.hh>
 #include <dynamic_graph_bridge/ros_interpreter.hh>
 #include <sot/core/abstract-sot-external-interface.hh>
+
+using namespace timer;
 
 namespace sot_youbot {
 
@@ -20,6 +23,7 @@ public:
     void nominalSetSensors(SensorMap &sensorsIn);
     void cleanupSetSensors(SensorMap &sensorsIn);
 
+    void findControl();
     void getControl(ControlMap &controlOut);
 
     boost::shared_ptr<dynamicgraph::Interpreter> interpreter_;
@@ -37,6 +41,7 @@ protected:
 
 private:
     YoubotDevice device_;
+    Timer timer;
 };
 
 }

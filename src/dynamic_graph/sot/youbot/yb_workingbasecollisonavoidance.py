@@ -3,6 +3,8 @@ from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d
 from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits
 import dynamic_graph.sotcollision as sc
 #solver.damping.value =3e-2
+# init tracer
+robot.initializeTracer('/home/nemogiftsun/laas/devel/data/youbot/')
 a = sc.SotCollision("sc")
 solver.damping.value =3
 a.createcollisionlink("wall1","box","external",(2.04,0.015,0.3,0,0,0.0,0.0,0,0))
@@ -55,14 +57,27 @@ task_collision_avoidance.dt.value=1
 task_collision_avoidance.controlGain.value=50.0
 #task_collision_avoidance.selec.value='110001'
 task_waist_metakine=MetaTaskKine6d('task_waist_metakine',robot.dynamic,'base_joint','base_joint')
-goal = ((1.,0,0,0.0),(0,1.,0,0.6),(0,0,1.,0),(0,0,0,1.),)
+goal = ((1.,0,0,0.0),(0,1.,0,0.0),(0,0,1.,0),(0,0,0,1.),)
 task_waist_metakine.gain.setConstant(8)
 task_waist_metakine.featureDes.position.value = goal
 a.collisionJacobian.recompute(0)
 print a.collisionJacobian
 a.collisionDistance.recompute(0)
 print a.collisionDistance
+#robot.traceDefaultSignals()
+robot.addTrace(task_waist_metakine.task.name,'error')
+robot.startTracer()
 solver.push (task_collision_avoidance.name)
 solver.push (task_waist_metakine.task.name)
 #solver.damping.value =3e-2
 plug (solver.control,robot.device.control)
+robot.stopTracer()
+# usage of tracer
+# robot.initializeTracer()
+# task_waist_metakine.featureDes.position.value = goal
+# robot.startTracer()
+# robot.traceDefaultSignals
+# robot.stopTracer()
+
+
+

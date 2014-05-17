@@ -3,9 +3,16 @@
 #include <geometry_msgs/Twist.h>
 #include <brics_actuator/JointVelocities.h>
 #include <brics_actuator/JointValue.h>
+#include <brics_actuator/JointPositions.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 #include <stdlib.h> 
 
+#include <dynamic_graph_bridge/ros_init.hh>
+
+
+#include <sot/core/debug.hh>
+#include <sot/core/exception-abstract.hh>
 
 //boost units for unit assignment
 //#include <boost/units/systems/si/plane_angle.hpp>
@@ -15,14 +22,19 @@ namespace sot_youbot {
 
 static const std::string JOINTNAME_PRE = "arm_joint_";
 
+
+
 std::ofstream logout;
 
 YoubotControllerPlugin::YoubotControllerPlugin()
     : pr2_controller_interface::Controller(),
-      sot_controller_("youBot"),
+      sot_controller_("Pr2"),
       loop_count_(0),
-      robot_(NULL) {
-    logout.open("/tmp/out.log", std::ios::out);
+      robot_(NULL),
+      get_control(true),
+      count_loop(0){
+
+
 }
 
 YoubotControllerPlugin::~YoubotControllerPlugin() {
@@ -30,11 +42,11 @@ YoubotControllerPlugin::~YoubotControllerPlugin() {
 
 bool
 YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
+
     sot_controller_.node_ = n;
-    cmd_vel_pub_ = sot_controller_.node_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-    arm_vel_pub_ = sot_controller_.node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1);
-    controller_status_pub_ = sot_controller_.node_.advertise<std_msgs::Bool>("/sot_youbot/controller_status",1);
-    jointstate_sub =sot_controller_.node_.subscribe("/joint_states", 1000, &YoubotControllerPlugin::jointstatesub_cb,this);
+    cmd_vel_pub_ =  sot_controller_.node_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    //arm_vel_pub_ =  sot_controller_.node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1000);
+
     // Check initialization
     if (!robot) {
         ROS_ERROR_STREAM("NULL robot pointer");
@@ -44,8 +56,9 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
         ROS_ERROR_STREAM("NULL model pointer");
         return false;
     }
+ std::cout << "Initialized SSS!!" << std::endl;
     robot_ = robot;
-
+        
     // Get the joints
     XmlRpc::XmlRpcValue joint_names;
     if (!sot_controller_.node_.getParam("joints", joint_names)) {
@@ -79,14 +92,30 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
         }
     }
 
+ // Setup PID controllers
+    std::string gains_ns;
+    if (!sot_controller_.node_.getParam("gains", gains_ns))
+        gains_ns = sot_controller_.node_.getNamespace() + "/gains";
+    pids_.resize(joints_.size());
+    for (size_t i=0; i<joints_.size(); ++i) {
+        if (!pids_[i].init(ros::NodeHandle(gains_ns + "/" + joints_[i]->joint_->name))) {
+            if (!pids_[i].init(ros::NodeHandle(sot_controller_.node_,"pid_parameters"))) {
+                ROS_ERROR("Failed to build PID controller");
+                return false;
+            }
+        }
+    }
     // TF Listener
-    listener_.waitForTransform("base_link", "odom", ros::Time(0), ros::Duration(1.0));
+    listener_.waitForTransform("base_link", "odom_combined", ros::Time(0), ros::Duration(1.0));
 
     // Allocate space
     const unsigned int jsz = joints_.size();
-    joint_encoder_.resize(jsz);
-    joint_velocity_.resize(jsz);
-    joint_control_.resize(jsz);
+    
+    joint_positionsOUT_.resize(jsz);
+    joint_positionsIN_.resize(jsz);
+    joint_velocityOUT_.resize(jsz);  
+    joint_velocityIN_.resize(jsz);
+
     error_raw.resize(jsz);
     error.resize(jsz);
 
@@ -107,29 +136,37 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
 
     timeFromStart_ = 0.0;
 
-    return true;
-}
+    std::cout << "Initialized!!!" << std::endl;
 
-void YoubotControllerPlugin::jointstatesub_cb(const sensor_msgs::JointState &msg )
-{
- 
-   for(int i = 8; i< 13;i++)
-   {
-     //joints_[i]->position_ = msg.position[i];
-   } 
+
+    return true;
 }
 
 void
 YoubotControllerPlugin::fillSensors() {
-    // Joint values
+    // Joint values/
     sensorsIn_["joints"].setName("position");
+    //std::cout<<"[";
     for (unsigned int i=0; i<joints_.size(); ++i)
-        joint_encoder_[i] = joints_[i]->position_;
-    sensorsIn_["joints"].setValues(joint_encoder_);
+    {
+        joint_positionsIN_[i] = joints_[i]->position_;
+        //if(joints_[i]->joint_->limits)
+           //std::cout<<joints_[i]->joint_->limits->upper<<",";
+        //else
+           //std::cout<<"no limit"<<",";
+    }
+    //std::cout<<"]"<<std::endl;
+    sensorsIn_["joints"].setValues(joint_positionsIN_);
+
+    // Joint velocities
+    sensorsIn_["velocities"].setName("velocity");
+    for (unsigned int i=0; i<joints_.size(); ++i)
+        joint_velocityIN_[i] = joints_[i]->velocity_;
+    sensorsIn_["velocities"].setValues(joint_velocityIN_);
 
     // Get Odometry
     tf::StampedTransform current_transform;
-    listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
+    listener_.lookupTransform("odom_combined","base_link",ros::Time(0), current_transform);
     std::vector<double> odom(6);
     tf::Vector3 xyz = current_transform.getOrigin();
     tf::Quaternion q = current_transform.getRotation();
@@ -142,7 +179,6 @@ YoubotControllerPlugin::fillSensors() {
 
     sensorsIn_["odometry"].setValues(odom);
  
-    
 }
 
 void
@@ -151,31 +187,36 @@ YoubotControllerPlugin::readControl() {
     ros::Duration dt = time - last_time_;
     last_time_ = time;
 
-//  Arm controller
+    //  Arm controller
+    joint_positionsOUT_ = controlValues_["joints"].getValues();
+    joint_velocityOUT_ = controlValues_["velocities"].getValues();
+    
+    // arm control
+    for (unsigned int i=12; i<joints_.size(); ++i) {
+        error[i] = joints_[i]->position_ - joint_positionsOUT_[i];
+
+        double errord = joints_[i]->velocity_ - joint_velocityOUT_[i];
+
+        joints_[i]->commanded_effort_ += pids_[i].updatePid(error[i], errord, dt);
+
+    }
+
+    //arm control
+    /*
     brics_actuator::JointVelocities arm_vel_cmd;
-    joint_control_ = controlValues_["joints"].getValues();
-    joint_velocity_ = controlValues_["velocities"].getValues();
-    std::stringstream jointName;
     std::vector <brics_actuator::JointValue> armJointvels;
     armJointvels.resize(5);
-    double arm_abs_vel = 0;
+    std::stringstream jointName;   
     for (int i = 0; i < 5; i++)
-    {
+    {       
         jointName.str("");
-
         jointName << JOINTNAME_PRE << (i+1);
-
         armJointvels[i].joint_uri = jointName.str();
-
-        armJointvels[i].value = joint_velocity_[i];
-
+        armJointvels[i].value = joint_velocityOUT_[i];
         armJointvels[i].unit = "s^-1 rad";
-   
-        arm_abs_vel += armJointvels[i].value;
-
-     }
+    }
     arm_vel_cmd.velocities = armJointvels;
-    arm_vel_pub_.publish(arm_vel_cmd);
+    arm_vel_pub_.publish(arm_vel_cmd);*/
 
     // Base controller
     geometry_msgs::Twist base_cmd;
@@ -196,7 +237,7 @@ YoubotControllerPlugin::readControl() {
         if (controller_state_publisher_ && controller_state_publisher_->trylock()) {
             controller_state_publisher_->msg_.header.stamp = time;
             for (size_t j=0; j<joints_.size(); ++j) {
-                controller_state_publisher_->msg_.desired.positions[j] = joint_control_[j];
+                controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[j];
                 controller_state_publisher_->msg_.actual.positions[j] = joints_[j]->position_;
                 controller_state_publisher_->msg_.actual.velocities[j] = joints_[j]->velocity_;
                 controller_state_publisher_->msg_.actual.time_from_start= ros::Duration(timeFromStart_);
@@ -211,44 +252,48 @@ YoubotControllerPlugin::readControl() {
 
 void
 YoubotControllerPlugin::starting() {
-    std::cout << "STARTING" << std::endl;
-    last_time_ = robot_->getTime();
+		std::cout << "STARTING" << std::endl;
+		fillSensors();
 
-    fillSensors();
-    try {
-        sot_controller_.setupSetSensors(sensorsIn_);
-        sot_controller_.getControl(controlValues_);
-    }
-    catch (std::exception &e) { throw e; }
-    readControl();
-
-}
-
-void
-YoubotControllerPlugin::update() {
-    fillSensors();
     try {
         sot_controller_.nominalSetSensors(sensorsIn_);
         sot_controller_.getControl(controlValues_);
     }
     catch (std::exception &e) { throw e; }
-    readControl();
+    
+		readControl();
+  
+    std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
+    //timer.start();
+
+}
+
+void
+YoubotControllerPlugin::update() {
+        timer.start();
+
+    
+		fillSensors();
+ 
+    try {
+        sot_controller_.nominalSetSensors(sensorsIn_);
+        sot_controller_.getControl(controlValues_);
+    }
+    catch (std::exception &e) { throw e; }
+
+		readControl();
+    timer.stop();
+    std::cout <<"time elapsed is "<<timer.getElapsedTimeInMilliSec()<< std::endl;
+
 }
 
 void
 YoubotControllerPlugin::stopping() {
     std::cout << "STOPPING" << std::endl;
+    // take care everything is destroyed
+    // and robot freezes 
 
-    /*fillSensors();
-    try {
-        sot_controller_.cleanupSetSensors(sensorsIn_);
-        sot_controller_.getControl(controlValues_);
-    }
-    catch (std::exception &e) { throw e; }
-    readControl();*/
 }
-
-
 
 /// Register controller to pluginlib
 PLUGINLIB_EXPORT_CLASS(sot_youbot::YoubotControllerPlugin,

@@ -29,7 +29,8 @@ class youbot(AbstractMobileRobot):
         'device': ['control', 'state']
         }
         
-    initPosition = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    #initPosition = [0,0,0,0,0,0,0.011,0.011,-0.1, 0.023, 0.12,0,0]
+    
     def specifySpecialLinks(self):
         if len(self.SpecialLinks) == len(self.SpecialNames):
             for i in range(0,len(self.SpecialLinks)):
@@ -40,6 +41,7 @@ class youbot(AbstractMobileRobot):
     def __init__(self, name, device = None, tracer = None):
         AbstractMobileRobot.__init__ (self, name, tracer)
         # add operational points
+        ip = (0,0,0,0,0,0.0022,0,-0.00012,0.00407,0.00345,0.001555,0.0007879)
         self.OperationalPoints.append('base_joint')
         self.OperationalPoints.append('arm_joint_1')
         self.OperationalPoints.append('arm_joint_2')
@@ -53,7 +55,8 @@ class youbot(AbstractMobileRobot):
         # load model
         self.dynamic.loadFromParameterServer()
         self.dimension = self.dynamic.getDimension()
-        self.initPosition = (0.,) * self.dimension
+        self.initPosition = ip
+        #self.initPosition = (0.,) * self.dimension
         # initialize ur robot
         self.initializeRobot()        
 __all__ = ["youbot"]

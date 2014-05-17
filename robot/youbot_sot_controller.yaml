@@ -1,0 +1,19 @@
+sot_youbot:
+    type: sot_youbot/YoubotSOTControllerPlugin
+    joints:
+        - arm_joint_1
+        - arm_joint_2
+        - arm_joint_3
+        - arm_joint_4
+        - arm_joint_5 
+        - gripper_finger_joint_r 
+        - gripper_finger_joint_l
+
+    gains:
+        arm_joint_1: {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        arm_joint_2: {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        arm_joint_3: {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        arm_joint_4: {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        arm_joint_5: {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        gripper_finger_joint_r:  {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}
+        gripper_finger_joint_l:  {p: 1000.0, i: 0.01, d: 0.1, i_clamp: 0.0}

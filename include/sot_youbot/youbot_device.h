@@ -4,6 +4,9 @@
 #include <sot/core/device.hh>
 #include <dynamic-graph/linear-algebra.h>
 #include <sot/core/abstract-sot-external-interface.hh>
+#include <sot_youbot/timer_utility.hh>
+
+using namespace timer;
 
 namespace sot_youbot {
 
@@ -24,7 +27,7 @@ namespace sot_youbot {
         void setupSetSensors(SensorMap &sensorsIn);
         void nominalSetSensors(SensorMap &sensorsIn);
         void cleanupSetSensors(SensorMap &sensorsIn);
-
+        void findControl();
         void getControl(ControlMap &controlOut);
 
     protected:
@@ -33,13 +36,13 @@ namespace sot_youbot {
     protected:
         double timestep_;
         dynamicgraph::Vector previous_state_;
-        dynamicgraph::Signal<dynamicgraph::Vector, int> robotState_;
+        //dynamicgraph::Signal<dynamicgraph::Vector, int> robotState_;
 
     private:
-        dynamicgraph::Vector mlRobotState;
+        //dynamicgraph::Vector mlRobotState;
         dynamicgraph::sot::MatrixRotation pose;
         std::vector<double> baseff_;
-
+        Timer timer;
         int loop_count_;
     };
 }
