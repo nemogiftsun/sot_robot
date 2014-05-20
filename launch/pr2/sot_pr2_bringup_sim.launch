@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find gazebo_worlds)/launch/empty_world.launch"/>
+    <include file="$(find sot_youbot)/launch/pr2/emptyworld.launch"/>
 
 <!--    <node name="rqt_console" pkg="rqt_console" type="rqt_console" /> -->
 
