@@ -6,7 +6,7 @@
 
 namespace sot_youbot {
 
-const double YoubotDevice::TIMESTEP_DEFAULT = 0.05;
+const double YoubotDevice::TIMESTEP_DEFAULT = 0.01;
 
 YoubotDevice::YoubotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),
@@ -15,7 +15,8 @@ YoubotDevice::YoubotDevice(const std::string &name)
   //robotState_ ("StackOfTasks(" + name + ")::output(vector)::robotState"),
   pose(),
   baseff_(),
-  loop_count_(0)
+  loop_count_(0),
+  init_required(true)
 {
     sotDEBUGIN(25);
     //signalRegistration(robotState_);
@@ -39,6 +40,58 @@ YoubotDevice::~YoubotDevice() {
 }
 
 void
+YoubotDevice::initSensors(SensorMap &sensorsIn) {
+    sotDEBUGIN(25);
+    SensorMap::iterator it;
+
+    // Joint Posiitons
+    it = sensorsIn.find("joints");
+    if (it != sensorsIn.end()) {
+        std::vector<double> anglesIn = it->second.getValues();
+        try {
+        for (unsigned i=0;i<6; ++i)
+            state_(i) = 0.;
+            for (unsigned i=0; i<45; ++i)
+             {
+                state_(i+6) = anglesIn[i];              
+             }
+        }
+        catch (...) {}
+    }
+    /* Joint velocity*/
+    it = sensorsIn.find("velocities");
+    if (it != sensorsIn.end()) {
+        std::vector<double> velIn = it->second.getValues();
+        try {
+        for (unsigned i=0;i<6; ++i)
+            velocity_(i) = 0.;
+            for (unsigned i=0; i<45; ++i)
+             {
+                velocity_(i+6) = velIn[i];              
+             }
+        }
+        catch (...) {}
+    }
+
+
+    // Odometry
+    it = sensorsIn.find("odometry");
+    if (it != sensorsIn.end()) {
+        std::vector<double> odomIn = it->second.getValues();
+        try {
+            for (unsigned i=0; i<6; ++i)
+                state_(i) = odomIn[i];
+        }
+        catch (...) {}
+    }
+
+    sotDEBUGOUT(25);
+
+}
+
+
+
+void
 YoubotDevice::setSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
@@ -59,7 +112,7 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
         catch (...) {}
     }*/
 
-    // Joint velocity
+    /* Joint velocity*/
     it = sensorsIn.find("velocities");
     if (it != sensorsIn.end()) {
         std::vector<double> velIn = it->second.getValues();
@@ -91,12 +144,19 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
 
 void
 YoubotDevice::setupSetSensors(SensorMap &sensorsIn) {
-    setSensors(sensorsIn);
+    initSensors(sensorsIn);
 }
 
 void
 YoubotDevice::nominalSetSensors(SensorMap &sensorsIn) {
-    setSensors(sensorsIn);
+    if(init_required == true)
+    {
+    initSensors(sensorsIn);
+    }
+    else
+    {setSensors(sensorsIn);
+    }
+    init_required = false;
 }
 
 void

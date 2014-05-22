@@ -104,7 +104,8 @@ YoubotControllerPlugin::YoubotControllerPlugin()
 		  boost::unique_lock<boost::mutex> lock(mut);
 		  cond.wait(lock);
 		  startupPython();
-		  interpreter_->startRosService ();
+		  (*interpreter_).startRosService ();
+
 		  logout.open("/tmp/out.log", std::ios::out);
 
 }
@@ -257,7 +258,7 @@ void
 YoubotControllerPlugin::readControl() {
     ros::Time time = robot_->getTime();
     ros::Duration dt_ = time - last_time_;
-    last_time_ = time;
+    
 
     //  Arm controller
     joint_positionsOUT_ = controlValues_["joints"].getValues();
@@ -267,7 +268,7 @@ YoubotControllerPlugin::readControl() {
 
 
 
-    // arm control
+    // arm position control
 
     for (unsigned int i=12; i<joints_.size(); ++i) {
         //error[i] =  joints_[i]->velocity_ - joint_velocityOUT_[i];
@@ -295,7 +296,18 @@ YoubotControllerPlugin::readControl() {
 
         joints_[i]->commanded_effort_ += pids_[i].updatePid(error[i], errord, dt_);
 
-    }
+        }
+
+    /*arm velocity control
+
+    for (unsigned int i=12; i<joints_.size(); ++i) {
+        error[i] =  joints_[i]->velocity_ - joint_velocityOUT_[i];
+        joints_[i]->commanded_effort_ = pids_[i].updatePid(error[i], dt_);
+
+    }*/
+
+
+
 
     //arm control
     /*
@@ -343,6 +355,7 @@ YoubotControllerPlugin::readControl() {
         }
     }
     ++loop_count_;
+    last_time_ = time;
 }
 
 
@@ -372,14 +385,14 @@ YoubotControllerPlugin::starting() {
 		readControl();
   
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
-    timer.start();
+    //timer.start();
 
 }
 
 void
 YoubotControllerPlugin::update() {
-    timer.stop();
-    //std::cout <<"time elapsed is "<<timer.getElapsedTimeInMilliSec()<< std::endl;
+    timer.start();
+    
 		fillSensors();
  
     try {  
@@ -392,14 +405,15 @@ YoubotControllerPlugin::update() {
       cond2.notify_all();
 		  {
 		      boost::mutex::scoped_lock lock(wmut);
-          //cond3.wait(lock);
+          cond3.wait(lock);
 		      controlValues_ = _holdOut;
 		  }
 		}
 		catch (std::exception &e) {throw e; }
 
 		readControl();
-    timer.start();
+    timer.stop();
+    //std::cout <<"time elapsed is "<<timer.getElapsedTimeInMilliSec()<< std::endl;
 
 }
 
