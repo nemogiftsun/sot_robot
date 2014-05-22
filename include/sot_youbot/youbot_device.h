@@ -23,6 +23,7 @@ namespace sot_youbot {
         virtual ~YoubotDevice();
 
         void setSensors(SensorMap &sensorsIn);
+        void initSensors(SensorMap &sensorsIn);
 
         void setupSetSensors(SensorMap &sensorsIn);
         void nominalSetSensors(SensorMap &sensorsIn);
@@ -44,6 +45,7 @@ namespace sot_youbot {
         std::vector<double> baseff_;
         Timer timer;
         int loop_count_;
+        bool init_required;
     };
 }
 
