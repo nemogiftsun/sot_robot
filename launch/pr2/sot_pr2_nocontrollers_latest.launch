@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-      <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find pr2_description)/robots/pr2_no_kinect.urdf.xacro'" />
-      <param name="robot_description" command="$(find xacro)/xacro.py '$(find pr2_description)/robots/pr2_no_kinect.urdf.xacro'" />
+    <include file="$(find sot_youbot)/launch/pr2/upload_pr2.launch"/>
 
     <arg name="gui" default="True" />
     <param name="use_gui" value="$(arg gui)"/>
