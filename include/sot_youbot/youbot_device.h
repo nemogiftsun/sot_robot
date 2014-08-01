@@ -17,6 +17,7 @@ namespace sot_youbot {
         DYNAMIC_GRAPH_ENTITY_DECL();
     public:
         static const double TIMESTEP_DEFAULT;
+        static const int NUMJOINTS;
 
     public:
         YoubotDevice(const std::string &name);
