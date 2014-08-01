@@ -4,6 +4,7 @@ from dynamic_graph import plug, writeGraph
 from dynamic_graph.sot.core.meta_task_6d import toFlags
 from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits
 import time
+'''
 import dynamic_graph.sotcollision as sc
 a = sc.SotCollision("sc")
 a.createcollisionlink("base_link","box","internal",(0.65,0.65,0.25,0.0,0.0,0.175,0,0,0))
@@ -59,6 +60,13 @@ task_collision_avoidance.referenceInf.value = (0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0
 task_collision_avoidance.referenceSup.value = (2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10,2e10)
 task_collision_avoidance.dt.value=1
 task_collision_avoidance.controlGain.value=50.0
+'''
+from dynamic_graph.sot.core.meta_tasks import generic6dReference
+from dynamic_graph.sot.core.matrix_util import matrixToTuple
+from dynamic_graph import plug, writeGraph
+from dynamic_graph.sot.core.meta_task_6d import toFlags
+from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits
+import time
 #waisttask
 task_waist_metakine=MetaTaskKine6d('task_waist_metakine',robot.dynamic,'base_joint','base_joint')
 goal_waist = ((1.,0,0,0.0),(0,1.,0,-0.0),(0,0,1.,0.0),(0,0,0,1.),)
@@ -85,7 +93,6 @@ taskjl.dt.value = 1
 task_l_wrist_metakine=MetaTaskKine6d('task_l_wrist_metakine',robot.dynamic,'l_wrist_roll_joint','l_wrist_roll_joint')
 #goal_l_wrist = ((1.,0,0,0.748),(0,1.,0,0.246),(0,0,1.,0.639),(0,0,0,1.),)
 #goal_l_wrist = ((1.,0,0,0.649),(0,1.,0,-0.042),(0,0,1.,0.845),(0,0,0,1.),)
-
 goal_l_wrist = ((1.,0,0,0.486),(0,1.,0,-0.251),(0,0,1.,0.826),(0,0,0,1.),)
 task_l_wrist_metakine.feature.frame('desired')
 task_l_wrist_metakine.feature.selec.value = '000111'#RzRyRxTzTyTx
@@ -109,14 +116,14 @@ solver.damping.value =3e-2
 time.sleep(1)
 solver.push (taskjl.name)
 time.sleep(1)
-solver.push (task_collision_avoidance.name)
-time.sleep(1)
+#solver.push (task_collision_avoidance.name)
+#time.sleep(1)
 solver.push (task_waist_metakine.task.name)
 time.sleep(1)
 solver.push (task_torso_metakine.task.name)
 time.sleep(1)
-solver.push (task_r_wrist_metakine.task.name)
-time.sleep(1)
+#solver.push (task_r_wrist_metakine.task.name)
+#time.sleep(1)
 solver.push (task_l_wrist_metakine.task.name)
 time.sleep(1)
 plug (solver.control,robot.device.control)

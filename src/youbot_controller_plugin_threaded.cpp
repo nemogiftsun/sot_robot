@@ -16,15 +16,20 @@
 
 //boost units for unit assignment
 //#include <boost/units/systems/si/plane_angle.hpp>
-
+/*
+['fl_caster_rotation_joint', 'fl_caster_l_wheel_joint', 'fl_caster_r_wheel_joint', 'fr_caster_rotation_joint', 'fr_caster_l_wheel_joint', 'fr_caster_r_wheel_joint', 'bl_caster_rotation_joint', 'bl_caster_l_wheel_joint', 'bl_caster_r_wheel_joint', 'br_caster_rotation_joint', 'br_caster_l_wheel_joint', 'br_caster_r_wheel_joint', 'torso_lift_joint', 'torso_lift_motor_screw_joint', 'head_pan_joint', 'head_tilt_joint', 'laser_tilt_mount_joint', 'r_upper_arm_roll_joint', 'r_shoulder_pan_joint', 'r_shoulder_lift_joint', 'r_forearm_roll_joint', 'r_elbow_flex_joint', 'r_wrist_flex_joint', 'r_wrist_roll_joint', 'r_gripper_joint', 'r_gripper_l_finger_joint', 'r_gripper_r_finger_joint', 'r_gripper_r_finger_tip_joint', 'r_gripper_l_finger_tip_joint', 'r_gripper_motor_screw_joint', 'r_gripper_motor_slider_joint', 'l_upper_arm_roll_joint', 'l_shoulder_pan_joint', 'l_shoulder_lift_joint', 'l_forearm_roll_joint', 'l_elbow_flex_joint', 'l_wrist_flex_joint', 'l_wrist_roll_joint', 'l_gripper_joint', 'l_gripper_l_finger_joint', 'l_gripper_r_finger_joint', 'l_gripper_r_finger_tip_joint', 'l_gripper_l_finger_tip_joint', 'l_gripper_motor_screw_joint', 'l_gripper_motor_slider_joint']
+*/
 
 namespace sot_youbot {
 
 static const std::string JOINTNAME_PRE = "arm_joint_";
+//static const std::string ODOMFRAME = "odom";
+static const std::string ODOMFRAME = "odom_combined";
 
 const std::string YoubotControllerPlugin::LOG_PYTHON="/tmp/youbot_sot_controller.out";
 #define LOG_TRACE(x) sotDEBUG(25) << __FILE__ << ":" << __FUNCTION__ <<"(#" << __LINE__ << " ) " << x << std::endl
 
+//const JOINT_INIT_PTR = 
 
 // boost threading variables
 boost::condition_variable cond;
@@ -94,6 +99,7 @@ std::ofstream logout;
 YoubotControllerPlugin::YoubotControllerPlugin()
     : pr2_controller_interface::Controller(),
       device_("Pr2_device"),
+      //device_("youBot_device"),
       loop_count_(0),
       robot_(NULL),
       get_control(true),
@@ -177,7 +183,7 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
         }
     }
     // TF Listener
-    listener_.waitForTransform("base_link", "odom_combined", ros::Time(0), ros::Duration(1.0));
+    listener_.waitForTransform("base_link", ODOMFRAME, ros::Time(0), ros::Duration(1.0));
 
     // Allocate space
     const unsigned int jsz = joints_.size();
@@ -239,13 +245,14 @@ YoubotControllerPlugin::fillSensors() {
 
     // Get Odometry
     tf::StampedTransform current_transform;
-    listener_.lookupTransform("odom_combined","base_link",ros::Time(0), current_transform);
+    listener_.lookupTransform(ODOMFRAME,"base_link",ros::Time(0), current_transform);
+    //listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
     std::vector<double> odom(6);
     tf::Vector3 xyz = current_transform.getOrigin();
     tf::Quaternion q = current_transform.getRotation();
     odom[0] = xyz[0];
     odom[1] = xyz[1];
-    odom[2] = 0.0;
+    odom[2] = 0;//joints_[0]->position_;
     odom[3] = 0.0;
     odom[4] = 0.0;
     odom[5] = std::atan2(2*(q.w()*q.z() + q.x()*q.y()), 1 - 2*(q.y()*q.y() + q.z()*q.z()));
@@ -268,9 +275,9 @@ YoubotControllerPlugin::readControl() {
 
 
 
-    // arm position control
+    /* arm position control*/
 
-    for (unsigned int i=12; i<joints_.size(); ++i) {
+    for (unsigned int i=0; i<joints_.size(); ++i) {
         //error[i] =  joints_[i]->velocity_ - joint_velocityOUT_[i];
         //error[i] = joints_[i]->position_ - joint_positionsOUT_[i];
         double errord = joints_[i]->velocity_ - joint_velocityOUT_[i];
@@ -301,7 +308,7 @@ YoubotControllerPlugin::readControl() {
     /*arm velocity control
 
     for (unsigned int i=12; i<joints_.size(); ++i) {
-        error[i] =  joints_[i]->velocity_ - joint_velocityOUT_[i];
+        error[i] =  (joints_[i]->velocity_ - joint_velocityOUT_[i]/2);
         joints_[i]->commanded_effort_ = pids_[i].updatePid(error[i], dt_);
 
     }*/
@@ -405,8 +412,11 @@ YoubotControllerPlugin::update() {
       cond2.notify_all();
 		  {
 		      boost::mutex::scoped_lock lock(wmut);
-          cond3.wait(lock);
-		      controlValues_ = _holdOut;
+          //cond3.wait(lock);
+          if(_holdOut["joints"].getValues() == _holdOut["joints"].getValues())
+          {
+		        controlValues_ = _holdOut;
+          }
 		  }
 		}
 		catch (std::exception &e) {throw e; }
@@ -442,6 +452,7 @@ void YoubotControllerPlugin::startupPython()
     runPython (aof, "from dynamic_graph.sot.core import *",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core import  SOT,FeaturePosition, Task",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.pr2.prologue import robot",true, *interpreter_);
+    //runPython (aof, "from dynamic_graph.sot.youbot.prologue import robot",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.dyninv import SolverKine",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits",true, *interpreter_);
