@@ -6,7 +6,9 @@
 
 namespace sot_youbot {
 
-const double YoubotDevice::TIMESTEP_DEFAULT = 0.01;
+const double YoubotDevice::TIMESTEP_DEFAULT = 0.1;
+const int YoubotDevice::NUMJOINTS = 33;//pr2
+//const int YoubotDevice::NUMJOINTS = 7;//youbot
 
 YoubotDevice::YoubotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),
@@ -44,14 +46,15 @@ YoubotDevice::initSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
 
-    // Joint Posiitons
+    /* Joint Posiitons*/
     it = sensorsIn.find("joints");
     if (it != sensorsIn.end()) {
         std::vector<double> anglesIn = it->second.getValues();
         try {
         for (unsigned i=0;i<6; ++i)
             state_(i) = 0.;
-            for (unsigned i=0; i<45; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i) 
+            //for (unsigned i=0; i<7; ++i)
              {
                 state_(i+6) = anglesIn[i];              
              }
@@ -65,7 +68,8 @@ YoubotDevice::initSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             velocity_(i) = 0.;
-            for (unsigned i=0; i<45; ++i)
+            //  for (unsigned i=0; i<7; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i)
              {
                 velocity_(i+6) = velIn[i];              
              }
@@ -96,7 +100,7 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
 
-    /* Joint Posiitons
+    /* Joint Posiitons*/
     
     it = sensorsIn.find("joints");
     if (it != sensorsIn.end()) {
@@ -104,13 +108,13 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             state_(i) = 0.;
-            for (unsigned i=0; i<45; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i)
              {
                 state_(i+6) = anglesIn[i];              
              }
         }
         catch (...) {}
-    }*/
+    }
 
     /* Joint velocity*/
     it = sensorsIn.find("velocities");
@@ -119,8 +123,9 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             velocity_(i) = 0.;
-            for (unsigned i=0; i<45; ++i)
-             {
+            for (unsigned i=0; i<NUMJOINTS; ++i)
+            // for (unsigned i=0; i<7; ++i)
+               {
                 velocity_(i+6) = velIn[i];              
              }
         }
