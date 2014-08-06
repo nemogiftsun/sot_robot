@@ -34,7 +34,7 @@ class Pr2(AbstractMobileRobot):
     def __init__(self, name, device = None, tracer = None):
         AbstractMobileRobot.__init__ (self, name, tracer)
         # add operational points
-#        ip = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        ip = (0.,0.,0.,0.,0.,0.,0.011,0.0,0.0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.)
         self.OperationalPoints.append('base_joint')
         self.OperationalPoints.append('r_shoulder_pan_joint')
         self.OperationalPoints.append('r_shoulder_lift_joint')
@@ -42,11 +42,15 @@ class Pr2(AbstractMobileRobot):
         self.OperationalPoints.append('l_shoulder_lift_joint')
         self.OperationalPoints.append('r_wrist_roll_joint')
         self.OperationalPoints.append('l_wrist_roll_joint')
+        self.OperationalPoints.append('r_wrist_flex_joint')
+        self.OperationalPoints.append('l_wrist_flex_joint')
         self.OperationalPoints.append('torso_lift_joint')
         self.OperationalPoints.append('l_upper_arm_roll_joint')
         self.OperationalPoints.append('r_upper_arm_roll_joint')
         self.OperationalPoints.append('l_forearm_roll_joint')
         self.OperationalPoints.append('r_forearm_roll_joint')
+        self.OperationalPoints.append('l_forearm_flex_joint')
+        self.OperationalPoints.append('r_forearm_flex_joint')
 
 
 #        self.OperationalPoints.append('arm_joint_2')
@@ -60,8 +64,8 @@ class Pr2(AbstractMobileRobot):
         # load model
         self.dynamic.loadFromParameterServer()
         self.dimension = self.dynamic.getDimension()
-#        self.initPosition = ip
-        self.initPosition = (0.,) * self.dimension
+        self.initPosition = ip
+        #self.initPosition = (0.,) * self.dimension
         # initialize ur robot
         self.initializeRobot()        
 __all__ = ["Pr2"]
