@@ -49,8 +49,8 @@ class Pr2(AbstractMobileRobot):
         self.OperationalPoints.append('r_upper_arm_roll_joint')
         self.OperationalPoints.append('l_forearm_roll_joint')
         self.OperationalPoints.append('r_forearm_roll_joint')
-        self.OperationalPoints.append('l_forearm_flex_joint')
-        self.OperationalPoints.append('r_forearm_flex_joint')
+        #self.OperationalPoints.append('l_forearm_flex_joint')
+        #self.OperationalPoints.append('r_forearm_flex_joint')
 
 
 #        self.OperationalPoints.append('arm_joint_2')
