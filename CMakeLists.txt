@@ -1,74 +1,108 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-include(cmake/base.cmake)
-include(cmake/python.cmake)
+SET(CXX_DISABLE_WERROR TRUE)
+INCLUDE(cmake/base.cmake)
+INCLUDE(cmake/cpack.cmake)
 
 set(ROS_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
-#rosbuild_gensrv()
+project(sot_robot)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+find_package(catkin REQUIRED COMPONENTS pr2_controller_interface pr2_controller_manager realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf)
+
+find_package(Boost REQUIRED COMPONENTS program_options)
+
+catkin_package(CATKIN_DEPENDS message_runtime)
+
+SET(PROJECT_NAME sot_robot)
+SET(PROJECT_DESCRIPTION "sot controller for ros based robot")
+SET(PROJECT_URL "")
+
+#SETUP_PROJECT()
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_INSTALL_RPATH "${LIBRARY_OUTPUT_PATH}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
+set(PKG_CONFIG_ADDITIONAL_VARIABLES
+  ${PKG_CONFIG_ADDITIONAL_VARIABLES}
+  plugindirname
+  plugindir
+  )
 
 # Search for dependencies.
 ADD_REQUIRED_DEPENDENCY("jrl-mathtools")
 ADD_REQUIRED_DEPENDENCY("jrl-mal")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph")
+ADD_REQUIRED_DEPENDENCY("dynamic_graph_bridge")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph-python")
 ADD_REQUIRED_DEPENDENCY("sot-core")
-
-
-# This is required by the Python prologue.
 ADD_REQUIRED_DEPENDENCY("sot-dynamic")
 
 # Python
 INCLUDE(cmake/python.cmake)
 FINDPYTHON()
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS} include)
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
-    src/youbot_controller_plugin_threaded.cpp
-#    src/youbot_sot_controller.cpp
-    src/youbot_device.cpp
+    src/sot_robot_controller_threaded.cpp
+    src/sot_robot_device.cpp
     src/timer_utility.cpp)
-#    src/youbot_controller_node.cpp)
-#    src/yb_controlnode_thread.cpp)
+
 set(HEADERS
-    include/sot_youbot/youbot_controller_plugin_threaded.h
-    #include/sot_youbot/youbot_sot_controller.h
-    include/sot_youbot/youbot_device.h
-    include/sot_youbot/timer_utility.hh)
-#    include/sot_youbot/youbot_controller_node.hh)
-#    include/yb_controlnode_thread.hh)
+    include/sot_robot/sot_robot_controller_threaded.h
+    include/sot_robot/sot_robot_device.h
+    include/sot_robot/timer_utility.hh)
 
-rosbuild_add_library(sot_youbot SHARED ${HEADERS} ${SOURCES})
+add_library(sot_robot SHARED ${HEADERS} ${SOURCES})
 
-target_link_libraries(sot_youbot dynamic-graph)
-target_link_libraries(sot_youbot sot-core)
-target_link_libraries(sot_youbot dynamic-graph-python)
-target_link_libraries(sot_youbot ros_bridge)
-target_link_libraries(sot_youbot ros_interpreter)
+target_link_libraries(sot_robot dynamic-graph)
+target_link_libraries(sot_robot sot-core)
+target_link_libraries(sot_robot dynamic-graph-python)
+target_link_libraries(sot_robot ros_bridge)
+target_link_libraries(sot_robot ros_interpreter)
 
 
+#message(cmakeinstall ${CMAKE_INSTALL_LIBDIR})
+PKG_CONFIG_USE_DEPENDENCY(sot_robot "dynamic-graph")
+PKG_CONFIG_USE_DEPENDENCY(sot_robot "sot-core")
+PKG_CONFIG_USE_DEPENDENCY(sot_robot "dynamic-graph-python")
 
-rosbuild_add_library(sot_youbot ${HEADERS} ${SOURCES})
+set_target_properties(sot_robot PROPERTIES BUILD_WITH_INSTALL_RPATH True
+                      LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
-PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph")
-PKG_CONFIG_USE_DEPENDENCY(sot_youbot "sot-core")
-PKG_CONFIG_USE_DEPENDENCY(sot_youbot "dynamic-graph-python")
 
-#rosbuild_add_executable(testdemo src/yb_controlnode_thread.cpp src/youbot_device.cpp src/timer_utility.cpp)
+message(path ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-#rosbuild_add_executable(testdemo src/youbot_controller_node.cpp src/youbot_device.cpp src/timer_utility.cpp)
+install(TARGETS ${PROJECT_NAME}
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-#PKG_CONFIG_USE_DEPENDENCY(testdemo "dynamic-graph")
-#PKG_CONFIG_USE_DEPENDENCY(testdemo "sot-core")
-#PKG_CONFIG_USE_DEPENDENCY(testdemo "dynamic-graph-python")
-#target_link_libraries(testdemo  ros_bridge)
-#target_link_libraries(testdemo  ros_interpreter)
 
+## copy launch files
+install(DIRECTORY launch
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+   FILES_MATCHING PATTERN "*.launch"
+)
+
+install(DIRECTORY robot
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+## Mark other files for installation (e.g. launch and bag files, etc.)
+install(FILES
+  robot/pr2_sot_controller.yaml
+#   # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
+
+install(FILES
+  controller_plugins.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+message(path ${CMAKE_PREFIX_PATH})
 
 ADD_SUBDIRECTORY(src)

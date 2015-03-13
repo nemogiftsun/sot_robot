@@ -22,7 +22,7 @@
   <include filename="$(find pr2_description)/urdf/torso_v0/torso.urdf.xacro" />
   <!-- PR2 base 
   <include filename="$(find pr2_description)/urdf/base_v0/base.urdf.xacro" />-->
-  <include filename="$(find sot_youbot)/robot/urdf/pr2/pr2_base.urdf.xacro" />-->
+  <include filename="$(find sot_robot)/robot/urdf/pr2/pr2_base.urdf.xacro" />
   <!-- Head sensors -->
   <include filename="$(find pr2_description)/urdf/sensors/head_sensor_package.urdf.xacro" />
   <!-- Camera sensors -->

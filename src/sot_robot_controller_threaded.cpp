@@ -1,4 +1,4 @@
-#include "sot_youbot/youbot_controller_plugin_threaded.h"
+#include "sot_robot/sot_robot_controller_threaded.h"
 #include <pluginlib/class_list_macros.h>
 #include <geometry_msgs/Twist.h>
 #include <brics_actuator/JointVelocities.h>
@@ -9,24 +9,20 @@
 #include <stdlib.h> 
 #include "angles/angles.h"
 #include <dynamic_graph_bridge/ros_init.hh>
-
-
+#include <dynamic_graph_bridge/ros_interpreter.hh>
 #include <sot/core/debug.hh>
 #include <sot/core/exception-abstract.hh>
 
 //boost units for unit assignment
 //#include <boost/units/systems/si/plane_angle.hpp>
-/*
-['fl_caster_rotation_joint', 'fl_caster_l_wheel_joint', 'fl_caster_r_wheel_joint', 'fr_caster_rotation_joint', 'fr_caster_l_wheel_joint', 'fr_caster_r_wheel_joint', 'bl_caster_rotation_joint', 'bl_caster_l_wheel_joint', 'bl_caster_r_wheel_joint', 'br_caster_rotation_joint', 'br_caster_l_wheel_joint', 'br_caster_r_wheel_joint', 'torso_lift_joint', 'torso_lift_motor_screw_joint', 'head_pan_joint', 'head_tilt_joint', 'laser_tilt_mount_joint', 'r_upper_arm_roll_joint', 'r_shoulder_pan_joint', 'r_shoulder_lift_joint', 'r_forearm_roll_joint', 'r_elbow_flex_joint', 'r_wrist_flex_joint', 'r_wrist_roll_joint', 'r_gripper_joint', 'r_gripper_l_finger_joint', 'r_gripper_r_finger_joint', 'r_gripper_r_finger_tip_joint', 'r_gripper_l_finger_tip_joint', 'r_gripper_motor_screw_joint', 'r_gripper_motor_slider_joint', 'l_upper_arm_roll_joint', 'l_shoulder_pan_joint', 'l_shoulder_lift_joint', 'l_forearm_roll_joint', 'l_elbow_flex_joint', 'l_wrist_flex_joint', 'l_wrist_roll_joint', 'l_gripper_joint', 'l_gripper_l_finger_joint', 'l_gripper_r_finger_joint', 'l_gripper_r_finger_tip_joint', 'l_gripper_l_finger_tip_joint', 'l_gripper_motor_screw_joint', 'l_gripper_motor_slider_joint']
-*/
 
-namespace sot_youbot {
+namespace sot_robot {
 
 static const std::string JOINTNAME_PRE = "arm_joint_";
 //static const std::string ODOMFRAME = "odom";
 static const std::string ODOMFRAME = "odom_combined";
 
-const std::string YoubotControllerPlugin::LOG_PYTHON="/tmp/youbot_sot_controller.out";
+const std::string RobotControllerPlugin::LOG_PYTHON="/tmp/robot_sot_controller.out";
 #define LOG_TRACE(x) sotDEBUG(25) << __FILE__ << ":" << __FUNCTION__ <<"(#" << __LINE__ << " ) " << x << std::endl
 
 //const JOINT_INIT_PTR = 
@@ -42,7 +38,7 @@ bool data_ready;
 
 
 // thread functions for sot control
-void workThread(YoubotControllerPlugin *actl) {
+void workThread(RobotControllerPlugin *actl) {
 
     dynamicgraph::Interpreter aLocalInterpreter(actl->node_);
 
@@ -57,7 +53,7 @@ void workThread(YoubotControllerPlugin *actl) {
     ros::waitForShutdown();
 }
 
-void sampleAndHold(YoubotControllerPlugin *actl) {
+void sampleAndHold(RobotControllerPlugin *actl) {
 
     SensorMap deviceIn;
     ControlMap deviceOut;
@@ -96,7 +92,7 @@ void sampleAndHold(YoubotControllerPlugin *actl) {
 
 std::ofstream logout;
 
-YoubotControllerPlugin::YoubotControllerPlugin()
+RobotControllerPlugin::RobotControllerPlugin()
     : pr2_controller_interface::Controller(),
       device_("Pr2_device"),
       //device_("youBot_device"),
@@ -116,13 +112,13 @@ YoubotControllerPlugin::YoubotControllerPlugin()
 
 }
 
-YoubotControllerPlugin::~YoubotControllerPlugin() {
+RobotControllerPlugin::~RobotControllerPlugin() {
 }
 
 bool
-YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
+RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
     node_ = n;
-    cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
     arm_vel_pub_ = node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1000);
 
     // Check initialization
@@ -152,7 +148,7 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
             ROS_ERROR("Array of joint names should contain all strings. (namespace: %s)", node_.getNamespace().c_str());
             return false;
         }
-        YoubotJointPtr j;
+        RobotJointPtr j;
         j.reset(robot->getJointState((std::string)name_value));
         if (!j) {
             ROS_ERROR("Joint not found: %s. (namespace: %s)", ((std::string)name_value).c_str(), node_.getNamespace().c_str());
@@ -222,7 +218,7 @@ YoubotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
 }
 
 void
-YoubotControllerPlugin::fillSensors() {
+RobotControllerPlugin::fillSensors() {
     // Joint values/
     sensorsIn_["joints"].setName("position");
     //std::cout<<"[";
@@ -262,7 +258,7 @@ YoubotControllerPlugin::fillSensors() {
 }
 
 void
-YoubotControllerPlugin::readControl() {
+RobotControllerPlugin::readControl() {
     ros::Time time = robot_->getTime();
     ros::Duration dt_ = time - last_time_;
     
@@ -367,7 +363,7 @@ YoubotControllerPlugin::readControl() {
 
 
 void
-YoubotControllerPlugin::starting() {
+RobotControllerPlugin::starting() {
 		std::cout << "STARTING" << std::endl;
 		fillSensors();
 
@@ -397,7 +393,7 @@ YoubotControllerPlugin::starting() {
 }
 
 void
-YoubotControllerPlugin::update() {
+RobotControllerPlugin::update() {
     timer.start();
     
 		fillSensors();
@@ -428,7 +424,7 @@ YoubotControllerPlugin::update() {
 }
 
 void
-YoubotControllerPlugin::stopping() {
+RobotControllerPlugin::stopping() {
     std::cout << "STOPPING" << std::endl;
     // take care everything is destroyed
     // and robot freezes 
@@ -437,7 +433,7 @@ YoubotControllerPlugin::stopping() {
 
 
 // python interactor services
-void YoubotControllerPlugin::startupPython() 
+void RobotControllerPlugin::startupPython() 
 {
     std::ofstream aof(LOG_PYTHON.c_str());
     runPython (aof, "import sys, os",true, *interpreter_);
@@ -471,7 +467,7 @@ void YoubotControllerPlugin::startupPython()
     aof.close();
 }
 
-void YoubotControllerPlugin::runPython(std::ostream &file,
+void RobotControllerPlugin::runPython(std::ostream &file,
                             const std::string &command,bool print,
                             dynamicgraph::Interpreter &interpreter) 
 {
@@ -497,7 +493,12 @@ void YoubotControllerPlugin::runPython(std::ostream &file,
 
 
 /// Register controller to pluginlib
-PLUGINLIB_EXPORT_CLASS(sot_youbot::YoubotControllerPlugin,
-                       pr2_controller_interface::Controller)
+PLUGINLIB_EXPORT_CLASS( sot_robot::RobotControllerPlugin,
+                         pr2_controller_interface::Controller)
 
+/*PLUGINLIB_DECLARE_CLASS(sot_robot,
+                        RobotControllerPlugin,
+                        sot_robot::RobotControllerPlugin,
+                        controller_interface::ControllerBase)
+*/
 }

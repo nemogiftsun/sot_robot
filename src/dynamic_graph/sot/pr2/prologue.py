@@ -8,7 +8,7 @@ from dynamic_graph.sot.core import  SOT,FeaturePosition, Task
 #from dynamic_graph.sot.youbot.youbot_device import YoubotDevice
 from dynamic_graph.entity import PyEntityFactoryClass
 
-Device = PyEntityFactoryClass('YoubotDevice')
+Device = PyEntityFactoryClass('RobotDevice')
 robot = Pr2(name = 'Pr2', device = Device('Pr2_device'))
 dimension = robot.dynamic.getDimension()
 plug(robot.device.state, robot.dynamic.position)

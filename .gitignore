@@ -12,3 +12,7 @@ srv_gen/
 
 *.cfgc
 *~
+*.swm
+*.swn
+*.swo
+*.swp

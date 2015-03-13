@@ -1,16 +1,16 @@
-#include "sot_youbot/youbot_device.h"
+#include "sot_robot/sot_robot_device.h"
 
 #include <sot/core/debug.hh>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 
-namespace sot_youbot {
+namespace sot_robot {
 
-const double YoubotDevice::TIMESTEP_DEFAULT = 0.1;
-const int YoubotDevice::NUMJOINTS = 33;//pr2
-//const int YoubotDevice::NUMJOINTS = 7;//youbot
+const double RobotDevice::TIMESTEP_DEFAULT = 0.1;
+const int RobotDevice::NUMJOINTS = 33;//pr2
+//const int RobotDevice::NUMJOINTS = 7;//robot
 
-YoubotDevice::YoubotDevice(const std::string &name)
+RobotDevice::RobotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),
   timestep_(TIMESTEP_DEFAULT),
   previous_state_(),
@@ -38,11 +38,11 @@ YoubotDevice::YoubotDevice(const std::string &name)
      sotDEBUGOUT(25);
 }
 
-YoubotDevice::~YoubotDevice() {
+RobotDevice::~RobotDevice() {
 }
 
 void
-YoubotDevice::initSensors(SensorMap &sensorsIn) {
+RobotDevice::initSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
 
@@ -96,7 +96,7 @@ YoubotDevice::initSensors(SensorMap &sensorsIn) {
 
 
 void
-YoubotDevice::setSensors(SensorMap &sensorsIn) {
+RobotDevice::setSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
     SensorMap::iterator it;
 
@@ -148,12 +148,12 @@ YoubotDevice::setSensors(SensorMap &sensorsIn) {
 }
 
 void
-YoubotDevice::setupSetSensors(SensorMap &sensorsIn) {
+RobotDevice::setupSetSensors(SensorMap &sensorsIn) {
     initSensors(sensorsIn);
 }
 
 void
-YoubotDevice::nominalSetSensors(SensorMap &sensorsIn) {
+RobotDevice::nominalSetSensors(SensorMap &sensorsIn) {
     if(init_required == true)
     {
     initSensors(sensorsIn);
@@ -165,12 +165,12 @@ YoubotDevice::nominalSetSensors(SensorMap &sensorsIn) {
 }
 
 void
-YoubotDevice::cleanupSetSensors(SensorMap &sensorsIn) {
+RobotDevice::cleanupSetSensors(SensorMap &sensorsIn) {
     setSensors(sensorsIn);
 }
 
 void
-YoubotDevice::findControl() {
+RobotDevice::findControl() {
     sotDEBUGIN(25);
     std::vector<double> anglesOut;
     anglesOut.resize(state_.size());
@@ -185,7 +185,7 @@ YoubotDevice::findControl() {
 }
 
 void
-YoubotDevice::getControl(ControlMap &controlOut) {
+RobotDevice::getControl(ControlMap &controlOut) {
 
     sotDEBUGIN(25);
     std::vector<double> anglesOut;
@@ -300,7 +300,7 @@ YoubotDevice::getControl(ControlMap &controlOut) {
 }
 
 void
-YoubotDevice::updateRobotState(const std::vector<double> &anglesIn)
+RobotDevice::updateRobotState(const std::vector<double> &anglesIn)
 {
     sotDEBUGIN(25);
     for (unsigned i=0; i<anglesIn.size(); ++i)
@@ -312,6 +312,6 @@ YoubotDevice::updateRobotState(const std::vector<double> &anglesIn)
 }
 
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(YoubotDevice,"YoubotDevice");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(RobotDevice,"RobotDevice");
 
 }

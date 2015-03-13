@@ -1,5 +1,7 @@
-<library path="lib/libsot_youbot">
-  <class name="sot_youbot/YoubotSOTControllerPlugin"
-         type="sot_youbot::YoubotControllerPlugin"
-         base_class_type="pr2_controller_interface::Controller" />
+<library path="lib/libsot_robot">
+  <class name="sot_robot/RobotControllerPlugin"
+         type="sot_robot::RobotControllerPlugin"
+         base_class_type="pr2_controller_interface::Controller" />  
 </library>
+
+

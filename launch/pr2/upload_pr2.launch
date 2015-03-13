@@ -2,5 +2,6 @@
 <launch>
       <param name="robot_description" command="$(find xacro)/xacro.py '$(find pr2_description)/robots/pr2_no_kinect.urdf.xacro'" />
 
-      <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find sot_youbot)/robot/urdf/pr2/pr2_sot.urdf.xacro'" />
+      <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find sot_robot)/robot/urdf/pr2/pr2_sot.urdf.xacro'" />
+
 </launch>

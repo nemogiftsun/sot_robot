@@ -1,27 +1,27 @@
-#ifndef PR2_DEVICE_H
-#define PR2_DEVICE_H
+#ifndef ROBOT_DEVICE_H
+#define ROBOT_DEVICE_H
 
 #include <sot/core/device.hh>
 #include <dynamic-graph/linear-algebra.h>
 #include <sot/core/abstract-sot-external-interface.hh>
-#include <sot_youbot/timer_utility.hh>
+#include <sot_robot/timer_utility.hh>
 
 using namespace timer;
 
-namespace sot_youbot {
+namespace sot_robot {
 
     typedef std::map<std::string, dynamicgraph::sot::SensorValues> SensorMap;
     typedef std::map<std::string, dynamicgraph::sot::ControlValues> ControlMap;
 
-    class YoubotDevice : public dynamicgraph::sot::Device {
+    class RobotDevice : public dynamicgraph::sot::Device {
         DYNAMIC_GRAPH_ENTITY_DECL();
     public:
         static const double TIMESTEP_DEFAULT;
         static const int NUMJOINTS;
 
     public:
-        YoubotDevice(const std::string &name);
-        virtual ~YoubotDevice();
+        RobotDevice(const std::string &name);
+        virtual ~RobotDevice();
 
         void setSensors(SensorMap &sensorsIn);
         void initSensors(SensorMap &sensorsIn);
