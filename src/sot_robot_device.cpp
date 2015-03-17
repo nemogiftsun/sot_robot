@@ -1,5 +1,4 @@
 #include "sot_robot/sot_robot_device.h"
-
 #include <sot/core/debug.hh>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>

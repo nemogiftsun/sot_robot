@@ -1,9 +1,6 @@
 #include "sot_robot/sot_robot_controller_threaded.h"
 #include <pluginlib/class_list_macros.h>
 #include <geometry_msgs/Twist.h>
-#include <brics_actuator/JointVelocities.h>
-#include <brics_actuator/JointValue.h>
-#include <brics_actuator/JointPositions.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <stdlib.h> 
@@ -118,9 +115,6 @@ RobotControllerPlugin::~RobotControllerPlugin() {
 bool
 RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
     node_ = n;
-    cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
-    arm_vel_pub_ = node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1000);
-
     // Check initialization
     if (!robot) {
         ROS_ERROR_STREAM("NULL robot pointer");
