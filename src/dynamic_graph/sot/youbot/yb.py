@@ -211,13 +211,13 @@ ip = (0.200, -0.006, 0.377,-0.155, 0.414, -0.555)
 zp = (0.198, 0.001, 0.581 ,-0.000, 0.001, 0.010)
 prl = (0.506, -0.001, 0.125,-3.115, 0.228, -3.029)
 aov = (-0.136, -0.005, 0.389,0.005, -0.575, 0.010)
-goal = matrixToTuple(generic6dReference(zp))
+goal = matrixToTuple(generic6dReference(prl))
 print goal
 solver.damping.value =3e-2
 task_wrist_metakine.gain.setConstant(10)
 #task_wrist_metakine.feature.selec.value = '000111'
 task_wrist_metakine.featureDes.position.value = goal
-#solver.push (taskjl.name)
+solver.push (taskjl.name)
 #solver.push (task_waist_metakine.task.name)
 solver.push (task_wrist_metakine.task.name)
 plug (solver.control,robot.device.control)
@@ -281,7 +281,7 @@ from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d
 robot.initializeTracer('/home/nemogiftsun/laas/devel/data/youbot/')
 ############ jl task ##########################
 ll = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0100692,0.0100692,-5.02655,0.0221239,0.110619,0,0)
-hl = (2e10,2e10,2e10,2e10,2e10,2e10,5.84014,2.61799,-0.015708,3.4292,5.64159,0,0)
+hl = (3e10, 3e10, 3e10, 3e10, 3e10, 3e10,5.84014,2.61799,-0.015708,3.4292,5.64159,0,0)
 taskjl = TaskJointLimits('taskJL')
 plug(robot.dynamic.position,taskjl.position)
 taskjl.controlGain.value = 10
@@ -291,26 +291,27 @@ taskjl.dt.value = 1
 ############ waist task ########################
 task_waist_metakine=MetaTaskKine6d('task_waist_metakine',robot.dynamic,'base_joint','base_joint')
 goal_waist = ((1.,0,0,0.0),(0,1.,0,-0.0),(0,0,1.,0),(0,0,0,1.),)
-#task_waist_metakine.feature.selec.value = '011101'#RzRyRxTzTyTx
+task_waist_metakine.feature.selec.value = '011100'#RzRyRxTzTyTx
 task_waist_metakine.gain.setConstant(1)
 task_waist_metakine.featureDes.position.value = goal_waist
 ############ wrist task ########################
 task_wrist_metakine=MetaTaskKine6d('task_wrist_metakine',robot.dynamic,'arm_joint_5','arm_joint_5')
 ip = (0.200, -0.006, 0.377,-0.155, 0.414, -0.555)
 zp = (0.155, 0.001, 0.558 ,-0.000, 0.001, 0.010)
+prl = (0.432, -0.047, 0.105,0,0,0)
 #zp = (0.198, 0.001, 0.581 ,-0.000, 0.001, 0.010)
-prl = (0.506, -0.001, -0.125,-3.115, 0.228, -3.029)
+prl = (0.632, -0.047, 0.105,0,0,0)
 #prl = (0.606, -0.001, 0.425,-3.115, 0.228, -3.029)
 aov = (-0.136, -0.005, 0.389,0.005, -0.575, 0.010)
 pp = (0.567, -0.013, 0.260,0,0,0)
 pr = (0.08,0.02,0.528,0,0,0)
-goal = matrixToTuple(generic6dReference(zp))
+goal = matrixToTuple(generic6dReference(ip))
 solver.damping.value =3e-2
 task_wrist_metakine.gain.setConstant(2)
 task_wrist_metakine.feature.selec.value = '000111'
 task_wrist_metakine.featureDes.position.value = goal
-robot.addTrace(task_wrist_metakine.task.name,'error')
-robot.addTrace(solver.name,'control')
+#robot.addTrace(task_wrist_metakine.task.name,'error')
+#robot.addTrace(solver.name,'control')
 solver.push (taskjl.name)
 time.sleep(1)
 solver.push (task_waist_metakine.task.name)

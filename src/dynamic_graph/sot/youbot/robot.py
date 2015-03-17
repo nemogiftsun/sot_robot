@@ -48,7 +48,8 @@ class youbot(AbstractMobileRobot):
         self.OperationalPoints.append('arm_joint_3')      
         self.OperationalPoints.append('arm_joint_4')
         self.OperationalPoints.append('arm_joint_5')
-
+        self.OperationalPoints.append('gripper_finger_joint_l')
+        self.OperationalPoints.append('gripper_finger_joint_r')
         # device and dynamic model assignment
         self.device = device
         self.dynamic = RosRobotModel("{0}_dynamic".format(name))

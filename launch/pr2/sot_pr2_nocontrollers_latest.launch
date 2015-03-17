@@ -2,7 +2,7 @@
 <launch>
     <include file="$(find sot_youbot)/launch/pr2/upload_pr2.launch"/>
 
-    <arg name="gui" default="True" />
+    <arg name="gui" default="False" />
     <param name="use_gui" value="$(arg gui)"/>
     <param name="robot_base_link" value="base_footprint"/>
     <!--<param name="ref_link" value="odom_combined"/>-->
