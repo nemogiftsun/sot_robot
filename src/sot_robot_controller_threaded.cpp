@@ -1,9 +1,6 @@
 #include "sot_robot/sot_robot_controller_threaded.h"
 #include <pluginlib/class_list_macros.h>
 #include <geometry_msgs/Twist.h>
-#include <brics_actuator/JointVelocities.h>
-#include <brics_actuator/JointValue.h>
-#include <brics_actuator/JointPositions.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <stdlib.h> 
