@@ -1,10 +1,12 @@
+#ifndef TIMER_UTILITY_HH
+#define TIMER_UTILITY_HH
+
 #include <cstdio>
 #include <cstddef>
 #include <fstream>
 #include <sys/time.h>
 
-#ifndef TIMER_UTILITY_HH
-#define TIMER_UTILITY_HH
+
 
 namespace timer
 {

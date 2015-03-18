@@ -115,9 +115,6 @@ RobotControllerPlugin::~RobotControllerPlugin() {
 bool
 RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
     node_ = n;
-    cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
-    arm_vel_pub_ = node_.advertise<brics_actuator::JointVelocities>("/arm_1/arm_controller/velocity_command",1000);
-
     // Check initialization
     if (!robot) {
         ROS_ERROR_STREAM("NULL robot pointer");
