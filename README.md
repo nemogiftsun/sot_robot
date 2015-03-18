@@ -49,12 +49,10 @@ steps:
   
       rosrun rviz rviz
 
-
-    
-* Copy the script from https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/pr2/joint_posture_task.py 
+* Copy the script from https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/pr2/joint_posture_task.py. The script can be modified to reach different joint configurations. 
 
 * Start the python interactor and paste/run the script in the interactor
 
       rosrun dynamic_graph_bridge run_command
 
-
+* Verify if the task in successful in rviz
