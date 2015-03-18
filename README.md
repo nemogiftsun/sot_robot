@@ -32,10 +32,8 @@ steps:
      It is recommanded to set variable DEVEL_DIR in your .bashrc for future use.
 
   3. Copy Config and Makefile from scripts/installation
-      - copy the config.sh file to $DEVEL_DIR
-          wget -O $DEVEL_DIR/config.sh https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/installation/config.sh
-      - copy the Makefile to src
-          $DEVEL_DIR/src/Makefile https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/installation/Makefile
+      -  wget -O $DEVEL_DIR/config.sh https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/installation/config.sh
+      -  wget -O $DEVEL_DIR/src/Makefile https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/installation/Makefile
   
   4. cd into $DEVEL_DIR and type
 
