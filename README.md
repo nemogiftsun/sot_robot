@@ -20,8 +20,6 @@ steps:
     - ros-hydro-robot_model
     - ros-hydro-pr2-controllers
     - ros-hydro-ros-control
-    - asciidoc,
-    - source-highlight,
     - git
         
 
@@ -42,3 +40,21 @@ steps:
   5. cd into $DEVEL_DIR/src and type
 
     make all
+  
+### Testing
+
+      roslaunch sot_robot sot_pr2_bringup_sim.launch
+
+      roslaunch sot_robot spawn_pr2_controller.launch
+  
+      rosrun rviz rviz
+
+
+    
+* Copy the script from https://raw.githubusercontent.com/nemogiftsun/sot_robot/hydro/script/pr2/joint_posture_task.py 
+
+* Start the python interactor and paste/run the script in the interactor
+
+      rosrun dynamic_graph_bridge run_command
+
+
