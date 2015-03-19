@@ -72,9 +72,9 @@ sot_robot.configure.dep: eigen3.install sot-dyninv.install dynamic_graph_bridge.
 
 jrl_dynamics_urdf.configure.dep: sot-dynamic.install \ jrl_dynamics_urdf.checkout
 
-dynamic_graph_bridge_msgs.configure.dep: dynamic_graph_bridge_msgs.checkout
+dynamic_graph_bridge_msgs.configure.dep: \ dynamic_graph_bridge_msgs.checkout
 
-dynamic_graph_bridge.configure.dep: jrl_dynamics_urdf.install dynamic_graph_bridge_msgs.install \ dynamic_graph_bridge.checkout
+dynamic_graph_bridge.configure.dep:dynamic_graph_bridge_msgs.install jrl_dynamics_urdf.install \ dynamic_graph_bridge.checkout
 
 eigen3.configure.dep: eigen3.checkout
 
@@ -120,7 +120,7 @@ log:
 	done
 
 update:
-	for d in hpp-util hpp-model hpp-model-urdf hpp-core hpp-template-corba hpp-corbaserver hpp-constraints hpp-wholebody-step hpp-wholebody-step-corba hpp-doc ; do \
+	for d in dynamic-graph ; do \
 	echo "Updating $$d";\
 	make $$d.update; done
 
