@@ -3,9 +3,7 @@ FINDPYTHON()
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 
-
-
-
+PYTHON_INSTALL("dynamic_graph/sot/dynamics" "mobile_robot.py" "${PYTHON_SITELIB}")
 
 PYTHON_INSTALL("dynamic_graph/sot/youbot" "__init__.py" "${PYTHON_SITELIB}")
 PYTHON_INSTALL("dynamic_graph/sot/youbot" "robot.py" "${PYTHON_SITELIB}")
