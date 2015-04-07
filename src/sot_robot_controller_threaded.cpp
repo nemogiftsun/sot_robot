@@ -446,9 +446,7 @@ void RobotControllerPlugin::startupPython()
     runPython (aof, "from dynamic_graph.sot.dyninv import SolverKine",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits",true, *interpreter_);
-    runPython (aof, "import dynamic_graph.sotcollision as sc",true, *interpreter_);
 
-    runPython (aof, "a = sc.SotCollision('sc')",true, *interpreter_);
     runPython (aof, "dt = 0",true, *interpreter_);
 
     runPython (aof, "solver = SolverKine('sot_solver')",true, *interpreter_);
