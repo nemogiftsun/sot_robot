@@ -186,7 +186,7 @@ RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHan
     error_raw.resize(jsz);
     error.resize(jsz);
 
-    /*controller_state_publisher_.reset(
+    controller_state_publisher_.reset(
         new realtime_tools::RealtimePublisher<control_msgs::JointTrajectoryControllerState>
                 (node_, "state", 1));
     controller_state_publisher_->lock();
@@ -199,7 +199,7 @@ RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHan
     controller_state_publisher_->msg_.actual.velocities.resize(joints_.size());
     controller_state_publisher_->msg_.error.positions.resize(joints_.size());
     controller_state_publisher_->msg_.error.velocities.resize(joints_.size());
-    controller_state_publisher_->unlock();*/
+    controller_state_publisher_->unlock();
 
     timeFromStart_ = 0.0;
 
