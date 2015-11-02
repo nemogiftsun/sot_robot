@@ -8,10 +8,20 @@ set(ROS_BUILD_TYPE RelWithDebInfo)
 
 project(sot_robot)
 
-find_package(catkin REQUIRED COMPONENTS pr2_controller_interface pr2_controller_manager realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf)
+find_package(catkin REQUIRED COMPONENTS pr2_controller_interface pr2_controller_manager realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf rospy rqt_gui_py)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
+
+##gui
+#find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+#include(${QT_USE_FILE})
+#include(${QT_USE_FILE})
+#add_definitions(-DQT_NO_KEYWORDS)
+#qt4_wrap_cpp(MOC_FILES
+#  include/gui/myviz.h
+#)
+#catkin_python_setup()
 catkin_package(CATKIN_DEPENDS message_runtime)
 
 SET(PROJECT_NAME sot_robot)
@@ -54,6 +64,10 @@ set(HEADERS
     include/sot_robot/sot_robot_controller_threaded.h
     include/sot_robot/sot_robot_device.h
     include/sot_robot/timer_utility.hh)
+
+
+
+#add_library(sot_robot ${SOURCES_GUI})
 
 add_library(sot_robot SHARED ${HEADERS} ${SOURCES})
 
@@ -103,6 +117,21 @@ install(FILES
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+############# GUI ################################
+install(FILES gui_plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(DIRECTORY resource
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(PROGRAMS
+  script/rqt_rpc
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+install(PROGRAMS
+  script/rqt_rpc_robot
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 message(path ${CMAKE_PREFIX_PATH})
 
 ADD_SUBDIRECTORY(src)

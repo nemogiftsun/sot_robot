@@ -1,6 +1,7 @@
 print("sot_youbot")
 print("Prologue loaded.")
 
+'''
 from dynamic_graph import plug
 from dynamic_graph.sot.pr2.robot import Pr2
 from dynamic_graph.sot.core import  SOT,FeaturePosition, Task
@@ -18,5 +19,11 @@ solver = SOT ('solver')
 solver.setSize (robot.dynamic.getDimension())
 plug (solver.control, robot.device.control)
 
-__all__ = ["robot"]
+'''
+#import sys
+from dynamic_graph.sot.pr2.sot_interface import SOTInterface
+sot = SOTInterface('Pr2_device')
+sot.connectDeviceWithSolver(False)
+
+__all__ = ["sot"]
 

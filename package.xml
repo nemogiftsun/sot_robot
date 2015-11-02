@@ -30,9 +30,8 @@
   <build_depend>pr2_controller_interface</build_depend>
   <build_depend>pr2_controller_manager</build_depend>
   <build_depend>pr2_mechanism_model</build_depend>
-
-
-
+	<build_depend>rospy</build_depend>
+	<build_depend>rqt_gui_py</build_depend>
 
   <run_depend>pr2_controller_interface</run_depend>
   <run_depend>pr2_controller_manager</run_depend>
@@ -50,6 +49,8 @@
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>urdf</run_depend>
+	<run_depend>rospy</run_depend>
+	<run_depend>rqt_gui_py</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
@@ -59,8 +60,10 @@
 
     <!-- Other tools can request additional information be placed here -->
     <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
-
+		<rqt_gui plugin="${prefix}/gui_plugin.xml"/>
   </export>
+
+
 
 
 </package>

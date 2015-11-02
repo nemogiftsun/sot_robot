@@ -9,7 +9,6 @@ from dynamic_graph.sot.core.meta_task_6d import toFlags
 from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d
 from dynamic_graph.sot.dyninv import SolverKine
-import dynamic_graph.sotcollision as sc
 from numpy import *
 
 # JOINT LIMIT INEQUALITY 
@@ -36,7 +35,9 @@ task_waist_metakine.featureDes.position.value = goal_waist
 posture_feature = FeaturePosture('featurePosition')
 plug(robot.device.state,posture_feature.state)
 robotDim = len(robot.dynamic.velocity.value)
-posture_feature.posture.value = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+posture_feature.posture.value = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+posture_feature.posture.value = [0,0,0,0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.12, 0.05, 1.3, -0.6, -1.5,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.09, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+###
 postureTaskDofs = [True]*(36)
 for dof,isEnabled in enumerate(postureTaskDofs):
     if dof > 6:

@@ -1,0 +1,39 @@
+<library path="src">
+  <class name="RPCPlugin" type="rqt_rpc.rpc_module.RPCPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Basic SOT user interface for robot control.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>RPC Plugin</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Basic SOT user interface for robot control.</statustip>
+    </qtgui>
+  </class>
+  <class name="SOTController" type="rqt_rpc.rpc_module_real.SOTController" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Basic SOT user interface for robot control.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>RPC on the Robot</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Basic SOT user interface for robot control.</statustip>
+    </qtgui>
+  </class>
+</library>
+

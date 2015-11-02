@@ -236,7 +236,8 @@ RobotControllerPlugin::fillSensors() {
     // Get Odometry
     tf::StampedTransform current_transform;
     listener_.lookupTransform(ODOMFRAME,"base_link",ros::Time(0), current_transform);
-    //listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
+
+ //listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
     std::vector<double> odom(6);
     tf::Vector3 xyz = current_transform.getOrigin();
     tf::Quaternion q = current_transform.getRotation();
@@ -431,13 +432,17 @@ void RobotControllerPlugin::startupPython()
 {
     std::ofstream aof(LOG_PYTHON.c_str());
     runPython (aof, "import sys, os",true, *interpreter_);
-    runPython (aof, "pythonpath = os.environ['PYTHONPATH']",true, *interpreter_);
+    runPython (aof, "pythonpath = os.environ['PYTHONPATH']",true, *interpreter_);  
     runPython (aof, "path = []",true, *interpreter_);
     runPython (aof, "for p in pythonpath.split(':'):\n"
                     "  if p not in sys.path:\n"
                     "    path.append(p)",true, *interpreter_);
     runPython (aof, "path.extend(sys.path)",true, *interpreter_);
     runPython (aof, "sys.path = path",true, *interpreter_);
+    runPython (aof, "from dynamic_graph.sot.pr2.prologue import sot",true, *interpreter_);
+
+
+/*
     runPython (aof, "from dynamic_graph import plug",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core import *",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.core import  SOT,FeaturePosition, Task",true, *interpreter_);
@@ -453,6 +458,7 @@ void RobotControllerPlugin::startupPython()
     runPython (aof, "solver.setSize (robot.dynamic.getDimension())",true, *interpreter_);
     runPython (aof, "robot.device.resize (robot.dynamic.getDimension())",true, *interpreter_);
 
+*/
     //runPython (aof, "plug (solver.control, robot.device.control)",true, *interpreter_);
     dynamicgraph::rosInit(true);
 
@@ -479,6 +485,7 @@ void RobotControllerPlugin::runPython(std::ostream &file,
             if (print == true){file << lres << std::endl;} else{}
     }
 }
+
 
 
 
