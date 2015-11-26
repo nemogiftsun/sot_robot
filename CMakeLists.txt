@@ -57,13 +57,11 @@ LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
     src/sot_robot_controller_threaded.cpp
-    src/sot_robot_device.cpp
-    src/timer_utility.cpp)
+    src/sot_robot_device.cpp)
 
 set(HEADERS
     include/sot_robot/sot_robot_controller_threaded.h
-    include/sot_robot/sot_robot_device.h
-    include/sot_robot/timer_utility.hh)
+    include/sot_robot/sot_robot_device.h)
 
 
 
