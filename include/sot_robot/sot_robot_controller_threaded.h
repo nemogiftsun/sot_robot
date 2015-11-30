@@ -9,7 +9,6 @@
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <tf/transform_listener.h>
 #include <sensor_msgs/JointState.h>
-#include <sot_robot/timer_utility.hh>
 #include <sot_robot/sot_robot_device.h>
 
 using namespace timer;
@@ -79,7 +78,7 @@ private:
         realtime_tools::RealtimePublisher<
             control_msgs::JointTrajectoryControllerState> > controller_state_publisher_;
 
-    ros::Publisher cmd_vel_pub_, arm_vel_pub_ ;
+    ros::Publisher cmd_vel_pub_ ;
 
     tf::TransformListener listener_;
 
