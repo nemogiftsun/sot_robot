@@ -1,4 +1,4 @@
-print("sot_youbot")
+print("sot_robot")
 print("Prologue loaded.")
 
 '''
@@ -22,7 +22,7 @@ plug (solver.control, robot.device.control)
 '''
 #import sys
 from dynamic_graph.sot.pr2.sot_interface import SOTInterface
-sot = SOTInterface('Ur5_device')
+sot = SOTInterface('Ur_device')
 sot.connectDeviceWithSolver(False)
 
 __all__ = ["sot"]

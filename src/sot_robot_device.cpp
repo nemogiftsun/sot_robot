@@ -6,8 +6,9 @@
 namespace sot_robot {
 
 const double RobotDevice::TIMESTEP_DEFAULT = 0.1;
-const int RobotDevice::NUMJOINTS = 33;//pr2
+//const int RobotDevice::NUMJOINTS = 33;//pr2
 //const int RobotDevice::NUMJOINTS = 7;//robot
+const int RobotDevice::NUMJOINTS = 7;//robot
 
 RobotDevice::RobotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),

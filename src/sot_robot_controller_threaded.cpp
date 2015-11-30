@@ -22,7 +22,6 @@ static const std::string ODOMFRAME = "odom_combined";
 const std::string RobotControllerPlugin::LOG_PYTHON="/tmp/robot_sot_controller.out";
 #define LOG_TRACE(x) sotDEBUG(25) << __FILE__ << ":" << __FUNCTION__ <<"(#" << __LINE__ << " ) " << x << std::endl
 
-//const JOINT_INIT_PTR = 
 
 // boost threading variables
 boost::condition_variable cond;
@@ -58,7 +57,7 @@ void sampleAndHold(RobotControllerPlugin *actl) {
     // Wait the start flag
     boost::unique_lock<boost::mutex> lock(wait_start);
     cond2.wait(lock);
-
+	
     // Go go go !!!
     while (true) {
         {
@@ -89,31 +88,36 @@ void sampleAndHold(RobotControllerPlugin *actl) {
 
 std::ofstream logout;
 
+
+//Constructor
 RobotControllerPlugin::RobotControllerPlugin()
     : pr2_controller_interface::Controller(),
-      device_("Pr2_device"),
+      //device_("Pr2_device"),
       //device_("youBot_device"),
+      device_("Ur_device")
       loop_count_(0),
       robot_(NULL),
       get_control(true),
       count_loop(0){
 
-		  boost::thread thr(workThread,this);
-		  LOG_TRACE("");
-		  boost::unique_lock<boost::mutex> lock(mut);
-		  cond.wait(lock);
-		  startupPython();
-		  (*interpreter_).startRosService ();
-		  logout.open("/tmp/out.log", std::ios::out);
+	boost::thread thr(workThread,this);
+	LOG_TRACE("");
+	boost::unique_lock<boost::mutex> lock(mut);
+	cond.wait(lock);
+	startupPython();
+	(*interpreter_).startRosService ();
+	logout.open("/tmp/out.log", std::ios::out);
 
 }
 
+
+// Destructor
 RobotControllerPlugin::~RobotControllerPlugin() {
+
 }
 
-bool
-RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
-    node_ = n;
+bool RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
+	node_ = n;
     cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
     // Check initialization
     if (!robot) {
@@ -172,6 +176,7 @@ RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHan
             }
         }
     }
+
     // TF Listener
     listener_.waitForTransform("base_link", ODOMFRAME, ros::Time(0), ros::Duration(1.0));
 
@@ -211,14 +216,12 @@ RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHan
     return true;
 }
 
-void
-RobotControllerPlugin::fillSensors() {
+void RobotControllerPlugin::fillSensors() {
     // Joint values/
     sensorsIn_["joints"].setName("position");
     //std::cout<<"[";
-    for (unsigned int i=0; i<joints_.size(); ++i)
-    {
-        joint_positionsIN_[i] = joints_[i]->position_;
+    for (unsigned int i=0; i<joints_.size(); ++i){
+    	joint_positionsIN_[i] = joints_[i]->position_;
         //if(joints_[i]->joint_->limits)
            //std::cout<<joints_[i]->joint_->limits->upper<<",";
         //else
@@ -237,7 +240,7 @@ RobotControllerPlugin::fillSensors() {
     tf::StampedTransform current_transform;
     listener_.lookupTransform(ODOMFRAME,"base_link",ros::Time(0), current_transform);
 
- //listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
+ 	//listener_.lookupTransform("odom","base_link",ros::Time(0), current_transform);
     std::vector<double> odom(6);
     tf::Vector3 xyz = current_transform.getOrigin();
     tf::Quaternion q = current_transform.getRotation();
@@ -252,20 +255,15 @@ RobotControllerPlugin::fillSensors() {
  
 }
 
-void
-RobotControllerPlugin::readControl() {
+void RobotControllerPlugin::readControl() {
+
     ros::Time time = robot_->getTime();
     ros::Duration dt_ = time - last_time_;
     
-
     //  Arm controller
     joint_positionsOUT_ = controlValues_["joints"].getValues();
     joint_velocityOUT_ = controlValues_["velocities"].getValues();
     
-    // 
-
-
-
     /* arm position control*/
 
     for (unsigned int i=0; i<joints_.size(); ++i) {
@@ -274,7 +272,7 @@ RobotControllerPlugin::readControl() {
         double errord = joints_[i]->velocity_ - joint_velocityOUT_[i];
         //double errord = joints_[i]->velocity_ ;
 
-        if(joints_[i]->joint_->type == urdf::Joint::REVOLUTE)
+    	if(joints_[i]->joint_->type == urdf::Joint::REVOLUTE)
         {
           angles::shortest_angular_distance_with_limits(joint_positionsOUT_[i], joints_[i]->position_, joints_[i]->joint_->limits->lower, joints_[i]->joint_->limits->upper,error[i]);
 
@@ -303,9 +301,6 @@ RobotControllerPlugin::readControl() {
         joints_[i]->commanded_effort_ = pids_[i].updatePid(error[i], dt_);
 
     }*/
-
-
-
 
     //arm control
     /*
@@ -357,39 +352,29 @@ RobotControllerPlugin::readControl() {
 }
 
 
-void
-RobotControllerPlugin::starting() {
-		std::cout << "STARTING" << std::endl;
-		fillSensors();
+void RobotControllerPlugin::starting() {
 
+	std::cout << "STARTING" << std::endl;
+	fillSensors();
     try {
-
-       
-		  {
-		      boost::mutex::scoped_lock lock(rmut);
-		      _holdIn = sensorsIn_;
-		  }
-      cond2.notify_all();
-
-
-		  {
-		      boost::mutex::scoped_lock lock(wmut);
-          cond3.wait(lock);
-		      controlValues_ = _holdOut;
-		  }
+			{
+			  boost::mutex::scoped_lock lock(rmut);
+			  _holdIn = sensorsIn_;
+			}
+		  	cond2.notify_all();
+			{
+				boost::mutex::scoped_lock lock(wmut);
+				cond3.wait(lock);
+				controlValues_ = _holdOut;
+			}
 		}
 		catch (std::exception &e) {throw e; }
-    
 		readControl();
   
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
-    //timer.start();
-
 }
 
-void
-RobotControllerPlugin::update() {
-    timer.start();
+void RobotControllerPlugin::update() {
     
 		fillSensors();
  
@@ -413,17 +398,10 @@ RobotControllerPlugin::update() {
 		catch (std::exception &e) {throw e; }
 
 		readControl();
-    timer.stop();
-    //std::cout <<"time elapsed is "<<timer.getElapsedTimeInMilliSec()<< std::endl;
-
 }
 
-void
-RobotControllerPlugin::stopping() {
+void RobotControllerPlugin::stopping() {
     std::cout << "STOPPING" << std::endl;
-    // take care everything is destroyed
-    // and robot freezes 
-
 }
 
 
@@ -461,14 +439,13 @@ void RobotControllerPlugin::startupPython()
 */
     //runPython (aof, "plug (solver.control, robot.device.control)",true, *interpreter_);
     dynamicgraph::rosInit(true);
-
     aof.close();
 }
 
 void RobotControllerPlugin::runPython(std::ostream &file,
                             const std::string &command,bool print,
-                            dynamicgraph::Interpreter &interpreter) 
-{
+                            dynamicgraph::Interpreter &interpreter) {
+
     if (print == true){file << ">>> " << command << std::endl;} else{}
     std::string lerr(""),lout(""),lres("");
     interpreter.runCommand(command,lres,lout,lerr);
