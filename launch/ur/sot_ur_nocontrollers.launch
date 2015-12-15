@@ -13,8 +13,6 @@
     <arg name="child_frame" value= "base_link"/>
     <param name="ref_link" value="world"/>
 
- 
-
 
      <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
 	<env name="ROS_NAMESPACE" value=""/>

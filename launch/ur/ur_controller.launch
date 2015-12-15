@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Controller Manager -->
+  <include file="$(find pr2_controller_manager)/controller_manager.launch" />
+
+  <!-- send pr2 urdf to param server -->
+  <include file="$(find sot_robot)/launch/ur/upload_ur.launch" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_ur_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.1" respawn="false" output="screen" />
+
+
+</launch>
+

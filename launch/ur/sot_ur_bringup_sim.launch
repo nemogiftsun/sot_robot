@@ -1,41 +1,23 @@
 <?xml version="1.0"?>
 <launch>
-
+  <arg name="limited" default="false"/>
+  <arg name="paused" default="false"/>
   
-  <param name="kitchen_description"
-  textfile="$(find iai_maps)/urdf/table_brown.urdf"/>
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+	<arg name="gui" value="false" />
+  </include>
 
-  <node pkg="tf" type="static_transform_publisher"
-	name="kitchen_link_broadcaster"
-	args="0 0 0 0 0 0 /odom_combined /iai_kitchen/table_top_link 200">
+   <!-- Robot state publisher -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="ur_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+    <param name="tf_prefix" type="string" value="" />
   </node>
 
-  <node pkg="robot_state_chain_publisher" type="state_chain_publisher"
-    name="kitchen_state_publisher" output="screen">
-    <param name="tf_prefix" value="/iai_kitchen"/>
-    <param name="publish_frequency" value="2"/>
-    <remap from="robot_description" to="kitchen_description" />
-  </node>
+	<!-- Startup PR2 without any mechanism controllers -->
+	<include file="$(find sot_robot)/launch/ur/ur_nocontrollers.launch" />
 
-      <param name="robot_description" command="$(find xacro)/xacro.py '$(find pr2_description)/robots/pr2_no_kinect.urdf.xacro'" />
-
-      <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find sot_robot)/robot/urdf/pr2/pr2_sot.urdf.xacro'" />
-
-    <param name="use_gui" value="false"/>
-    <param name="robot_base_link" value="base_footprint"/>
-
-    <arg name="frame" value="odom_combined"/>
-    <arg name="child_frame" value= "base_footprint"/>
-    <param name="ref_link" value="odom_combined"/>
-
- 
-    <node name="robot_pose_publisher" pkg="dynamic_graph_bridge" type="robot_pose_publisher" args="_frame:=$(arg frame) _child_frame:=$(arg child_frame)">
-        <env name="ROS_NAMESPACE" value="" />
-    </node>
-
-     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
-	<env name="ROS_NAMESPACE" value=""/>
-    </node>
 
 </launch>
 
