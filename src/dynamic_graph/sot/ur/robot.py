@@ -41,7 +41,6 @@ class Ur5(AbstractMobileRobot):
         self.OperationalPoints.append('wrist_1_joint')
         self.OperationalPoints.append('wrist_2_joint')
         self.OperationalPoints.append('wrist_3_joint')
-        self.OperationalPoints.append('vacuum_tool_joint')
 
         # device and dynamic model assignment
         self.device = device

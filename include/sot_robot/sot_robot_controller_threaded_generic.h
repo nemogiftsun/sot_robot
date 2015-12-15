@@ -55,6 +55,7 @@
 namespace sot_robot {
 
 typedef boost::shared_ptr<hardware_interface::JointHandle> RobotJointPtr;
+typedef boost::shared_ptr<const urdf::Joint> UrdfJointConstPtr;
 
 struct Commands
 {
@@ -70,24 +71,33 @@ public:
     RobotControllerPlugin();
     ~RobotControllerPlugin();
 
-    bool init(hardware_interface::EffortJointInterface *robot,
-                      ros::NodeHandle &n);
-    void starting();
+    bool init(hardware_interface::EffortJointInterface *robot, ros::NodeHandle &n);
+
+    void starting(const ros::Time& time);
+
     void update(const ros::Time& time, const ros::Duration& period);
-    void stopping();
+
+    void stopping(const ros::Time& time);
+
+
+
     SensorMap &holdIn() {return _holdIn;}
     ControlMap &holdOut() {return _holdOut;}
     RobotDevice &device() {return *device_;}
+
     ros::NodeHandle node_;
+
     static const std::string LOG_PYTHON;
+
     boost::shared_ptr<dynamicgraph::Interpreter> interpreter_;
 
 	realtime_tools::RealtimeBuffer<Commands> command_;
+
 	Commands command_struct_;
 
 private:
     void fillSensors();
-    void readControl();
+    void readControl(const ros::Time& time,const ros::Duration& period);
 
 private:
     // python interactor methods
@@ -118,7 +128,10 @@ private:
     // Controller Parameters
     int loop_count_;
     ros::Time last_time_;
-    std::vector<RobotJointPtr> joints_;
+    //jointh
+    std::vector<hardware_interface::JointHandle> joints_;
+    std::vector<UrdfJointConstPtr> urdf_joints;
+
 	hardware_interface::JointHandle joint_;
     std::vector<control_toolbox::Pid> pids_;
 
@@ -128,9 +141,9 @@ private:
     boost::scoped_ptr<
         realtime_tools::RealtimePublisher<control_msgs::JointTrajectoryControllerState> > controller_state_publisher_;
 
-    ros::Publisher cmd_vel_pub_ ;
+    //ros::Publisher cmd_vel_pub_ ;
 
-    tf::TransformListener listener_;
+    //tf::TransformListener listener_;
 
     // SoT device
     RobotDevice *device_;

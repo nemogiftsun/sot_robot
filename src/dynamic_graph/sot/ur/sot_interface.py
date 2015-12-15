@@ -35,11 +35,11 @@ class SOTInterface:
     def __init__(self,device_type='simu'): 
         if device_type =='simu':
             self.Device=RobotSimu('Ur5')
+            device = self.Device
         else:
             self.Device=PyEntityFactoryClass('RobotDevice')  
-	    self.Device('Ur_device')
         # define robot device
-        self.robot = Ur5('Ur5',self.Device )
+        self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
         self.dimension = self.robot.dynamic.getDimension()
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
