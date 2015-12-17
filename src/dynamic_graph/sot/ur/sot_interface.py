@@ -1,4 +1,3 @@
-import dynamic_graph.sotcollision as sc
 from dynamic_graph.sot.ur.robot import Ur5
 from dynamic_graph.ros.robot_model import RosRobotModel
 from dynamic_graph.sot.core import RobotSimu, FeaturePosition, FeaturePosture, Task, SOT, GainAdaptive, FeatureGeneric
@@ -30,16 +29,17 @@ file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc
 '''
 from dynamic_graph.sot.ur.sot_interface import SOTInterface
 test = SOTInterface()
+test.initializeRobot()
+test.startRobot()
 '''
 class SOTInterface:
     def __init__(self,device_type='simu'): 
         if device_type =='simu':
-            self.Device=RobotSimu('Ur5')
-            device = self.Device
+            self.robot=Ur5('Ur5')
         else:
             self.Device=PyEntityFactoryClass('RobotDevice')  
-        # define robot device
-        self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
+	    self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
+        # define robot device        
         self.dimension = self.robot.dynamic.getDimension()
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
@@ -101,7 +101,7 @@ class SOTInterface:
 
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
-        self.pushTask(self.waisttaskname)
+        #self.pushTask(self.waisttaskname)
         #self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
@@ -149,7 +149,7 @@ class SOTInterface:
         self.goal_waist = RPYToMatrix( position )
         #self.goal_waist = ((1.,0,0,position[0]),(0,1.,0,position[1]),(0,0,1.,position[2]),(0,0,0,1.),)
         self.task_waist_metakine.feature.frame('desired')
-        self.task_waist_metakine.feature.selec.value = '000000'#RzRyRxTzTyTx
+        #self.task_waist_metakine.feature.selec.value = '000000'#RzRyRxTzTyTx
         self.task_waist_metakine.gain.setConstant(10)
         self.task_waist_metakine.featureDes.position.value = self.goal_waist
         return self.task_waist_metakine.task.name

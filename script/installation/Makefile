@@ -1,6 +1,7 @@
 #
-# Copyright (c) 2014 CNRS-LAAS
+# Copyright (c) 2015 CNRS-LAAS
 # Author: Florent Lamiraux
+# Refactored by Nirmal Giftsun for sot_robot
 #
 
 JRL_REPO=https://github.com/jrl-umi3218

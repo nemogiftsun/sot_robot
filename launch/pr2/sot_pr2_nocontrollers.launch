@@ -22,7 +22,6 @@
 	<env name="ROS_NAMESPACE" value="/dynamic_graph"/>
     </node>
 
-
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sot_pr2)/launch/pr2.rviz" />
 
 </launch>
