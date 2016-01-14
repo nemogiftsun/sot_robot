@@ -54,6 +54,8 @@
 
 namespace sot_robot {
 
+namespace robot{
+
 typedef boost::shared_ptr<hardware_interface::JointHandle> RobotJointPtr;
 typedef boost::shared_ptr<const urdf::Joint> UrdfJointConstPtr;
 
@@ -155,5 +157,5 @@ private:
 };
 
 }
-
+}
 #endif

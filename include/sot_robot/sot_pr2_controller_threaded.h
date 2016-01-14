@@ -11,16 +11,15 @@
 #include <sensor_msgs/JointState.h>
 #include <sot_robot/sot_robot_device.h>
 
-using namespace timer;
 
 namespace sot_robot {
 
-typedef boost::shared_ptr<pr2_mechanism_model::JointState> RobotJointPtr;
+typedef boost::shared_ptr<pr2_mechanism_model::JointState> Pr2JointPtr;
 
-class RobotControllerPlugin : public pr2_controller_interface::Controller {
+class Pr2ControllerPlugin : public pr2_controller_interface::Controller {
 public:
-    explicit RobotControllerPlugin();
-    virtual ~RobotControllerPlugin();
+    explicit Pr2ControllerPlugin();
+    virtual ~Pr2ControllerPlugin();
 
     virtual bool init(pr2_mechanism_model::RobotState *robot,
                       ros::NodeHandle &n);
@@ -63,13 +62,12 @@ private:
 
     std::vector<double> error_raw;
     std::vector<double> error;
-    Timer timer;
 
 
     // Pr2 Controller
     int loop_count_;
     ros::Time last_time_;
-    std::vector<RobotJointPtr> joints_;
+    std::vector<Pr2JointPtr> joints_;
     std::vector<control_toolbox::Pid> pids_;
     pr2_mechanism_model::RobotState *robot_;
 

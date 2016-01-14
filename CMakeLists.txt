@@ -56,13 +56,14 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS} include)
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
-    src/sot_robot_controller_threaded_generic.cpp
+    src/sot_pr2_controller_threaded.cpp
+    #src/sot_robot_controller_threaded_generic.cpp
     src/sot_robot_device.cpp)
 
 set(HEADERS
-    include/sot_robot/sot_robot_controller_threaded_generic.h
-    include/sot_robot/sot_robot_device.h)
-
+    #include/sot_robot/sot_robot_controller_threaded_generic.h
+    include/sot_robot/sot_robot_device.h
+    include/sot_robot/sot_pr2_controller_threaded.h)
 
 
 #add_library(sot_robot ${SOURCES_GUI})

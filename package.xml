@@ -59,7 +59,7 @@
     <!-- <metapackage/> -->
 
     <!-- Other tools can request additional information be placed here -->
-    <controller_interface plugin="${prefix}/controller_plugins.xml"/>
+    <pr2_controller_interface plugin="${prefix}/controller_plugins.xml"/>
 		<rqt_gui plugin="${prefix}/gui_plugin.xml"/>
   </export>
 

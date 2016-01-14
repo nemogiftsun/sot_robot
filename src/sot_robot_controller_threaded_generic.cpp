@@ -15,6 +15,7 @@
 
 namespace sot_robot {
 
+namespace robot{
 static const std::string JOINTNAME_PRE = "arm_joint_";
 //static const std::string ODOMFRAME = "odom";
 static const std::string ODOMFRAME = "odom_combined";
@@ -462,14 +463,14 @@ void RobotControllerPlugin::runPython(std::ostream &file,
             if (print == true){file << lres << std::endl;} else{}
     }
 }
-
+}
 
 
 
 
 
 /// Register controller to pluginlib
-PLUGINLIB_EXPORT_CLASS( sot_robot::RobotControllerPlugin, controller_interface::ControllerBase)
+PLUGINLIB_EXPORT_CLASS( sot_robot::robot::RobotControllerPlugin, controller_interface::ControllerBase)
 
 
 /*PLUGINLIB_DECLARE_CLASS(sot_robot,

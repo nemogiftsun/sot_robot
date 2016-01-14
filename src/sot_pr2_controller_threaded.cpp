@@ -1,4 +1,4 @@
-#include "sot_robot/sot_robot_controller_threaded.h"
+#include "sot_robot/sot_pr2_controller_threaded.h"
 #include <pluginlib/class_list_macros.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Bool.h>
@@ -19,7 +19,7 @@ static const std::string JOINTNAME_PRE = "arm_joint_";
 //static const std::string ODOMFRAME = "odom";
 static const std::string ODOMFRAME = "odom_combined";
 
-const std::string RobotControllerPlugin::LOG_PYTHON="/tmp/robot_sot_controller.out";
+const std::string Pr2ControllerPlugin::LOG_PYTHON="/tmp/robot_sot_controller.out";
 #define LOG_TRACE(x) sotDEBUG(25) << __FILE__ << ":" << __FUNCTION__ <<"(#" << __LINE__ << " ) " << x << std::endl
 
 
@@ -34,7 +34,7 @@ bool data_ready;
 
 
 // thread functions for sot control
-void workThread(RobotControllerPlugin *actl) {
+void workThread(Pr2ControllerPlugin *actl) {
 
     dynamicgraph::Interpreter aLocalInterpreter(actl->node_);
 
@@ -49,7 +49,7 @@ void workThread(RobotControllerPlugin *actl) {
     ros::waitForShutdown();
 }
 
-void sampleAndHold(RobotControllerPlugin *actl) {
+void sampleAndHold(Pr2ControllerPlugin *actl) {
 
     SensorMap deviceIn;
     ControlMap deviceOut;
@@ -90,11 +90,9 @@ std::ofstream logout;
 
 
 //Constructor
-RobotControllerPlugin::RobotControllerPlugin()
+Pr2ControllerPlugin::Pr2ControllerPlugin()
     : pr2_controller_interface::Controller(),
-      //device_("Pr2_device"),
-      //device_("youBot_device"),
-      device_("Ur_device")
+      device_("Pr2_device"),
       loop_count_(0),
       robot_(NULL),
       get_control(true),
@@ -112,11 +110,11 @@ RobotControllerPlugin::RobotControllerPlugin()
 
 
 // Destructor
-RobotControllerPlugin::~RobotControllerPlugin() {
+Pr2ControllerPlugin::~Pr2ControllerPlugin() {
 
 }
 
-bool RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
+bool Pr2ControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n) {
 	node_ = n;
     cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
     // Check initialization
@@ -146,7 +144,7 @@ bool RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::No
             ROS_ERROR("Array of joint names should contain all strings. (namespace: %s)", node_.getNamespace().c_str());
             return false;
         }
-        RobotJointPtr j;
+        Pr2JointPtr j;
         j.reset(robot->getJointState((std::string)name_value));
         if (!j) {
             ROS_ERROR("Joint not found: %s. (namespace: %s)", ((std::string)name_value).c_str(), node_.getNamespace().c_str());
@@ -216,7 +214,7 @@ bool RobotControllerPlugin::init(pr2_mechanism_model::RobotState *robot, ros::No
     return true;
 }
 
-void RobotControllerPlugin::fillSensors() {
+void Pr2ControllerPlugin::fillSensors() {
     // Joint values/
     sensorsIn_["joints"].setName("position");
     //std::cout<<"[";
@@ -255,7 +253,7 @@ void RobotControllerPlugin::fillSensors() {
  
 }
 
-void RobotControllerPlugin::readControl() {
+void Pr2ControllerPlugin::readControl() {
 
     ros::Time time = robot_->getTime();
     ros::Duration dt_ = time - last_time_;
@@ -352,7 +350,7 @@ void RobotControllerPlugin::readControl() {
 }
 
 
-void RobotControllerPlugin::starting() {
+void Pr2ControllerPlugin::starting() {
 
 	std::cout << "STARTING" << std::endl;
 	fillSensors();
@@ -374,7 +372,7 @@ void RobotControllerPlugin::starting() {
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
 }
 
-void RobotControllerPlugin::update() {
+void Pr2ControllerPlugin::update() {
     
 		fillSensors();
  
@@ -400,13 +398,13 @@ void RobotControllerPlugin::update() {
 		readControl();
 }
 
-void RobotControllerPlugin::stopping() {
+void Pr2ControllerPlugin::stopping() {
     std::cout << "STOPPING" << std::endl;
 }
 
 
 // python interactor services
-void RobotControllerPlugin::startupPython() 
+void Pr2ControllerPlugin::startupPython() 
 {
     std::ofstream aof(LOG_PYTHON.c_str());
     runPython (aof, "import sys, os",true, *interpreter_);
@@ -442,7 +440,7 @@ void RobotControllerPlugin::startupPython()
     aof.close();
 }
 
-void RobotControllerPlugin::runPython(std::ostream &file,
+void Pr2ControllerPlugin::runPython(std::ostream &file,
                             const std::string &command,bool print,
                             dynamicgraph::Interpreter &interpreter) {
 
@@ -469,12 +467,12 @@ void RobotControllerPlugin::runPython(std::ostream &file,
 
 
 /// Register controller to pluginlib
-PLUGINLIB_EXPORT_CLASS( sot_robot::RobotControllerPlugin,
+PLUGINLIB_EXPORT_CLASS( sot_robot::Pr2ControllerPlugin,
                          pr2_controller_interface::Controller)
 
 /*PLUGINLIB_DECLARE_CLASS(sot_robot,
-                        RobotControllerPlugin,
-                        sot_robot::RobotControllerPlugin,
+                        Pr2ControllerPlugin,
+                        sot_robot::Pr2ControllerPlugin,
                         controller_interface::ControllerBase)
 */
 }

@@ -1,7 +1,7 @@
 <library path="lib/libsot_robot">
-  <class name="sot_robot/RobotControllerPlugin"
-         type="sot_robot::RobotControllerPlugin"
-         base_class_type="controller_interface::ControllerBase" />  
+  <class name="sot_robot/Pr2ControllerPlugin"
+         type="sot_robot::Pr2ControllerPlugin"
+         base_class_type="pr2_controller_interface::Controller" />  
 </library>
 
 
