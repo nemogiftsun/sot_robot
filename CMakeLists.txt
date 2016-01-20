@@ -76,6 +76,7 @@ target_link_libraries(sot_robot dynamic-graph-python)
 target_link_libraries(sot_robot ros_bridge)
 target_link_libraries(sot_robot ros_interpreter)
 
+#pr2_enable_rpath(sot_robot)
 
 #message(cmakeinstall ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(sot_robot "dynamic-graph")
