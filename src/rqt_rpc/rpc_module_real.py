@@ -12,13 +12,13 @@ from sensor_msgs.msg import JointState
 
 
 import xml.etree.ElementTree as ET
-file = '/home/nemogiftsun/laasinstall/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
+file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
 
 
 
 from dynamic_graph import plug, writeGraph
 from dynamic_graph.sot.pr2.sot_interface import SOTInterface
-from rqt_kws.planning_interface import KineoPlanner_Interface
+#from rqt_kws.planning_interface import KineoPlanner_Interface
 from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
 from dynamic_graph.sot.hpp import PathSampler
 
@@ -163,7 +163,7 @@ class SOTController(Plugin):
 
         self.sh = RosShell()
         
-        self.planner = KineoPlanner_Interface()  
+        #self.planner = KineoPlanner_Interface()  
 
 
     def _fixState(self):

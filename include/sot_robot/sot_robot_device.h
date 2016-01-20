@@ -15,13 +15,13 @@ namespace sot_robot {
         DYNAMIC_GRAPH_ENTITY_DECL();
     public:
         static const double TIMESTEP_DEFAULT;
+        static const int NUMJOINTS;
 
     public:
         RobotDevice(const std::string &name);
         virtual ~RobotDevice();
 
         void setSensors(SensorMap &sensorsIn);
-        void setNumdofs(const int num);
         void initSensors(SensorMap &sensorsIn);
 
         void setupSetSensors(SensorMap &sensorsIn);
@@ -44,7 +44,6 @@ namespace sot_robot {
         std::vector<double> baseff_;
         int loop_count_;
         bool init_required;
-        int num_dofs;
     };
 }
 

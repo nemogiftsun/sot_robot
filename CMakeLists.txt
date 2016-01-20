@@ -101,7 +101,8 @@ install(DIRECTORY launch
    FILES_MATCHING PATTERN "*.launch"
 )
 
-install(DIRECTORY robot
+
+install(DIRECTORY robot urdf srdf
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 ## Mark other files for installation (e.g. launch and bag files, etc.)

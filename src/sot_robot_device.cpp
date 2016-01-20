@@ -6,9 +6,8 @@
 namespace sot_robot {
 
 const double RobotDevice::TIMESTEP_DEFAULT = 0.1;
-//const int RobotDevice::num_dofs = 33;//pr2
-//const int RobotDevice::num_dofs = 7;//robot
-//const int RobotDevice::num_dofs = 6;//robot
+const int RobotDevice::NUMJOINTS = 33;//pr2
+//const int RobotDevice::NUMJOINTS = 7;//robot
 
 RobotDevice::RobotDevice(const std::string &name)
 : dynamicgraph::sot::Device(name),
@@ -41,14 +40,6 @@ RobotDevice::RobotDevice(const std::string &name)
 RobotDevice::~RobotDevice() {
 }
 
-
-void 
-RobotDevice::setNumdofs( const int num) {
-num_dofs = num;
-}
-
-
-
 void
 RobotDevice::initSensors(SensorMap &sensorsIn) {
     sotDEBUGIN(25);
@@ -61,7 +52,7 @@ RobotDevice::initSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             state_(i) = 0.;
-            for (unsigned i=0; i<num_dofs; ++i) 
+            for (unsigned i=0; i<NUMJOINTS; ++i) 
             //for (unsigned i=0; i<7; ++i)
              {
                 state_(i+6) = anglesIn[i];              
@@ -77,7 +68,7 @@ RobotDevice::initSensors(SensorMap &sensorsIn) {
         for (unsigned i=0;i<6; ++i)
             velocity_(i) = 0.;
             //  for (unsigned i=0; i<7; ++i)
-            for (unsigned i=0; i<num_dofs; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i)
              {
                 velocity_(i+6) = velIn[i];              
              }
@@ -116,7 +107,7 @@ RobotDevice::setSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             state_(i) = 0.;
-            for (unsigned i=0; i<num_dofs; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i)
              {
                 state_(i+6) = anglesIn[i];              
              }
@@ -131,7 +122,7 @@ RobotDevice::setSensors(SensorMap &sensorsIn) {
         try {
         for (unsigned i=0;i<6; ++i)
             velocity_(i) = 0.;
-            for (unsigned i=0; i<num_dofs; ++i)
+            for (unsigned i=0; i<NUMJOINTS; ++i)
             // for (unsigned i=0; i<7; ++i)
                {
                 velocity_(i+6) = velIn[i];              
