@@ -2,6 +2,7 @@ import os
 import rospy
 import rospkg
 import tf
+import os
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -12,7 +13,9 @@ from sensor_msgs.msg import JointState
 
 
 import xml.etree.ElementTree as ET
-file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
+
+devel_directory = os.environ.get('DEVEL_SRC')
+file = devel_directory + '/sot_robot/src/rqt_rpc/rpc_config.xml'
 
 
 
@@ -55,8 +58,6 @@ order = ('', 'r_shoulder_pan_joint', 'r_shoulder_lift_joint', 'l_elbow_flex_join
 
 
 #[0,0,0,state[order.index('l_shoulder_pan_joint')], state[order.index('l_shoulder_lift_joint')], state[order.index('l_upper_arm_roll_joint')],state[order.index('l_elbow_flex_joint')], state[order.index('l_forearm_roll_joint')], state[order.index('l_wrist_flex_joint')], state[order.index('l_wrist_roll_joint')], state[order.index('l_gripper_l_finger_joint')], state[order.index('l_gripper_l_finger_tip_joint')],state[order.index('l_gripper_motor_slider_joint')],state[order.index( 'l_gripper_motor_screw_joint')], state[order.index('l_gripper_r_finger_joint')], state[order.index('l_gripper_r_finger_tip_joint')], state[order.index('l_gripper_joint')],0,state[order.index('r_shoulder_pan_joint')], state[order.index('r_shoulder_lift_joint')], state[order.index('r_upper_arm_roll_joint')], state[order.index('r_elbow_flex_joint')], state[order.index('r_forearm_roll_joint')], state[order.index('r_wrist_flex_joint')], state[order.index('r_wrist_roll_joint')], state[order.index('r_gripper_l_finger_joint')], state[order.index('r_gripper_l_finger_tip_joint')],state[order.index('r_gripper_motor_slider_joint')],state[order.index( 'r_gripper_motor_screw_joint')], state[order.index('r_gripper_r_finger_joint')], state[order.index('r_gripper_r_finger_tip_joint')], state[order.index('r_gripper_joint')],0]
-
-
 
 
 
