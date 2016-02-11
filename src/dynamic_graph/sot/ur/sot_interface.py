@@ -167,7 +167,7 @@ class SOTInterface:
 
         postureTaskDofs = [True]*(self.robot.dimension)
         for dof,isEnabled in enumerate(postureTaskDofs):
-            if dof >= 5:
+            if dof >= 6:
               self.posture_feature.selectDof(dof,isEnabled)
 
         task_posture=Task('Posture Task')
