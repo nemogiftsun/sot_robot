@@ -2,30 +2,32 @@ import os
 import rospy
 import rospkg
 import tf
+import os
+import math
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QWidget
 from python_qt_binding.QtCore import Signal, QThread, QTimer, QMutex
 
+import roslib; roslib.load_manifest('easy_markers')
+from easy_markers.generator import *
 from sensor_msgs.msg import JointState
-
+from geometry_msgs.msg import Quaternion
+#from visualization_msgs import Marker
 
 import xml.etree.ElementTree as ET
-file = '/home/nemogiftsun/laasinstall/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
-
-
 
 from dynamic_graph import plug, writeGraph
 from dynamic_graph.sot.pr2.sot_interface import SOTInterface
-from rqt_kws.planning_interface import KineoPlanner_Interface
+##from rqt_kws.planning_interface import KineoPlanner_Interface
 from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
-
-
 from dynamic_graph.sot.hpp import PathSampler
 
+devel_directory = os.environ.get('DEVEL_SRC')
+file = devel_directory + '/sot_robot/src/rqt_rpc/rpc_config.xml'
 
-import math
+
 ## History
 # loopShortcuts
 # Threading
@@ -59,9 +61,6 @@ order = ('', 'r_shoulder_pan_joint', 'r_shoulder_lift_joint', 'l_elbow_flex_join
 #[0,0,0,state[order.index('l_shoulder_pan_joint')], state[order.index('l_shoulder_lift_joint')], state[order.index('l_upper_arm_roll_joint')],state[order.index('l_elbow_flex_joint')], state[order.index('l_forearm_roll_joint')], state[order.index('l_wrist_flex_joint')], state[order.index('l_wrist_roll_joint')], state[order.index('l_gripper_l_finger_joint')], state[order.index('l_gripper_l_finger_tip_joint')],state[order.index('l_gripper_motor_slider_joint')],state[order.index( 'l_gripper_motor_screw_joint')], state[order.index('l_gripper_r_finger_joint')], state[order.index('l_gripper_r_finger_tip_joint')], state[order.index('l_gripper_joint')],0,state[order.index('r_shoulder_pan_joint')], state[order.index('r_shoulder_lift_joint')], state[order.index('r_upper_arm_roll_joint')], state[order.index('r_elbow_flex_joint')], state[order.index('r_forearm_roll_joint')], state[order.index('r_wrist_flex_joint')], state[order.index('r_wrist_roll_joint')], state[order.index('r_gripper_l_finger_joint')], state[order.index('r_gripper_l_finger_tip_joint')],state[order.index('r_gripper_motor_slider_joint')],state[order.index( 'r_gripper_motor_screw_joint')], state[order.index('r_gripper_r_finger_joint')], state[order.index('r_gripper_r_finger_tip_joint')], state[order.index('r_gripper_joint')],0]
 
 
-
-
-
 class RPCPlugin(Plugin):
     mutex = QMutex()
     def __init__(self, context):
@@ -90,8 +89,6 @@ class RPCPlugin(Plugin):
         self._widget.setObjectName('RPCPluginUi')
         if context.serial_number() > 1:
             return None
-
-        #self.planner = KineoPlanner_Interface()
         self.init = [] 
         self.goal = []
 
@@ -155,13 +152,17 @@ class RPCPlugin(Plugin):
         for trajectory in self.CF_trajectories:
             self._widget.Trajectories.addItem(str(trajectory.attrib['name']))
     
-
-
         # coded information of the joint dofs.
         self.code = [7,9,13,22,24,28,32]
         self.posesignalstring = 'self.sot.robot.device.state'
 
-        self.sh = RosShell()
+	self.pub = rospy.Publisher('/visualization_marker', Marker)
+    	self.gen = MarkerGenerator()
+    	self.gen.ns = '/closest_point_skin'
+	self.gen.type = Marker.LINE_STRIP
+	self.gen.scale = [.3]*3
+	self.gen.frame_id = '/odom'
+        self.br = tf.TransformBroadcaster()
 
 
     def _converttohpp(self,point):
@@ -199,6 +200,8 @@ class RPCPlugin(Plugin):
 
     def _goPreGrasp(self):
         self.switch_plugged = True
+        self.sot._executeTrajectory("pregrasp_configuration","scenario_1")
+        '''
         self.ps.resetPath()
         self.wps = ()
         for trajectory in self.CF_trajectories:
@@ -212,11 +215,13 @@ class RPCPlugin(Plugin):
             self.ps.addWaypoint(tuple(hpp_config))
             if wp.attrib['name'] == 'pregrasp_configuration':
                 break
+
         plug(self.sot.robot.device.state, self.ps.position)
         self.ps.setTimeStep (0.01)
         self.ps.configuration.recompute(self.ps.configuration.time)
         self.ps.start()
         plug(self.ps.configuration,self.sot.posture_feature.posture) 
+        '''
         '''
         self.timer_control_cycle.stop()
         plug(self.ps.configuration,self.sot.posture_feature.posture) 
@@ -228,9 +233,6 @@ class RPCPlugin(Plugin):
         self.timer_control_cycle.start()
         '''
 
-
-
-
     def _copyGoal(self):
         self._copyState('goal')
 
@@ -240,7 +242,7 @@ class RPCPlugin(Plugin):
     def _copyState(self,point): 
         #print type(state[6:len(state)])
         state = self.sot.robot.dynamic.position.value
-        print state
+        #print state
         '''
         pose = state[0:6]
         th = state[6:9]
@@ -424,7 +426,7 @@ class RPCPlugin(Plugin):
                         index  = self.jointsList.index(joint)
                         trajectory_point[j] = trajectory_joint_state[index]
                     j = j + 1
-            print tuple(trajectory_point)
+            #print tuple(trajectory_point)
             self.ps.addWaypoint (tuple(trajectory_point))
 
         self.ps.createJointReference(self.referenceSignal)
@@ -459,12 +461,35 @@ class RPCPlugin(Plugin):
         self.ps.resetPath()
         
 
-
     def increment(self):
         #self.mutex.lock()
         self.sot.robot.device.increment(0.1)
+        print self.sot.ps.configuration.value
+        self.gen.counter = 0
+        t = rospy.get_time()
+        self.gen.color = [1,0,1,1]
+        t = self.sot.collisionAvoidance.collisionJacobian.time
+        self.sot.collisionAvoidance.closestPointi.recompute(t)
+        self.sot.collisionAvoidance.closestPointj.recompute(t)
+        i = self.sot.collisionAvoidance.closestPointi.value
+        j = self.sot.collisionAvoidance.closestPointj.value
+	m = self.gen.marker(points= [(i[0][0],i[1][0],i[2][0]),(j[0][0],j[1][0],j[2][0])] )
+        #m = self.gen.marker(points= [(0.647754,0.188,0.830563),(0.647754,0.188,1.830563)] )
+        #print 'i = ' + str(i[0][0])+' 2 ' +str(i[1][0])+' 3 ' +str(i[2][0])   
+        #print 'j = ' +  str(j[0][0])+' 2 ' +str(j[1][0])+' 3 ' +str(j[2][0]) 
+	#m = self.gen.marker(points= [(1,1,0),(0,0,0)] )
+        m.scale.x = 0.02
+        self.pub.publish(m)
         #print self.ps.configuration.value
         #self.mutex.unlock()
+        self.sot.collisionAvoidance.collisionModelState.recompute(t)
+        state = self.sot.collisionAvoidance.collisionModelState.value[0]
+        #quat = Quaternion(); quat.x = state[3]; quat.y = state[4];quat.z = state[5];quat.w = state[6];
+	self.br.sendTransform((state[0], state[1], state[2]),
+		             (state[3],state[4],state[5],state[6]),
+		             rospy.Time.now(),
+		             'forearm_frame',
+		             "odom")
     
     def _update_display(self):
         # update joint state
@@ -546,19 +571,17 @@ class RPCPlugin(Plugin):
         self.jp = [self._widget.base_x_joint.value(),self._widget.base_y_joint.value(),0,0,0,self._widget.base_yaw_joint.value()]+[self._widget.torso_lift_joint.value(),self._widget.head_pan_joint.value(),self._widget.head_tilt_joint.value()]+self.larm+[0]+self.rarm+[0]
         #self.mutex.lock()
         #self.mutex.unlock()
-        self.sot.task_waist_metakine.featureDes.position.value = ((1.,0,0,self._widget.base_x_joint.value()),(0,1.,0,self._widget.base_y_joint.value()),(0,0,1.,0),(0,0,0,1.),)
+        #self.sot.task_waist_metakine.featureDes.position.value = ((1.,0,0,self._widget.base_x_joint.value()),(0,1.,0,self._widget.base_y_joint.value()),(0,0,1.,0),(0,0,0,1.),)
         if self.switch_plugged == False:
               self.sot.setRobotPosture(self.jp)
 
       
     def _start_robot(self, checked): 
-        self.sot.connectDeviceWithSolver(True)    
+        self.sot.startRobot()    
+        self.status_robot = str(self.sot.status)
         self._widget.Logger.append(self.status_robot)
-        self.status_robot = 'STARTED'
-        self._widget.Logger.append(self.status_robot)
-        self.jp = self.sot.robot.dynamic.position.value
-        plug(self.sot.robot.dynamic.position,self.ps.position)
-        self.ps.setTimeStep (0.001)
+        js = self.sot.robot.dynamic.position.value
+        self._goState(js) 
         # start timers
         self.timer_update.start(500)
         self.timer_control_cycle.start(100)
@@ -566,8 +589,8 @@ class RPCPlugin(Plugin):
 
 
     def _stop_robot(self, checked):   
-        self.sot.connectDeviceWithSolver(False) 
-        self.status_robot = 'STOPPED'
+        self.sot.stopRobot()
+        self.status_robot = self.sot.status
         self._widget.Logger.append(self.status_robot)
         # stop the controller
         self.timer_control_cycle.stop()
@@ -576,16 +599,12 @@ class RPCPlugin(Plugin):
     def _initialize_robot(self, checked):  
         self._widget.Logger.append("Initializing")
         self.sot = SOTInterface()
-        self.ps = PathSampler ('ps')
         self.referenceSignal = str(self._widget.referenceSignal.currentText())
-        self.ps.createJointReference(self.referenceSignal)
-        self.ps.loadRobotModel ('sot_robot', 'planar', 'pr2_sot')
-        self.status_robot = 'INITIALIZED'
-        self._widget.Logger.append(self.status_robot) 
-        self.planner = KineoPlanner_Interface()       
+        self.sot.initializeRobot(self.referenceSignal)
+        self.status_robot = str(self.sot.status)
+        self._widget.Logger.append(self.sot.status)  
 
         
-
     def shutdown_plugin(self):
         # TODO unregister all publishers here
         pass

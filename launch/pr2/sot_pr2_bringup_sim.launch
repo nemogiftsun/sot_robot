@@ -25,16 +25,12 @@
     <arg name="gui" value="false" />
     </include>
 
-    <node name="pr2_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
-
     <!-- Startup PR2 without any mechanism controllers -->
     <include file="$(find sot_robot)/launch/pr2/pr2_nocontrollers.launch" />
-
 
     <rosparam file="$(find pr2_controller_configuration_gazebo)/config/pr2_base_controller.yaml" command="load" />
     <rosparam file="$(find pr2_controller_configuration_gazebo)/config/pr2_odometry.yaml" command="load" />
     <node name="pr2_base_controllers_spawner" pkg="pr2_controller_manager" type="spawner" output="screen"
     args="--wait-for=/calibrated base_controller base_odometry" />
-
 
 </launch>

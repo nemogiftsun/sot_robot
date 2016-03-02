@@ -13,6 +13,12 @@ from dynamic_graph.sot.dyninv import SolverKine
 from dynamic_graph.ros import Ros
 from dynamic_graph.entity import PyEntityFactoryClass
 
+import time
+import os
+import datetime
+import numpy as np
+
+
 # trajectory interpolator
 from dynamic_graph.sot.hpp import PathSampler 
 
@@ -22,8 +28,9 @@ import time
 
 
 import xml.etree.ElementTree as ET
-file = '/home/ngiftsun/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
-#file = '/home/nemogiftsun/laasinstall/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
+devel_directory = os.environ.get('DEVEL_SRC')
+file = devel_directory + '/sot_robot/src/rqt_rpc/rpc_config.xml'
+
 
 #usage
 #from dynamic_graph.sot.pr2.sot_interface import SOTInterface
@@ -33,10 +40,11 @@ class SOTInterface:
     def __init__(self,device_type='simu'): 
         if device_type =='simu':
             self.Device=RobotSimu('Pr2')
+            self.robot = Pr2('Pr2')
         else:
             self.Device=PyEntityFactoryClass('RobotDevice')  
-        # define robot device
-        self.robot = Pr2(name ='Pr2',device = self.Device('Pr2_device') )
+            self.robot = Pr2(name ='Pr2',device = self.Device('Pr2_device') )
+        # define robot device        
         self.dimension = self.robot.dynamic.getDimension()
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
@@ -48,6 +56,7 @@ class SOTInterface:
         #self.joint_names = rospy.get_param('sot_controller/jrl_map') 
         self.defineBasicTasks()
         self.defineCollisionAvoidance()
+        self.definePoseTask('l_wrist_roll_joint')
         self.solver.damping.value =3e-5
         self.status = 'NOT_INITIALIZED'
         self.code = [7,9,13,22,24,28,32]
@@ -57,6 +66,33 @@ class SOTInterface:
         if (self.CF_root.tag == "Trajectories"):
             self.CF_trajectories = self.CF_root.findall('trajectory')
             self.CF_count = len(self.CF_trajectories)
+        # tracer
+        day = str(datetime.date.today())
+        t = time.strftime("-%H:%M:%S")
+        dt = '/'+day+t
+        self.tracerCounts = 0
+        self.log_directory = os.environ.get('DEVEL_DIR') + '/logs'
+        self.dt_directory = self.log_directory+dt
+	if not os.path.exists(self.log_directory):
+	    os.makedirs(self.log_directory)
+	if not os.path.exists(self.dt_directory):
+	    os.makedirs(self.dt_directory)
+ 
+    def initializeTracer(self):
+        self.tracerCounts += 1
+        self.directory = self.dt_directory+'/cycle_'+ str(self.tracerCounts)
+	os.mkdir(self.directory)
+        self.robot.initializeTracer(self.directory) 
+	#self.robot.addTrace(self.solver.name,'control')
+	#self.robot.addTrace(self.robot.device.name,'control')
+        #self.robot.addTrace(self.collisionAvoidance.name,'collisionDistance')
+        #self.robot.addTrace(self.ros.rosSubscribe.name,'proximity')
+        self.robot.addTrace(self.task_skinsensor.name,'error')
+        self.robot.addTrace(self.robot.dynamic.name,'position')
+        self.robot.addTrace(self.robot.dynamic.name,'l_wrist_roll_joint')
+        #self.robot.addTrace(self.task_posture.name,'error')
+        #self.robot.addTrace(self.task_pose_metakine.name,'error')
+
 
     def defineBasicTasks(self):
         # 1. DEFINE JOINT LIMIT TASK
@@ -87,8 +123,11 @@ class SOTInterface:
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
         self.pushTask(self.task_skinsensor.name)        
+        self.task_pose_metakine.feature.selec.value = '011111'
+        self.pushTask(self.posetaskname)
         self.pushTask(self.posturetaskname)
-        #self.pushTask(self.posetaskname)
+        time.sleep(1)
+
 
 
 
@@ -97,6 +136,7 @@ class SOTInterface:
         self.connectDeviceWithSolver(False)
         self.solver.clear()
         self.pushBasicTasks()
+        time.sleep(1)
         self.connectDeviceWithSolver(True)
 
 
@@ -104,7 +144,9 @@ class SOTInterface:
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
         self.pushTask(self.task_skinsensor.name)
+        self.pushTask(self.posetaskname)
         self.pushTask(self.posturetaskname)
+        #self.pushTask(self.posetaskname)
         #self.connectDeviceWithSolver(False)
 
     def pushTask(self,taskname):
@@ -124,23 +166,26 @@ class SOTInterface:
 
     def defineJointLimitsTask(self,inf=None,sup=None):
         # joint limits
-        taskjl = TaskJointLimits('Joint Limits Task')
-        plug(self.robot.dynamic.position,taskjl.position)
-        taskjl.controlGain.value = 5
-        taskjl.referenceInf.value = (-3,-3,0,0,0,-3.14,0.01, -2.86, -0.370000, -0.560000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0,-0.7854, -2.140000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0, -3.14)
-        taskjl.referenceSup.value = (3,3,0,0,0,3.14, 0.33, 2.86,1.30,2.140000,1.30,3.75,-0.15,3.14,1.0,3.14, 0.55, 0.55,0.1, 3.14, 0.55, 0.55, 0.09,1.48353,0.56, 1.30, 3.75, -0.15, 3.14, 1.0, 3.14, 0.55, 0.55, 0.1, 3.14, 0.55, 0.55, 0.09,3.14)
-        taskjl.dt.value = 1
-        return taskjl.name
+        self.taskjl=TaskInequality('taskjl')
+        self.jl_feature = FeatureGeneric('jlfeature')
+        self.jl_feature.jacobianIN.value = matrixToTuple(np.eye(39))
+        plug(self.robot.dynamic.position,self.jl_feature.errorIN)
+        self.taskjl.add(self.jl_feature.name)
+        self.taskjl.referenceInf.value = (-3,-3,-3,0,0,-3.14,0.01, -2.86, -0.370000, -0.560000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0,-0.7854, -2.140000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0, -3.14)
+        self.taskjl.referenceSup.value = (3,3,3,0,0,3.14, 0.33, 2.86,1.30,2.140000,1.30,3.75,-0.15,3.14,1.0,3.14, 0.55, 0.55,0.1, 3.14, 0.55, 0.55, 0.09,1.48353,0.56, 1.30, 3.75, -0.15, 3.14, 1.0, 3.14, 0.55, 0.55, 0.1, 3.14, 0.55, 0.55, 0.09,3.14)
+        self.taskjl.dt.value = 1
+        self.taskjl.dt.value=1
+        return self.taskjl.name
   
 
     def definePoseTask(self,goal_joint):
         # joint limits
-        position = (0,0,0)    
+        position = (0.688,0.07,1.07)    
         self.task_pose_metakine=MetaTaskKine6d('poseTask',self.robot.dynamic,goal_joint,goal_joint)
         self.goal_pose = ((1.,0,0,position[0]),(0,1.,0,position[1]),(0,0,1.,position[2]),(0,0,0,1.),)
         self.task_pose_metakine.feature.frame('desired')
-        #self.task_pose_metakine.feature.selec.value = '011111'#RzRyRxTzTyTx
-        self.task_pose_metakine.gain.setConstant(0.3)
+        self.task_pose_metakine.feature.selec.value = '000000'#RzRyRxTzTyTx
+        self.task_pose_metakine.gain.setConstant(1)
         self.task_pose_metakine.featureDes.position.value = self.goal_pose
         self.posetaskname = self.task_pose_metakine.task.name
       
@@ -170,28 +215,28 @@ class SOTInterface:
             if dof >= 0:
               self.posture_feature.selectDof(dof,isEnabled)
 
-        task_posture=Task('Posture Task')
-        task_posture.add(self.posture_feature.name)
+        self.task_posture=Task('Posture Task')
+        self.task_posture.add(self.posture_feature.name)
         # featurePosition.selec.value = toFlags((6,24))
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
         gainPosition.gain.value = 0.5
         #plug(task_posture.error,gainPosition.error)
         #plug(gainPosition.gain,task_posture.controlGain)
-        task_posture.controlGain.value = 1.0
-        return task_posture.name
+        self.task_posture.controlGain.value = 2.0
+        return self.task_posture.name
     
     def defineCollisionAvoidance(self):
         self.collisionAvoidance = sc.SotCollision("sc")
-        self.collisionAvoidance.createcollisionlink("lfaa","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfab","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfac","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfad","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfae","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfaf","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("lfag","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfaa","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfab","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfac","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfad","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfae","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfaf","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("lfag","box","internal",(0.25,0.09,0.09,0.2,0.0,-0.0,0,0,0))
         # hand
-        self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.22,-10,-0.0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.2,-1.0,-0.0,0,0,0))
         self.collisionAvoidance.createcollisionpair("lfaa","hand")
         self.collisionAvoidance.createcollisionpair("lfab","hand")
         self.collisionAvoidance.createcollisionpair("lfac","hand")
@@ -207,25 +252,27 @@ class SOTInterface:
         plug(self.robot.dynamic.l_forearm_roll_joint,self.collisionAvoidance.lfaf)
         plug(self.robot.dynamic.l_forearm_roll_joint,self.collisionAvoidance.lfag)
         #jacobian plug
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfaa)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfab)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfac)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfad)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfae)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfaf)
-        plug(self.robot.dynamic.Jl_forearm_roll_joint,self.collisionAvoidance.Jlfag)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfaa)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfab)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfac)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfad)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfae)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfaf)
+        plug(self.robot.dynamic.JWl_forearm_roll_joint,self.collisionAvoidance.Jlfag)
         plug(self.robot.dynamic.l_forearm_roll_joint,self.collisionAvoidance.hand)
-        self.collisionAvoidance.Jhand.value = ((1,0,0,0),(0,1,0,10),(0,0,1,0),(0,0,0,1))
+        self.collisionAvoidance.Jhand.value = ((1,0,0,0),(0,1,0,0),(0,0,1,0),(0,0,0,1))
         plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
         self.task_skinsensor=TaskInequality('taskskinsensor')
         self.sensor_feature = FeatureGeneric('sensorfeature')
+        #self.sensor_feature.jacobianIN.value = matrixToTuple( (np.zeros((7,39)) )) 
+        #plug(self.robot.dynamic.Jl_forearm_roll_joint,self.sensor_feature.jacobianIN)
         plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
         plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)
         self.task_skinsensor.add(self.sensor_feature.name)
         self.task_skinsensor.referenceInf.value = (0.85,)*7
-        self.task_skinsensor.referenceSup.value = (1.0,)*7
+        self.task_skinsensor.referenceSup.value = (1,)*7#(0.05,)*7
         self.task_skinsensor.dt.value=0.5
-        self.task_skinsensor.controlSelec.value = '110001000000000000000000000000000000000'
+        #self.task_skinsensor.controlSelec.value = '000000100000000000000000000000000000000'
         '''
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
@@ -233,22 +280,27 @@ class SOTInterface:
         plug(self.task_skinsensor.error,gainPosition.error)
         plug(gainPosition.gain,self.task_skinsensor.controlGain)
         '''
-        self.task_skinsensor.controlGain.value = 0.5
+        self.task_skinsensor.controlGain.value = 0.25
+        #robot.addTrace()
 
 
     def setRobotPosture(self,posture):
+        '''
         self.ps.resetPath()
         self.ps.setTimeStep (0.01)
         sot_config = self.robot.dynamic.position.value
         hpp_config = self._converttohpp(sot_config)
         self.ps.addWaypoint(tuple(hpp_config))
-        #self.posture_feature.posture.value = posture
+        '''
+        self.posture_feature.posture.value = posture
+        '''
         hpp_config = self._converttohpp(posture)  
         self.ps.addWaypoint(tuple(hpp_config))
         self.ps.configuration.recompute(self.ps.configuration.time)
         plug(self.ps.configuration,self.posture_feature.posture)         
         self.ps.start()        
-        
+        '''
+
         
     # robot control procedures    
     def initializeRobot(self,referenceSignal):
@@ -269,10 +321,13 @@ class SOTInterface:
             self.ps.setTimeStep (0.01)
             self.status = 'STARTED'
             self.connectDeviceWithSolver(True) 
+            self.initializeTracer()
+            
            
     def stopRobot(self): 
         self.connectDeviceWithSolver(False) 
         self.status = 'STOPPED'
+        self.robot.stopTracer()
 
 
 ############ Trajectory Handler Tools#########################         
@@ -298,32 +353,44 @@ class SOTInterface:
         
     def _executeTrajectory(self,destination,scenario):
         self.ps.resetPath()
-        self.ps.setTimeStep (0.001)
+        self.ps.setTimeStep (0.01)
         self.wps = ()
         for trajectory in self.CF_trajectories:
             if trajectory.attrib['name'] == 'scenario_1':
                 self.wps = trajectory.findall('waypoint')
                 break
-
+        #hpp_config = self._converttohpp(self.robot.device.state.value)
+        #self.ps.addWaypoint(tuple(hpp_config))
         for wp in self.wps:
             sot_config = [float(x) for x in wp.attrib['jc'].split(',')]
             hpp_config = self._converttohpp(sot_config)
-            
             self.ps.addWaypoint(tuple(hpp_config))
             if wp.attrib['name'] == "pregrasp_configuration":
+		#self.ps.addWaypoint(tuple(hpp_config))
                 break
+
+        self.connectDeviceWithSolver(False)
         time.sleep(1)
         plug(self.ps.configuration,self.posture_feature.posture)  
-        self.definePoseTask('l_wrist_roll_joint')
-        self.task_pose_metakine.featureDes.position.value = self.robot.dynamic.l_wrist_roll_joint.value
-        self.changeDefaultStackToRPP()   
+        #self.definePoseTask('l_wrist_roll_joint')
+        #self.task_pose_metakine.featureDes.position.value = self.robot.dynamic.l_wrist_roll_joint.value
+        #self.changeDefaultStackToRPP()   
         self.ps.configuration.recompute(self.ps.configuration.time)
-        time.sleep(0.1)
+        #time.sleep(0.1)
         self.ps.start()
-        self.connectDeviceWithSolver(True)
+        #self.task_pose_metakine.featureDes.position.value = self.robot.dynamic.l_wrist_roll_joint.value
+        #self.connectDeviceWithSolver(True)
+        #task_pose_metakine.featureDes.position.recompute(self.ps.configuration.time)
+        #self.connectDeviceWithSolver(True)
+        #self.connectDeviceWithSolver(False)
         plug(self.ps.l_wrist_roll_joint,self.task_pose_metakine.featureDes.position)
-        #self.ps.l_wrist_roll_joint.recompute(self.ps.l_wrist_roll_joint.time)
-        
+        self.task_pose_metakine.feature.selec.value = '011111'
+        time.sleep(0.5)        
+        self.connectDeviceWithSolver(True)
+        self.robot.addTrace(self.ps.name,'configuration')
+        self.robot.addTrace(self.ps.name,'l_wrist_roll_joint')
+        self.robot.startTracer()        
+
 '''        
 from dynamic_graph import plug
 
@@ -332,7 +399,6 @@ for trajectory in sot.CF_trajectories:
     if trajectory.attrib['name'] == 'scenario_1':
         wps = trajectory.findall('waypoint')
         break
-
 
 for wp in wps:
     sot_config = [float(x) for x in wp.attrib['jc'].split(',')]

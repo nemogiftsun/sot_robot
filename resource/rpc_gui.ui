@@ -19986,8 +19986,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="goPreGrasp">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>810</y>
+     <x>360</x>
+     <y>200</y>
      <width>141</width>
      <height>27</height>
     </rect>
@@ -19999,8 +19999,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="goInitial">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>840</y>
+     <x>360</x>
+     <y>240</y>
      <width>141</width>
      <height>27</height>
     </rect>
@@ -20012,8 +20012,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="goGrasp">
    <property name="geometry">
     <rect>
-     <x>920</x>
-     <y>800</y>
+     <x>360</x>
+     <y>340</y>
      <width>141</width>
      <height>27</height>
     </rect>
@@ -20025,8 +20025,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="goPostGrasp">
    <property name="geometry">
     <rect>
-     <x>920</x>
-     <y>840</y>
+     <x>350</x>
+     <y>380</y>
      <width>141</width>
      <height>27</height>
     </rect>
@@ -20038,8 +20038,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="goPreGraspObj">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>820</y>
+     <x>360</x>
+     <y>310</y>
      <width>141</width>
      <height>27</height>
     </rect>
@@ -20051,8 +20051,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="fixState">
    <property name="geometry">
     <rect>
-     <x>590</x>
-     <y>820</y>
+     <x>360</x>
+     <y>280</y>
      <width>131</width>
      <height>27</height>
     </rect>

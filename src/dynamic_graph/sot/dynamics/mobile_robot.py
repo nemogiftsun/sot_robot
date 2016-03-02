@@ -11,7 +11,7 @@ class AbstractMobileRobot(object):
     name = None
     initPosition = None
     tracer = None
-    tracerSize = 2**20
+    tracerSize = 2**30
     autoRecomputedSignals = []
     tracedSignals = {
         'dynamic': ["position", "velocity"],
