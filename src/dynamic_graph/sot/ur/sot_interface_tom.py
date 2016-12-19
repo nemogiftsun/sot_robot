@@ -85,6 +85,86 @@ runner.once()
 [go,stop,next,n]=loopShortcuts(runner)
 '''
 
+########## MOTION PLANNING #####################
+
+'''
+from dynamic_graph.sot.hpp import PathSampler
+ps = PathSampler ('ps')
+ps.loadRobotModel ('tom_description', 'anchor', 'tom_hpp')
+ps.setTimeStep(0.01)
+plug(sot.robot.device.state,ps.position)
+q_init = 12*[0]
+q_end = 12*[0]
+q_end[0] = 0.5;q_end[5]=0.2
+final = 12*[0]
+ps.addWaypoint (tuple (q_init))
+ps.addWaypoint (tuple (q_end))
+plug(ps.configuration,sot.posture_feature.posture)
+ps.start()
+
+
+def send_planrequest(r,planning_group):
+	r = _moveit_robot_interface.RobotInterface("robot_description")  
+	jointList = r.get_group_joint_names(userdata.planning_group) 
+	# set up start state
+	startState = RobotState()
+	startState.deserialize(r.get_current_state())
+	# Get the number of active joints
+	goalConstraints = set_constraints(r,jointList,userdata.goal)
+	# set up request
+	resp = callPathPlanService(planning_group, startState, goalConstraints,goal)  
+
+def callPathPlanService(planningGroup, startState, goalConstraints,goal):                           
+    req = MotionPlanRequest()
+    req.allowed_planning_time = 5;
+    req.group_name = planningGroup
+    req.start_state = startState
+    req.goal_constraints = [goalConstraints]       
+    get_motion_plan = rospy.ServiceProxy('/kws_ros_planner/plan_kinematic_path', GetMotionPlan)      
+    try:
+        res = get_motion_plan(req) 
+    except rospy.ServiceException, e:
+        rospy.logerr("Service did not process request: " + str(e))     
+        return -1         
+               
+    jnames = res.motion_plan_response.trajectory.joint_trajectory.joint_names   
+    jpoints =  res.motion_plan_response.trajectory.joint_trajectory.points
+    return [jnames, jpoints] 
+
+def set_constraints(r,jointList,goal):
+        goalConstraints = Constraints()
+        activeJointCount = 0
+        jointConstraintsSize = 0
+        for joint in jointList:
+            jointLimits = r.get_joint_limits(str(joint))
+            if len(jointLimits) > 0:
+                activeJointCount = activeJointCount + 1
+                jointConstraintsSize = jointConstraintsSize + len(jointLimits) 
+        goalConstraints.joint_constraints = [None] * jointConstraintsSize        
+        #m_baseGoal = [None] * 3
+        m_jtPosition = [None] * activeJointCount          
+        # Since jointList can contain some fixed joint (i.e. not active)
+        # we recreate a list with only active joints
+        m_activeJointList = [None] * activeJointCount
+        i = 0
+        for joint in jointList:
+            jointLimits = r.get_joint_limits(str(joint))
+            if len(jointLimits) > 0:
+                m_activeJointList[i] = str(joint)
+                i = i + 1
+        i = 0
+        resIndex = 0;
+        for joint in m_activeJointList:
+            #jointLimits = r.get_joint_limits(str(joint)) 
+            jointConstraint = JointConstraint()
+            jointConstraint.position = goal[i]   
+            jointConstraint.joint_name = joint       
+            goalConstraints.joint_constraints[i] = jointConstraint
+            i = i + 1   
+        return goalConstraints
+
+'''
+
 def make_markers(mid,marker_type,scale):
     m = Marker()
     if marker_type == 'POINTS':
