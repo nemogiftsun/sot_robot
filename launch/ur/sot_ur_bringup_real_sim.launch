@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<launch>
+
+	<arg name="limited" default="false"/>
+	<arg name="paused" default="false"/>
+
+	<!-- Robot state publisher-->
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="tom_state_publisher">
+	<param name="publish_frequency" type="double" value="50.0" />
+	<param name="tf_prefix" type="string" value="" />
+	</node>
+
+	<!-- send ur urdf to param server -->
+	<include file="$(find sot_robot)/launch/ur/upload_ur.launch" />
+	  <arg name="min_payload"  default="0.0"/>
+	  <arg name="max_payload"  default="3.0"/>
+	  <arg name="prefix" default="" />  
+	  <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
+	  <arg name="base_frame" default="$(arg prefix)base" />
+	  <arg name="tool_frame" default="$(arg prefix)tool0_controller" />
+          <arg name="launch_prefix" value="" />
+
+
+	 <!-- Load hardware interface -->
+	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" output="log" launch-prefix="$(arg launch_prefix)">
+	    <param name="robot_ip_address" type="str" value="'127.0.0.1'"/>
+	    <param name="min_payload" type="double" value="$(arg min_payload)"/>
+	    <param name="max_payload" type="double" value="$(arg max_payload)"/>
+	    <param name="max_velocity" type="double" value="$(arg max_velocity)"/>
+	    <param name="use_ros_control" type="bool" value="True"/>
+	    <param name="servoj_gain" type="double" value="750" />
+	    <param name="prefix" value="$(arg prefix)" />
+	    <param name="base_frame" type="str" value="$(arg base_frame)"/>
+	    <param name="tool_frame" type="str" value="$(arg tool_frame)"/>
+	  </node>
+
+      <node name="ur_driver" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen">
+      <param name="set_io_service" type="string" value="/ur_driver/set_io" />
+
+	<!-- push robot_description to factory and spawn robot in gazebo 
+	<node name="spawn_ur_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -ros_namespace /gazebo -z 0.1" respawn="false" output="screen" />-->
+
+
+</launch>
+
