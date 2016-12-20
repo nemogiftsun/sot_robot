@@ -66,12 +66,12 @@ bool has_velocity_; // false if no velocity command has been specified
 
 
 
-class RobotControllerPlugin : public controller_interface::Controller<hardware_interface::EffortJointInterface> {
+class RobotControllerPlugin : public controller_interface::Controller<hardware_interface::VelocityJointInterface> {
 public:
     RobotControllerPlugin();
     ~RobotControllerPlugin();
 
-    bool init(hardware_interface::EffortJointInterface *robot, ros::NodeHandle &n);
+    bool init(hardware_interface::VelocityJointInterface *robot, ros::NodeHandle &n);
 
     void starting(const ros::Time& time);
 
@@ -135,7 +135,7 @@ private:
 	hardware_interface::JointHandle joint_;
     std::vector<control_toolbox::Pid> pids_;
 
-	hardware_interface::EffortJointInterface *robot_;
+	hardware_interface::VelocityJointInterface *robot_;
 
     // ROS interface
     boost::scoped_ptr<

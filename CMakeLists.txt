@@ -8,21 +8,12 @@ set(ROS_BUILD_TYPE RelWithDebInfo)
 
 project(sot_robot)
 
-find_package(catkin REQUIRED COMPONENTS pr2_controller_interface pr2_controller_manager realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf rospy rqt_gui_py)
+find_package(catkin REQUIRED COMPONENTS controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
-
-##gui
-#find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-#include(${QT_USE_FILE})
-#include(${QT_USE_FILE})
-#add_definitions(-DQT_NO_KEYWORDS)
-#qt4_wrap_cpp(MOC_FILES
-#  include/gui/myviz.h
-#)
 #catkin_python_setup()
-catkin_package(CATKIN_DEPENDS message_runtime)
+catkin_package(CATKIN_DEPENDS message_runtime controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro)
 
 SET(PROJECT_NAME sot_robot)
 SET(PROJECT_DESCRIPTION "sot controller for ros based robot")
@@ -56,7 +47,7 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS} include)
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
 
 set(SOURCES
-    src/sot_robot_controller_threaded_generic.cpp
+    src/vel_sot_robot_controller_threaded_generic.cpp
     src/sot_robot_device.cpp)
 
 set(HEADERS
@@ -103,25 +94,20 @@ install(DIRECTORY launch
 install(DIRECTORY robot
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-## Mark other files for installation (e.g. launch and bag files, etc.)
+
+
 install(FILES
-  robot/pr2_sot_controller.yaml
+  robot/ur_sot_controller.yaml
 #   # myfile2
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )
+
 
 install(FILES
   controller_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-############# GUI ################################
-install(FILES gui_plugin.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-install(DIRECTORY resource
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
 install(PROGRAMS
   script/rqt_rpc
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
