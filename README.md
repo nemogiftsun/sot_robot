@@ -60,3 +60,22 @@ steps:
   The first six elements are x,y,z,r,p,y followed by six joints of the ur5 arm.
 
 * Verify if the joint values manifest in rviz
+
+
+### Testing in UR SIM
+
+* Start the ur simulator
+
+* Launch the ur robot
+        roslaunch sot_ur_bringup_real_sim.launch
+* Launch the sot controller
+        roslaunch spawn_ur_controller.launch
+* Start the python interactor 
+
+      rosrun dynamic_graph_bridge run_command
+* Play with the joint positions to check the value
+
+      sot.posture_feature.posture.feature.value = (0,0,0,0,0,0,0,0,0,0,0,0)
+ 
+
+
