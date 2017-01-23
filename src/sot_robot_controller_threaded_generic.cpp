@@ -117,7 +117,7 @@ void sampleAndHold(RobotControllerPlugin *actl) {
             LOG_TRACE(err.getStringMessage());
             throw err;
         }
-        actl->device().getControl(deviceOut);
+        //actl->device().getControl(deviceOut);
         {
             boost::mutex::scoped_lock lock(wmut);
             actl->holdOut() = deviceOut;
@@ -392,7 +392,8 @@ void RobotControllerPlugin::starting(const ros::Time& time) {
 		}
 		catch (std::exception &e) {throw e; }
 		//readControl();
-  
+    std::ofstream aof(LOG_PYTHON.c_str());
+    runPython (aof, "sot.startRobot()",true, *interpreter_);
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
 }
 

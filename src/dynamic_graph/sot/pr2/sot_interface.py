@@ -1,7 +1,7 @@
-from dynamic_graph.sot.ur.robot import Ur5
+#import dynamic_graph.sotcollision as sc
+from dynamic_graph.sot.pr2.robot import Pr2
 from dynamic_graph.ros.robot_model import RosRobotModel
 from dynamic_graph.sot.core import RobotSimu, FeaturePosition, FeaturePosture, Task, SOT, GainAdaptive, FeatureGeneric
-from dynamic_graph.sot.core.matrix_util import RPYToMatrix
 from dynamic_graph.sot.core.meta_tasks import generic6dReference
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph import plug, writeGraph
@@ -14,7 +14,7 @@ from dynamic_graph.ros import Ros
 from dynamic_graph.entity import PyEntityFactoryClass
 
 # trajectory interpolator
-#from dynamic_graph.sot.hpp import PathSampler 
+from dynamic_graph.sot.hpp import PathSampler 
 
 
 import math
@@ -22,34 +22,38 @@ import time
 
 
 import xml.etree.ElementTree as ET
-file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
+file = '/home/ngiftsun/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
 #file = '/home/nemogiftsun/laasinstall/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
 
-#usage
 '''
-from dynamic_graph.sot.ur.sot_interface import SOTInterface
+from dynamic_graph.sot.pr2.sot_interface import SOTInterface
+from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
+import transformations as tr
+from dynamic_graph import plug, writeGraph
+import numpy as np
+import math
+
 test = SOTInterface()
 test.initializeRobot()
 test.startRobot()
-
-from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
+dt = 0.01
 @loopInThread
-
 def inc():
-    test.robot.device.increment(0.01)
+    test.robot.device.increment(dt)
 
 runner=inc()
 runner.once()
 [go,stop,next,n]=loopShortcuts(runner)
 '''
+
 class SOTInterface:
     def __init__(self,device_type='simu'): 
         if device_type =='simu':
-            self.robot=Ur5('Ur5')
+            self.robot = Pr2('Pr2')
         else:
             self.Device=PyEntityFactoryClass('RobotDevice')  
-	    self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
-        # define robot device        
+            self.robot = Pr2(name ='Pr2',device = self.Device('Pr2_device') )
+        # define robot 
         self.dimension = self.robot.dynamic.getDimension()
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
@@ -64,32 +68,33 @@ class SOTInterface:
         self.solver.damping.value =3e-5
         self.status = 'NOT_INITIALIZED'
         self.code = [7,9,13,22,24,28,32]
-        self.initializeRobot()
-        '''
         # file upload
+        '''
         self.CF_tree = ET.parse(file)
         self.CF_root = self.CF_tree.getroot()
         if (self.CF_root.tag == "Trajectories"):
             self.CF_trajectories = self.CF_root.findall('trajectory')
             self.CF_count = len(self.CF_trajectories)
-        '''
-
-
+         '''
     def defineBasicTasks(self):
         # 1. DEFINE JOINT LIMIT TASK
         self.robot.dynamic.upperJl.recompute(0)
         self.robot.dynamic.lowerJl.recompute(0)
         ll = list(self.robot.dynamic.lowerJl.value)
         ul = list(self.robot.dynamic.upperJl.value)
+        ul[13] = -2.1213
+        ul[15] = -2
+        ll[13] = -0.15
+        ll[15] = -0.1
         self.jltaskname = self.defineJointLimitsTask(ll,ul)
 
         # 2. DEFINE BASE/WAIST POSITIONING TASK
-        position = [0,0,0,0,0,-0.785]
+        position = [0,0,0]
         self.waisttaskname = self.defineWaistPositionTask(position)
         
         # 3. DEFINE ROBOT POSTURE TASK
         self.robot.device.state.recompute(self.robot.device.state.time)
-        posture = [0,0,0,0,0,-0.785,5.297316345615761, -4.983172114475046, 4.856191953125, -4.428600915992907, -4.505247814299959, 6.036689290915096]
+        posture = self.robot.device.state.value
         #posture[13] = 1.6
         self.posturetaskname = self.defineRobotPostureTask(posture)
     
@@ -140,10 +145,8 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf[0:6] = [-3,-3,-3,-3,-3,-3]
-        sup[0:6] = [3,3,3,3,3,3]
-	taskjl.referenceInf.value = inf
-	taskjl.referenceSup.value = sup
+        taskjl.referenceInf.value = (-3,-3,0,0,0,-3.14,0.01, -2.86, -0.370000, -0.560000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0,-0.7854, -2.140000, -0.35,-0.65,-2.12,-3.14,-2.00,-3.14,0.0, 0.0,-0.1, -3.14,0.0, 0.0, 0.0, -3.14)
+        taskjl.referenceSup.value = (3,3,0,0,0,3.14, 0.33, 2.86,1.30,2.140000,1.30,3.75,-0.15,3.14,1.0,3.14, 0.55, 0.55,0.1, 3.14, 0.55, 0.55, 0.09,1.48353,0.56, 1.30, 3.75, -0.15, 3.14, 1.0, 3.14, 0.55, 0.55, 0.1, 3.14, 0.55, 0.55, 0.09,3.14)
         taskjl.dt.value = 1
         return taskjl.name
   
@@ -162,10 +165,9 @@ class SOTInterface:
 
     def defineWaistPositionTask(self,position):
         self.task_waist_metakine=MetaTaskKine6d('WaistTask',self.robot.dynamic,'base_joint','base_joint')
-        self.goal_waist = RPYToMatrix( position )
-        #self.goal_waist = ((1.,0,0,position[0]),(0,1.,0,position[1]),(0,0,1.,position[2]),(0,0,0,1.),)
+        self.goal_waist = ((1.,0,0,position[0]),(0,1.,0,position[1]),(0,0,1.,position[2]),(0,0,0,1.),)
         self.task_waist_metakine.feature.frame('desired')
-        #self.task_waist_metakine.feature.selec.value = '000000'#RzRyRxTzTyTx
+        self.task_waist_metakine.feature.selec.value = '011100'#RzRyRxTzTyTx
         self.task_waist_metakine.gain.setConstant(10)
         self.task_waist_metakine.featureDes.position.value = self.goal_waist
         return self.task_waist_metakine.task.name
@@ -181,9 +183,9 @@ class SOTInterface:
             posture = self.robot.device.state.value
         self.posture_feature.posture.value = posture 
 
-        postureTaskDofs = [True]*(self.robot.dimension)
+        postureTaskDofs = [True]*(39)
         for dof,isEnabled in enumerate(postureTaskDofs):
-            if dof >= 6:
+            if dof >= 0:
               self.posture_feature.selectDof(dof,isEnabled)
 
         self.task_posture=Task('Posture Task')
@@ -191,10 +193,10 @@ class SOTInterface:
         # featurePosition.selec.value = toFlags((6,24))
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
-        gainPosition.gain.value = 1
-        plug(self.task_posture.error,gainPosition.error)
-        plug(gainPosition.gain,self.task_posture.controlGain)
-        #self.task_posture.controlGain.value = 1
+        gainPosition.gain.value = 0.5
+        #plug(task_posture.error,gainPosition.error)
+        #plug(gainPosition.gain,task_posture.controlGain)
+        self.task_posture.controlGain.value = 1.0
         return self.task_posture.name
     
     def defineCollisionAvoidance(self):
@@ -253,19 +255,19 @@ class SOTInterface:
 
 
     def setRobotPosture(self,posture):
-        #self.ps.resetPath()
-        #self.ps.setTimeStep (0.01)
-        #sot_config = self.robot.dynamic.position.value
-        #hpp_config = self._converttohpp(sot_config)
-        #self.ps.addWaypoint(tuple(hpp_config))
-        self.posture_feature.posture.value = posture
-        #hpp_config = self._converttohpp(posture)  
-        #self.ps.addWaypoint(tuple(hpp_config))
-        #self.ps.configuration.recompute(self.ps.configuration.time)
-        #plug(self.ps.configuration,self.posture_feature.posture)         
-        #self.ps.start()        
+        self.ps.resetPath()
+        self.ps.setTimeStep (0.01)
+        sot_config = self.robot.dynamic.position.value
+        hpp_config = self._converttohpp(sot_config)
+        self.ps.addWaypoint(tuple(hpp_config))
+        #self.posture_feature.posture.value = posture
+        hpp_config = self._converttohpp(posture)  
+        self.ps.addWaypoint(tuple(hpp_config))
+        self.ps.configuration.recompute(self.ps.configuration.time)
+        plug(self.ps.configuration,self.posture_feature.posture)         
+        self.ps.start()        
         
-        
+       
     # robot control procedures    
     def initializeRobot(self):
         self.connectDeviceWithSolver(False)

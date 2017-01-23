@@ -124,9 +124,8 @@ void sampleAndHold(RobotControllerPlugin *actl) {
             actl->holdOut() = deviceOut;
         }
         cond3.notify_all();
-        usleep(20000);
-        }
-    
+        usleep(1);
+    }
 }
 
 
@@ -154,7 +153,7 @@ RobotControllerPlugin::~RobotControllerPlugin() {
 
 }
 
-bool RobotControllerPlugin::init(hardware_interface::VelocityJointInterface *robot, ros::NodeHandle &n) {
+bool RobotControllerPlugin::init(hardware_interface::PositionJointInterface *robot, ros::NodeHandle &n) {
 
 	node_ = n;
 
@@ -218,23 +217,22 @@ bool RobotControllerPlugin::init(hardware_interface::VelocityJointInterface *rob
 	if (urdf_joints.empty()) {return false;}
 	assert(n_joints == urdf_joints.size());
 
-
-    /*Ensures joints are calibrated
+/*
+    // Ensures joints are calibrated
     for (size_t i=0; i<joints_.size(); ++i) {
         if (!joints_[i]->calibrated_) {
             ROS_ERROR("Joint %s was not calibrated (namespace: %s)", joints_[i]->joint_->name.c_str(), node_.getNamespace().c_str());
             return false;
         }
-    }*/
-
+    }
+*/
  // Setup PID controllers
     std::string gains_ns;
     if (!node_.getParam("gains", gains_ns))
         gains_ns = node_.getNamespace() + "/gains";
     pids_.resize(joints_.size());
     for (size_t i=0; i<joints_.size(); ++i) {
-        //pids_[i].reset( new control_toolbox::Pid( 1.0 ) );
-        
+
         if (!pids_[i].init(ros::NodeHandle(gains_ns + "/" + joints_[i].getName()))) {
             if (!pids_[i].init(ros::NodeHandle(node_,"pid_parameters"))) {
                 ROS_ERROR("Failed to build PID controller");
@@ -289,8 +287,7 @@ void RobotControllerPlugin::fillSensors() {
     // Joint values/
     sensorsIn_["joints"].setName("position");
     for (unsigned int i=0; i<joints_.size(); ++i){
-        joint_positionsIN_[i] = joints_[i].getPosition();
-    	//joint_positionsIN_[i] = floorf(joints_[i].getPosition() * 100) / 100;
+    	joint_positionsIN_[i] = joints_[i].getPosition();
     }
     sensorsIn_["joints"].setValues(joint_positionsIN_);
 
@@ -326,8 +323,17 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
     joint_positionsOUT_ = controlValues_["joints"].getValues();
     joint_velocityOUT_ = controlValues_["velocities"].getValues();
 
+    /* arm velcoity control
+for (unsigned int i=0; i<joints_.size(); ++i) {
+        double error_vel = joint_velocityOUT_[i] - joints_[i].getVelocity();
+        //double error_vel_sum[i] += error_vel;
+        //double error_vel_delta  = error_vel-error_vel_last[i];
+        double command = pids_[i].computeCommand(error_vel,period);
+        joints_[i].setCommand(command);
+        //error_vel_last[i] = error_vel;
+        }*/
     
-    /* arm velocity control*/
+    /* arm position control*/
 
     for (unsigned int i=0; i<joints_.size(); ++i) {
         double errord = joint_velocityOUT_[i]-joints_[i].getVelocity() ;
@@ -345,7 +351,7 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
           error[i] = joints_[i].getPosition() - joint_positionsOUT_[i];
         }
 
-        joints_[i].setCommand(pids_[i].updatePid(error[i], errord, period));
+        joints_[i].setCommand(pids_[i].updatePid(error[i], 0, period));
 
         }
 
