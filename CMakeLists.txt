@@ -8,12 +8,12 @@ set(ROS_BUILD_TYPE RelWithDebInfo)
 
 project(sot_robot)
 
-find_package(catkin REQUIRED COMPONENTS controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro)
+find_package(catkin REQUIRED COMPONENTS controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs message_generation std_srvs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro urdf)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
 #catkin_python_setup()
-catkin_package(CATKIN_DEPENDS message_runtime controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro)
+catkin_package(CATKIN_DEPENDS message_runtime controller_interface controller_manager hardware_interface realtime_tools roscpp rospy urdf std_msgs geometry_msgs sensor_msgs control_msgs tf rospy gazebo_ros_control xacro urdf)
 
 SET(PROJECT_NAME sot_robot)
 SET(PROJECT_DESCRIPTION "sot controller for ros based robot")
@@ -45,6 +45,7 @@ INCLUDE(cmake/python.cmake)
 FINDPYTHON()
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS} include)
 LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})
+LINK_DIRECTORIES(/opt/ros/indigo/lib)
 
 set(SOURCES
     src/vel_sot_robot_controller_threaded_generic.cpp
@@ -65,6 +66,8 @@ target_link_libraries(sot_robot sot-core)
 target_link_libraries(sot_robot dynamic-graph-python)
 target_link_libraries(sot_robot ros_bridge)
 target_link_libraries(sot_robot ros_interpreter)
+target_link_libraries(sot_robot urdf)
+target_link_libraries(sot_robot control_toolbox)
 
 
 #message(cmakeinstall ${CMAKE_INSTALL_LIBDIR})
@@ -119,3 +122,4 @@ install(PROGRAMS
 message(path ${CMAKE_PREFIX_PATH})
 
 ADD_SUBDIRECTORY(src)
+

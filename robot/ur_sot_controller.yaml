@@ -1,3 +1,17 @@
+# Settings for ros_control control loop
+hardware_control_loop:
+   loop_hz: 125
+
+# Settings for ros_control hardware interface
+hardware_interface:
+   joints:
+     - shoulder_pan_joint
+     - shoulder_lift_joint
+     - elbow_joint
+     - wrist_1_joint
+     - wrist_2_joint
+     - wrist_3_joint
+
 sot_robot:  
     type: sot_robot/RobotControllerPlugin
     robot: "Ur_device"
@@ -9,11 +23,11 @@ sot_robot:
         - wrist_2_joint
         - wrist_3_joint
     gains:
-        shoulder_pan_joint: {p: 10000.0, i: 500.0, d: 200.0, i_clamp: 100.0}
-        shoulder_lift_joint: {p: 10000.0, i: 500.0, d: 200.0, i_clamp: 100.0}
-        elbow_joint: {p: 10000.0, i: 500.0, d: 100.0, i_clamp: 100.0}
-        wrist_1_joint: {p: 100.0, i: 0.0, d: 10.0, i_clamp: 0.0}
-        wrist_2_joint: {p: 100.0, i: 0.0, d: 10.0, i_clamp: 0.0}
-        wrist_3_joint: {p: 100.0, i: 0.0, d: 0.0, i_clamp: 0.0}
+        shoulder_pan_joint: {p: 40, i: 10, d: 0.0, i_clamp: 0}
+        shoulder_lift_joint: {p: 40, i: 10, d: 0.0, i_clamp: 0}
+        elbow_joint: {p: 40, i: 10, d: 0.0, i_clamp: 0}
+        wrist_1_joint: {p: 40, i: 10.0, d: 0, i_clamp: 0.0}
+        wrist_2_joint: {p: 40, i: 10.0, d: 0, i_clamp: 0.0}
+        wrist_3_joint: {p: 40, i: 10.0, d: 0.0, i_clamp: 0.0}
 
 
