@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <launch>
 
- <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey_with_objects.urdf.xacro" />
-
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey.urdf.xacro" />
  <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_sot.urdf.xacro'" />
-
+ <param name="robot_description_simple" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_$(arg robot).urdf.xacro'"/>
+ <param name="robot_description_semantic" textfile="$(find tom_description)/srdf/tom_$(arg robot).srdf" />
+	
 
     <param name="use_gui" value="false"/>
     <param name="robot_base_link" value="base_link"/>

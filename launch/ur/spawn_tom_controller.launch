@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <rosparam file="$(find sot_robot)/robot/ur_sot_controller.yaml" command="load"/>
+
+    <rosparam file="$(find sot_robot)/robot/tom_sot_controller.yaml" command="load"/>
 
     <node pkg="controller_manager" type="spawner" args="sot_robot" name="robot_sot_controller_spawner" />
 </launch>

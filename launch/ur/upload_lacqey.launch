@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey.urdf.xacro'" />
+ <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_sot.urdf.xacro'" />
+ <param name="robot_description_simple" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_simple_kinect.urdf.xacro'"/>
+ <param name="robot_description_semantic" textfile="$(find tom_description)/srdf/tom_simple_kinect.srdf" />
+
+
+  <!-- Joint limits -->
+  <rosparam command="load" file="$(find tom_description)/config/joint_limits.yaml"/>
+
+</launch>

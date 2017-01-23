@@ -22,8 +22,7 @@
 
 
 	 <!-- Load hardware interface -->
-	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" output="log" launch-prefix="$(arg launch_prefix)">
-	    <param name="robot_ip_address" type="str" value="'127.0.0.1'"/>
+	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="log" launch-prefix="$(arg launch_prefix)">
 	    <param name="min_payload" type="double" value="$(arg min_payload)"/>
 	    <param name="max_payload" type="double" value="$(arg max_payload)"/>
 	    <param name="max_velocity" type="double" value="$(arg max_velocity)"/>
@@ -32,14 +31,15 @@
 	    <param name="prefix" value="$(arg prefix)" />
 	    <param name="base_frame" type="str" value="$(arg base_frame)"/>
 	    <param name="tool_frame" type="str" value="$(arg tool_frame)"/>
-	  </node>
+	</node>
 
-      <node name="ur_driver" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen">
-      <param name="set_io_service" type="string" value="/ur_driver/set_io" />
+    <rosparam file="$(find sot_robot)/robot/ur_sot_controller.yaml" command="load"/>
+
+	  <!--node name="ur_driver" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen"/-->
+      <!--param name="set_io_service" type="string" value="/ur_driver/set_io" /-->
 
 	<!-- push robot_description to factory and spawn robot in gazebo 
 	<node name="spawn_ur_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -ros_namespace /gazebo -z 0.1" respawn="false" output="screen" />-->
 
 
 </launch>
-

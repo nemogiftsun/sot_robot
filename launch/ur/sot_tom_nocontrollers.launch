@@ -1,23 +1,21 @@
 <?xml version="1.0"?>
 <launch>
 
- <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey_with_objects.urdf.xacro" />
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey_with_objects.urdf.xacro'" />
 
- <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_sot.urdf.xacro'" />
+ <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey.urdf.xacro'" />
 
 
     <param name="use_gui" value="false"/>
     <param name="robot_base_link" value="base_link"/>
 
-    <arg name="frame" value="robot_pedestal_link"/>
-    <arg name="child_frame" value= "base_link"/>
+    <arg name="frame" value="world"/>
+    <arg name="child_frame" value= "base_footprint"/>
     <param name="ref_link" value="world"/>
-
 
      <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
 	<env name="ROS_NAMESPACE" value=""/>
     </node>
-
     <node name="robot_pose_publisher" pkg="dynamic_graph_bridge" type="robot_pose_publisher" args="_frame:=$(arg frame) _child_frame:=$(arg child_frame)">
         <env name="ROS_NAMESPACE" value="" />
     </node>

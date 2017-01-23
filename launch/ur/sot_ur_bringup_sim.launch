@@ -1,19 +1,21 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="limited" default="false"/>
-  <arg name="paused" default="false"/>
-  
-  <!-- startup simulated world -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" default="worlds/empty.world"/>
-	<arg name="gui" value="false" />
-  </include>
 
-   <!-- Robot state publisher -->
-  <node pkg="robot_state_publisher" type="robot_state_publisher" name="ur_state_publisher">
-    <param name="publish_frequency" type="double" value="50.0" />
-    <param name="tf_prefix" type="string" value="" />
-  </node>
+	<arg name="limited" default="false"/>
+	<arg name="paused" default="false"/>
+
+	<!-- startup simulated world 
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+	<arg name="world_name" default="worlds/empty.world"/>
+	<arg name="gui" value="false" />
+	</include>-->
+
+
+	<!-- Robot state publisher-->
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="tom_state_publisher">
+	<param name="publish_frequency" type="double" value="50.0" />
+	<param name="tf_prefix" type="string" value="" />
+	</node>
 
 	<!-- Startup PR2 without any mechanism controllers -->
 	<include file="$(find sot_robot)/launch/ur/ur_nocontrollers.launch" />
