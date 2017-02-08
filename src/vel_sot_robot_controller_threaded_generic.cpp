@@ -108,7 +108,7 @@ void sampleAndHold(RobotControllerPlugin *actl) {
             boost::mutex::scoped_lock lock(rmut);
             deviceIn = actl->holdIn();
         }
-        actl->device().nominalSetSensors(deviceIn);
+        //actl->device().nominalSetSensors(deviceIn);
         try {
             LOG_TRACE("");
             actl->device().getControl(deviceOut);
@@ -124,7 +124,7 @@ void sampleAndHold(RobotControllerPlugin *actl) {
             actl->holdOut() = deviceOut;
         }
         cond3.notify_all();
-        usleep(20000);
+        //usleep(20000);
         }
     
 }
@@ -345,7 +345,8 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
           error[i] = joints_[i].getPosition() - joint_positionsOUT_[i];
         }
 
-        joints_[i].setCommand(pids_[i].updatePid(error[i], errord, period));
+       
+        joints_[i].setCommand(pids_[i].updatePid(angles::normalize_angle(error[i]), errord, period));
 
         }
 
@@ -370,8 +371,8 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
             controller_state_publisher_->msg_.header.stamp = time;
             for (size_t j=0; j<joints_.size(); ++j) {
                 controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[j];
-                controller_state_publisher_->msg_.actual.positions[j] = joints_[j].getPosition();
-                controller_state_publisher_->msg_.actual.velocities[j] = joints_[j].getVelocity();
+                controller_state_publisher_->msg_.actual.positions[j] = angles::normalize_angle(joints_[j].getPosition());
+                controller_state_publisher_->msg_.actual.velocities[j] = angles::normalize_angle(joints_[j].getVelocity());
                 controller_state_publisher_->msg_.actual.time_from_start= ros::Duration(timeFromStart_);
                 controller_state_publisher_->msg_.error.positions[j] = error[j];
             }
@@ -397,6 +398,7 @@ void RobotControllerPlugin::starting(const ros::Time& time) {
 				cond3.wait(lock);
 				controlValues_ = _holdOut;
 			}
+                
 		}
 		catch (std::exception &e) {throw e; }
 		//readControl();

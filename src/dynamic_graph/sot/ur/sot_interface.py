@@ -9,6 +9,7 @@ from dynamic_graph.sot.core.meta_task_6d import toFlags
 from dynamic_graph.sot.dyninv import TaskInequality, TaskJointLimits
 from dynamic_graph.sot.core.meta_tasks_kine import MetaTaskKine6d
 from dynamic_graph.sot.dyninv import SolverKine
+import numpy as np
 
 from dynamic_graph.ros import Ros
 from dynamic_graph.entity import PyEntityFactoryClass
@@ -41,6 +42,17 @@ def inc():
 runner=inc()
 runner.once()
 [go,stop,next,n]=loopShortcuts(runner)
+
+
+def followTrajectoryThroughPosture(t):
+    #angle_range = np.linspace(-math.pi/2.0, math.pi/2.0,100);
+    angle_range = np.linspace(0, 2*math.pi);
+    for idx in range(0, angle_range.shape[0]):
+       angle = np.sin(angle_range[idx])
+       joint_posture = (angle,) * 12
+       sot.setRobotPosture(joint_posture)
+       time.sleep(t)
+
 '''
 class SOTInterface:
     def __init__(self,device_type='simu'): 
@@ -51,6 +63,9 @@ class SOTInterface:
 	    self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
         # define robot device        
         self.dimension = self.robot.dynamic.getDimension()
+        #rospy.init_node('publisher')
+        #self.pub = rospy.Publisher('posture', String, queue_size=10)
+        #self.r = rospy.Rate(10) # 10hz
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
         # define SOT solver
@@ -73,7 +88,14 @@ class SOTInterface:
             self.CF_trajectories = self.CF_root.findall('trajectory')
             self.CF_count = len(self.CF_trajectories)
         '''
-
+    def followTrajectoryThroughPosture(self,time):
+	#angle_range = np.linspace(-math.pi/2.0, math.pi/2.0,100);
+	angle_range = np.linspace(0, 2*math.pi);
+	for idx in range(0, angle_range.shape[0]):
+	    angle = np.sin(angle_range[idx])
+	    joint_posture = (angle,) * 12
+	    self.setRobotPosture(joint_posture)
+	    time.sleep(time)
 
     def defineBasicTasks(self):
         # 1. DEFINE JOINT LIMIT TASK
@@ -177,9 +199,10 @@ class SOTInterface:
         self.posture_feature = FeaturePosture('featurePosition')
         plug(self.robot.device.state,self.posture_feature.state)
 
+        # sot.posture_feature.posture.feature.value = self.robot.device.state
         if (len(posture) != self.dimension):
             posture = self.robot.device.state.value
-        self.posture_feature.posture.value = posture 
+        self.posture_feature.posture.value = self.robot.device.state.value
 
         postureTaskDofs = [True]*(self.robot.dimension)
         for dof,isEnabled in enumerate(postureTaskDofs):
@@ -287,6 +310,7 @@ class SOTInterface:
             self.status = 'STARTED'
             time.sleep(0.1)
             self.connectDeviceWithSolver(True) 
+            self.posture_feature.posture.value = [0,0,0,0,0,0,-1.6007, -1.7271, -2.2029, -0.8079, 1.5951, -0.03099] 
            
     def stopRobot(self): 
         self.connectDeviceWithSolver(False) 

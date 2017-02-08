@@ -5,7 +5,7 @@
 
 namespace sot_robot {
 
-const double RobotDevice::TIMESTEP_DEFAULT = 0.1;
+const double RobotDevice::TIMESTEP_DEFAULT = 0.02;
 //const int RobotDevice::num_dofs = 33;//pr2
 //const int RobotDevice::num_dofs = 7;//robot
 //const int RobotDevice::num_dofs = 6;//robot
