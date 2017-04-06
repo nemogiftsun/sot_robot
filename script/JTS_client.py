@@ -1,6 +1,8 @@
 import rospy
 import actionlib
 from giftbot_action_server.msg import *
+import numpy as np
+from trajectory_msgs.msg import JointTrajectoryPoint
 
 wps = np.zeros((10,12))
 wps[0,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,-9.433983580109384e-06, -1.570015140892183, 0.00020204444625893103, -1.5705694895909812, 0.0002106347369460476, -9.722773326359402e-05]
@@ -17,18 +19,24 @@ wps[9,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-
 
 def plan_robot():
     rospy.init_node('giftbot_client_py')
-    client = actionlib.SimpleActionClient('JTS', giftbot_action_server.msg.giftbot_action_serverAction)
+    client = actionlib.SimpleActionClient('JTS', giftbot_action_serverAction)
+    print 'Waiting for the server'
     client.wait_for_server()
     goal = giftbot_action_serverGoal()
-    
-    
-    goal.goal_pose = plan
+    #goal.goal_pose.joint_trajectory.points = [JointTrajectoryPoint(),]* wps.shape[0]
+    print 'Planning'
+    for i in range(wps.shape[0]):
+        point = JointTrajectoryPoint()
+        point.positions = wps[i,6:12]
+        goal.goal_pose.joint_trajectory.points.append(point)
+    #goal.goal_pose.joint_trajectory.points = points
+    print 'Sending Goal'
     client.send_goal(goal)
-    client.wait_for_result()
-    moveit_commander.os._exit(0)
+    #client.wait_for_result()
 
 if __name__=='__main__':
-  try:
-      plan_robot()
-  except rospy.ROSInterruptException:
-      pass
+  plan_robot()
+#  try:
+#      plan_robot()
+#  except rospy.ROSInterruptException:
+#      pass

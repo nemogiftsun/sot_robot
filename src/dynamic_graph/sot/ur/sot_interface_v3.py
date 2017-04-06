@@ -82,6 +82,7 @@ class SOTInterface:
         #self.r = rospy.Rate(10) # 10hz
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
+        
         # define SOT solver
         self.solver = SolverKine('sot_solver')
         self.solver.setSize (self.robot.dynamic.getDimension())
@@ -294,6 +295,11 @@ class SOTInterface:
         '''
         self.task_skinsensor.controlGain.value = 0.5
 
+
+    def reWireControl(self):
+        self.ros.rosSubscribe.add('vector','pc','posture_command')
+        plug(self.ros.rosSubscribe.pc,self.posture_feature.posture)
+        
 
     def setRobotPosture(self,posture):
         #self.ps.resetPath()

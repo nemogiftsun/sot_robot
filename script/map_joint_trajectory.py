@@ -28,6 +28,14 @@ wps[7,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-
 wps[8,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,1.3066071312926775, -1.4900456384583056, 1.7333029173228738, -1.9789118318373302, -1.3956011896192357, -1.1746703466797555e-05]
 wps[9,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,1.4699342019522097, -1.480049450654071, 1.9499405264324507, -2.029954624618124, -1.5700776676637587, -1.061574742197989e-06]
 
+'''
+ps = PathSampler ('ps')
+ps.loadRobotModel ('ur_description', 'anchor', 'ur5_robot')
+ps.setTimeStep(0.01)
+for i in range(10):
+     ps.addWaypoint(tuple(wps[i,6:12])) 
+ps.position.value = (0,0,0,0,0,-0.785)+(-9.433983580109384e-06, -1.570015140892183, 0.00020204444625893103, -1.5705694895909812, 0.0002106347369460476, -9.722773326359402e-05)  
+'''
 class JointTrajectorySequencer:
     _result = giftbot_action_server.msg.giftbot_action_serverResult()
     _goalReached = False
@@ -37,39 +45,42 @@ class JointTrajectorySequencer:
         self.pinocchioModel = se3.buildModelFromUrdf(self.urdfDir + self.urdfName, se3.JointModelFreeFlyer())
         self.pinocchioData = self.pinocchioModel.createData()
         self._action_name = name
-        self._as = actionlib.SimpleActionServer(self._action_name, giftbot_action_server.msg.giftbot_action_serverAction, execute_cb=self.execute_cb, auto_start = False)
+        self._as = actionlib.SimpleActionServer(self._action_name, giftbot_action_serverAction, execute_cb=self.execute_cb, auto_start = False)
         self._as.register_preempt_callback(self.preempt_cb)
         self._preempted = False
-        self._as.start()
         self.pub_pc = rospy.Publisher('posture_command', Vector, queue_size=10)
         rospy.Subscriber("sot_robot/state", JointTrajectoryControllerState, self.callback)
-        #rospy.Subscriber("sot_robot/state/desired", JointTrajectoryControllerState, self.callback_desired)
-        #rospy.Subscriber("/trajectory_command", JointTrajectory, self.callback_trj)
         self.rate = rospy.Rate(10) # 10hz
         self.joint_states = None
         self.ps = PathSampler ('ps')
         self.ps.loadRobotModel ('ur_description', 'anchor', 'ur5_robot')
-        self.ps.setTimeStep(0.01)
         self.posture_command = None
-        print 's'
-              
+        self.joint_positions_actual = None
+        self._as.start()
+        self.count = 'INIT'
+        print 'Initialized'         
+        
+        
     def callback(self,data):
         self.joint_positions_desired = data.desired.positions
         self.joint_velocities_desired = data.desired.velocities
-        self.joint_positions_actual = data.desired.positions
-        self.joint_velocities_actual = data.desired.velocities
+        self.joint_positions_actual = data.actual.positions
+        self.joint_velocities_actual = data.actual.velocities
 
     def process_trajectory(self,data,dt=0.01):
-        self.ps.setTimeStep(0.01)
         self.ps.resetPath ()
-        num_wps = len(data.points)
-        wps = np.zeros((num_wps,12))
-        time_segment = np.zeros(num_wps-1)
-        for i in range(num_wps):
-            wps[i,0:6] = [0.,0., 0., 0., 0.,-0.785]
-            wps[i,6:] = data.points[i].positions
-        for i in range(num_wps):
-            ps.addWaypoint(tuple(wps_ref[i,6:12]))            
+        self.ps.setTimeStep(0.01)
+        self.ps.position.value = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
+        self.ps.addWaypoint(tuple(self.joint_positions_actual))
+        self.num_wps = len(data.points)
+        self.wps = np.zeros((self.num_wps,12))
+        for i in range(self.num_wps):
+            self.wps[i,0:6] = [0.,0., 0., 0., 0.,-0.785]
+            self.wps[i,6:] = data.points[i].positions
+        for i in range(self.num_wps):
+            self.ps.addWaypoint(tuple(self.wps[i,6:12])) 
+        self.ps.configuration.recompute(0)   
+        self.ps.start()
         '''    
         for j in range(num_wps-1):
             init = data.points[j].time_from_start.secs + (data.points[j].time_from_start.nsecs/1e9)
@@ -81,30 +92,46 @@ class JointTrajectorySequencer:
         #self.dt
         '''   
     def set_posture_command(self):
-        #self.ps.position.value = (0,0,0,0,0,-0.785)+self.joint_positions_actual
-        self.ps.configuration.recompute(0)
+        current_state = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
+        self.ps.position.value = current_state; 
+        self.ps.configuration.recompute(1)
         self.posture_command = self.ps.configuration.value
+        if self.count == 'NOT_INIT':
+            self.goalStatusCallback()
+        self.rate.sleep()
+        velocity_norm = np.linalg.norm(self.joint_velocities_actual)
+        if (velocity_norm > 0) and (self.count == 'INIT'):
+            print 'Initial State passed'
+            self.count = 'NOT_INIT'
+        
        
     def run(self):
         while not rospy.is_shutdown():
-            if self.posture_command != None:
-                self.pub.publish(self.posture_command)
-                print 'run'    
+            if self.joint_positions_actual != None and self.posture_command == None:
+                current_state = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
+                self.posture_command = current_state
+            if self.posture_command != None:                
+                self.pub_pc.publish(self.posture_command)   
             self.rate.sleep()
         
-    def goalStatusCallback(self,data):
-            velocity_norm = np.linalg.norm(self.joint_velocities_actual.velocities)            
-            goal_error =  np.linalg.norm(self.joint_positions_desired - self.joint_positions_actual)
-            if (velocity_norm < 1e-5) and (goal_error< 1e-5):                   
+    def goalStatusCallback(self):
+            print 'feedback'
+            velocity_norm = np.linalg.norm(self.joint_velocities_actual)   
+            print velocity_norm
+            goal_error =  np.linalg.norm(np.array(self.wps[self.num_wps-1,6:12]) - np.array(self.joint_positions_actual))
+            print goal_error
+            if (velocity_norm < 1e-5) and (goal_error< 1e-3):                   
                 self._goalReached = True
             else:                    
                 self._goalReached = False
 
-    def execute_cb(self, goal_pose): 
-        self.process_trajectory(goal_pose.joint_trajectory)
+    def execute_cb(self, goal): 
+        print 'trying...'
+        self.process_trajectory(goal.goal_pose.joint_trajectory)
         print('R1:Goal received')
         self._preempted = False
         self._goalReached = False
+        self.count = 'INIT'
 
         while (self._preempted == False) and (self._goalReached == False):
             self.set_posture_command()
@@ -125,10 +152,11 @@ class JointTrajectorySequencer:
 
 
 if __name__ == '__main__':
-     rospy.init_node('JointTrajectorySequencer', anonymous=True)
-     JTS = JointTrajectorySequencer('JTS')
+     rospy.init_node('JTS')
+     JTS = JointTrajectorySequencer(rospy.get_name())
      JTS.run()
      rospy.spin()
+     #rospy.spin()
      #wps_ref = wps[0:2,6:].T 
      #posture_traj = SmoothedNdTrajectory("posture_traj", wps_ref,0.2,3);
      #JTS.run()
