@@ -22,7 +22,7 @@
 
 
 	 <!-- Load hardware interface -->
-	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="log" launch-prefix="$(arg launch_prefix)">
+	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen" launch-prefix="$(arg launch_prefix)">
 	    <param name="min_payload" type="double" value="$(arg min_payload)"/>
 	    <param name="max_payload" type="double" value="$(arg max_payload)"/>
 	    <param name="max_velocity" type="double" value="$(arg max_velocity)"/>

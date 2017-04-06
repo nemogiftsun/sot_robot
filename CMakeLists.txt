@@ -32,13 +32,16 @@ set(PKG_CONFIG_ADDITIONAL_VARIABLES
   )
 
 # Search for dependencies.
-ADD_REQUIRED_DEPENDENCY("jrl-mathtools")
-ADD_REQUIRED_DEPENDENCY("jrl-mal")
-ADD_REQUIRED_DEPENDENCY("dynamic-graph")
-ADD_REQUIRED_DEPENDENCY("dynamic_graph_bridge")
-ADD_REQUIRED_DEPENDENCY("dynamic-graph-python")
-ADD_REQUIRED_DEPENDENCY("sot-core")
-ADD_REQUIRED_DEPENDENCY("sot-dynamic")
+
+ADD_REQUIRED_DEPENDENCY("dynamic-graph >=3")
+ADD_REQUIRED_DEPENDENCY("dynamic_graph_bridge >=3")
+ADD_REQUIRED_DEPENDENCY("dynamic-graph-python >= 3")
+ADD_REQUIRED_DEPENDENCY("sot-core >=3")
+ADD_REQUIRED_DEPENDENCY("sot-dynamic-pinocchio")
+ADD_REQUIRED_DEPENDENCY ("hpp-core")
+ADD_REQUIRED_DEPENDENCY ("hpp-model-urdf")
+ADD_REQUIRED_DEPENDENCY ("hpp-model")
+ADD_REQUIRED_DEPENDENCY ("hpp-fcl")
 
 # Python
 INCLUDE(cmake/python.cmake)

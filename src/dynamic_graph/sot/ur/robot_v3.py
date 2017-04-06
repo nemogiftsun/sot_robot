@@ -16,14 +16,15 @@
 # dynamic-graph. If not, see <http://www.gnu.org/licenses/>.
 
 #from dynamic_graph.sot.dynamics.abstract_robot import AbstractRobot
-from dynamic_graph.sot.dynamics.mobile_robot import AbstractMobileRobot
+from dynamic_graph.sot.dynamics.mobile_robot_v3 import AbstractMobileRobot
 from dynamic_graph.ros import RosRobotModel
 from dynamic_graph.sot.core import  SOT,FeaturePosition, Task
-import pinocchio as se3
 from rospkg import RosPack
-class Tom(AbstractMobileRobot):
+import pinocchio as se3
+
+class Ur5(AbstractMobileRobot):
     """
-    This class instanciates a Tom robot.
+    This class instanciates a Ur5 robot.
     """
 
     tracedSignals = {
@@ -35,41 +36,35 @@ class Tom(AbstractMobileRobot):
     
     def __init__(self, name, device = None, tracer = None):
         AbstractMobileRobot.__init__ (self, name, tracer)
-        rospack = RosPack()
-        self.urdfDir = rospack.get_path('tom_description') + '/robots/'
-        self.urdfName = 'tom_lacquey.urdf'
         # add operational points
-        #self.OperationalPoints.append('base_joint')
-        #self.OperationalPoints.append('l_s') 
-        '''       
-        self.OperationalPoints.append('l_shoulder_pan_joint')
-        self.OperationalPoints.append('l_shoulder_lift_joint')
-        self.OperationalPoints.append('l_elbow_joint')
-        self.OperationalPoints.append('l_wrist_1_joint')
-        self.OperationalPoints.append('l_wrist_2_joint')
-        self.OperationalPoints.append('l_wrist_3_joint')
-        '''
-        self.OperationalPoints.append('r_shoulder_pan_joint')
-        self.OperationalPoints.append('r_shoulder_lift_joint')
-        self.OperationalPoints.append('r_elbow_joint')
-        self.OperationalPoints.append('r_wrist_1_joint')
-        self.OperationalPoints.append('r_wrist_2_joint')
-        self.OperationalPoints.append('r_wrist_3_joint')
-        self.OperationalPoints.append('r_front_wheel_joint')  
-       # device and dynamic model assignment
+        self.OperationalPoints.append('root_joint')
+        self.OperationalPoints.append('shoulder_pan_joint')
+        self.OperationalPoints.append('shoulder_lift_joint')
+        self.OperationalPoints.append('elbow_joint')
+        self.OperationalPoints.append('wrist_1_joint')
+        self.OperationalPoints.append('wrist_2_joint')
+        self.OperationalPoints.append('wrist_3_joint')
+
+        # device and dynamic model assignment
         self.device = device
-        self.dynamic = RosRobotModel("{0}_dynamic".format(name))
+        rospack = RosPack()
+	self.urdfDir = rospack.get_path('ur_description') + '/urdf/'
+        print "Loaded model...."
+        self.urdfName = 'ur5_robot.urdf'
         self.pinocchioModel = se3.buildModelFromUrdf(self.urdfDir + self.urdfName,
                                                      se3.JointModelFreeFlyer())
         self.pinocchioData = self.pinocchioModel.createData()
+
+        self.dynamic = RosRobotModel("{0}_dynamic".format(name))
         self.dynamic.setModel(self.pinocchioModel)
         self.dynamic.setData(self.pinocchioData)
+
         # load model
         #self.dynamic.loadFromParameterServer()
         self.dimension = self.dynamic.getDimension()
         #self.initPosition = ip
-        self.initPosition = (0.,) * self.dimension
+        self.initPosition = (-1.,) * self.dimension
         # initialize ur robot
         self.initializeRobot()        
-__all__ = ["Tom"]
+__all__ = ["Ur5"]
 

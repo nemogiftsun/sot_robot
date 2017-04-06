@@ -1,5 +1,5 @@
-from dynamic_graph.sot.ur.robot import Ur5
-from dynamic_graph.ros.robot_model import RosRobotModel
+from dynamic_graph.sot.ur.robot_v3 import Ur5
+from dynamic_graph.ros import RosRobotModel
 from dynamic_graph.sot.core import RobotSimu, FeaturePosition, FeaturePosture, Task, SOT, GainAdaptive, FeatureGeneric
 from dynamic_graph.sot.core.matrix_util import RPYToMatrix
 from dynamic_graph.sot.core.meta_tasks import generic6dReference
@@ -16,13 +16,13 @@ from dynamic_graph.entity import PyEntityFactoryClass
 
 # trajectory interpolator
 #from dynamic_graph.sot.hpp import PathSampler 
-
-
 import math
 import time
-
-
+import rospy
+from trajectory_msgs.msg import JointTrajectory
+from sensor_msgs.msg import JointState
 import xml.etree.ElementTree as ET
+
 file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
 #file = '/home/nemogiftsun/laasinstall/devel/ros/src/sot_robot/src/rqt_rpc/rpc_config.xml'
 
@@ -53,6 +53,18 @@ def followTrajectoryThroughPosture(t):
        sot.setRobotPosture(joint_posture)
        time.sleep(t)
 
+import rospy
+from std_msgs.msg import String
+
+def callback(data):
+    rospy.loginfo("I heard %s",data.data)
+    
+def listener():
+    rospy.init_node('node_name')
+    rospy.Subscriber("chatter", String, callback)
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
 '''
 class SOTInterface:
     def __init__(self,device_type='simu'): 
@@ -63,6 +75,8 @@ class SOTInterface:
 	    self.robot = Ur5('Ur5',device = self.Device('Ur_device'))
         # define robot device        
         self.dimension = self.robot.dynamic.getDimension()
+	self.node_name = rospy.get_name()
+	#rospy.init_node('check_life', anonymous=True,disable_signals=True)
         #rospy.init_node('publisher')
         #self.pub = rospy.Publisher('posture', String, queue_size=10)
         #self.r = rospy.Rate(10) # 10hz
@@ -80,6 +94,8 @@ class SOTInterface:
         self.status = 'NOT_INITIALIZED'
         self.code = [7,9,13,22,24,28,32]
         self.initializeRobot()
+	rospy.Subscriber("command", JointTrajectory, self.callback)
+        self.d = 0
         '''
         # file upload
         self.CF_tree = ET.parse(file)
@@ -88,6 +104,10 @@ class SOTInterface:
             self.CF_trajectories = self.CF_root.findall('trajectory')
             self.CF_count = len(self.CF_trajectories)
         '''
+    def callback(data):
+        self.d = data
+        print data
+
     def followTrajectoryThroughPosture(self,time):
 	#angle_range = np.linspace(-math.pi/2.0, math.pi/2.0,100);
 	angle_range = np.linspace(0, 2*math.pi);
@@ -183,7 +203,7 @@ class SOTInterface:
       
 
     def defineWaistPositionTask(self,position):
-        self.task_waist_metakine=MetaTaskKine6d('WaistTask',self.robot.dynamic,'base_joint','base_joint')
+        self.task_waist_metakine=MetaTaskKine6d('WaistTask',self.robot.dynamic,'root_joint','root_joint')
         self.goal_waist = RPYToMatrix( position )
         #self.goal_waist = ((1.,0,0,position[0]),(0,1.,0,position[1]),(0,0,1.,position[2]),(0,0,0,1.),)
         self.task_waist_metakine.feature.frame('desired')

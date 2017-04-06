@@ -241,7 +241,7 @@ RobotDevice::getControl(ControlMap &controlOut) {
 	<< " running periodical commands (before)" << std::endl;
     }*/
 
-    ml::Vector control;
+    dynamicgraph::Vector control;
     try {
           
           controlSIN( time );

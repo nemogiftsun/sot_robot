@@ -21,7 +21,7 @@ plug (solver.control, robot.device.control)
 
 '''
 import sys
-from dynamic_graph.sot.ur.sot_interface import SOTInterface
+from dynamic_graph.sot.ur.sot_interface_v3 import SOTInterface
 sot = SOTInterface('Ur_device')
 sot.connectDeviceWithSolver(False)
 
