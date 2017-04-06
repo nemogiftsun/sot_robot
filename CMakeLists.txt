@@ -53,6 +53,7 @@ LINK_DIRECTORIES(/opt/ros/indigo/lib)
 set(SOURCES
     src/vel_sot_robot_controller_threaded_generic.cpp
     src/sot_robot_device.cpp)
+    #src/path_sampler.cc)
 
 set(HEADERS
     include/sot_robot/sot_robot_controller_threaded_generic.h
@@ -71,13 +72,17 @@ target_link_libraries(sot_robot ros_bridge)
 target_link_libraries(sot_robot ros_interpreter)
 target_link_libraries(sot_robot urdf)
 target_link_libraries(sot_robot control_toolbox)
-
+target_link_libraries(sot_robot hpp-model-urdf)
+target_link_libraries(sot_robot hpp-core)
 
 #message(cmakeinstall ${CMAKE_INSTALL_LIBDIR})
 PKG_CONFIG_USE_DEPENDENCY(sot_robot "dynamic-graph")
 PKG_CONFIG_USE_DEPENDENCY(sot_robot "sot-core")
 PKG_CONFIG_USE_DEPENDENCY(sot_robot "dynamic-graph-python")
-
+PKG_CONFIG_USE_DEPENDENCY (sot_robot  "hpp-model-urdf")
+PKG_CONFIG_USE_DEPENDENCY (sot_robot  "hpp-core")
+PKG_CONFIG_USE_DEPENDENCY (sot_robot  "hpp-fcl")
+PKG_CONFIG_USE_DEPENDENCY (sot_robot  "hpp-model")
 set_target_properties(sot_robot PROPERTIES BUILD_WITH_INSTALL_RPATH True
                       LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
