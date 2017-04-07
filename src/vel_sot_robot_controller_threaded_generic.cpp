@@ -100,15 +100,20 @@ void sampleAndHold(RobotControllerPlugin *actl) {
 
     // Wait the start flag
     boost::unique_lock<boost::mutex> lock(wait_start);
-    cond2.wait(lock);
-	
+    cond2.wait(lock);	
+    bool init = true;
     // Go go go !!!
     while (true) {
         {
             boost::mutex::scoped_lock lock(rmut);
             deviceIn = actl->holdIn();
         }
-        //actl->device().nominalSetSensors(deviceIn);
+        if (init == true)
+        {
+	actl->device().nominalSetSensors(deviceIn);
+        init = false;
+        }
+        
         try {
             LOG_TRACE("");
             actl->device().getControl(deviceOut);
@@ -138,7 +143,7 @@ RobotControllerPlugin::RobotControllerPlugin()
     : loop_count_(0),
       robot_(NULL),
       get_control(true),
-      count_loop(0){
+      count_loop(0),initstatus(true){
 			boost::thread thr(workThread,this);
 			LOG_TRACE("");
 			boost::unique_lock<boost::mutex> lock(mut);
@@ -403,14 +408,15 @@ void RobotControllerPlugin::starting(const ros::Time& time) {
 		catch (std::exception &e) {throw e; }
 		//readControl();
     std::ofstream aof(LOG_PYTHON.c_str());
-    runPython (aof, "sot.startRobot()",true, *interpreter_);
+    //runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
+    runPython (aof, "sot.startRobot()",true, *interpreter_); 
+    runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
 }
 
 void RobotControllerPlugin::update(const ros::Time& time, const ros::Duration& period) {
-    
-		fillSensors();
- 
+
+    fillSensors();
     try {  
 		  {
 		      boost::mutex::scoped_lock lock(rmut);
@@ -419,10 +425,7 @@ void RobotControllerPlugin::update(const ros::Time& time, const ros::Duration& p
       cond2.notify_all();
 		  {
 		      boost::mutex::scoped_lock lock(wmut);
-          if(_holdOut["joints"].getValues() == _holdOut["joints"].getValues())
-          {
-		        controlValues_ = _holdOut;
-          }
+		      controlValues_ = _holdOut;
 		  }
 		}
 		catch (std::exception &e) {throw e; }
@@ -449,6 +452,7 @@ void RobotControllerPlugin::startupPython()
     runPython (aof, "path.extend(sys.path)",true, *interpreter_);
     runPython (aof, "sys.path = path",true, *interpreter_);
     runPython (aof, "from dynamic_graph.sot.ur.prologue import sot",true, *interpreter_);
+    runPython (aof, "from dynamic_graph import plug, writeGraph",true, *interpreter_);
 
     dynamicgraph::rosInit(true);
     aof.close();

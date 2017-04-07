@@ -297,6 +297,7 @@ class SOTInterface:
 
 
     def reWireControl(self):
+        self.posture_feature.posture.unplug()
         self.ros.rosSubscribe.add('vector','pc','posture_command')
         plug(self.ros.rosSubscribe.pc,self.posture_feature.posture)
         
@@ -330,13 +331,14 @@ class SOTInterface:
 
     def startRobot(self):
         if ((self.status == 'INITIALIZED') | (self.status == 'STOPPED')) :   
-            self.posture_feature.posture.value = self.robot.device.state.value        
+            self.posture_feature.posture.value = self.robot.device.state.value  
+            #self.robot.dynamic.position.value =     
             #plug(self.robot.dynamic.position,self.ps.position)
             #self.ps.setTimeStep (0.01)
             self.status = 'STARTED'
             time.sleep(0.1)
             self.connectDeviceWithSolver(True) 
-            self.posture_feature.posture.value = [0,0,0,0,0,0,-1.6007, -1.7271, -2.2029, -0.8079, 1.5951, -0.03099] 
+            #self.posture_feature.posture.value = [0,0,0,0,0,0,-1.6007, -1.7271, -2.2029, -0.8079, 1.5951, -0.03099] 
            
     def stopRobot(self): 
         self.connectDeviceWithSolver(False) 
