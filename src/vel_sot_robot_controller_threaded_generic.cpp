@@ -143,7 +143,7 @@ RobotControllerPlugin::RobotControllerPlugin()
     : loop_count_(0),
       robot_(NULL),
       get_control(true),
-      count_loop(0),initstatus(true){
+      count_loop(0){
 			boost::thread thr(workThread,this);
 			LOG_TRACE("");
 			boost::unique_lock<boost::mutex> lock(mut);
