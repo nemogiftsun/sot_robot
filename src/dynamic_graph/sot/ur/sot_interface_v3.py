@@ -90,7 +90,6 @@ class SOTInterface:
         # define basic tasks
         #self.joint_names = rospy.get_param('sot_controller/jrl_map') 
         self.defineBasicTasks()
-        #self.defineCollisionAvoidance()
         self.solver.damping.value =3e-5
         self.status = 'NOT_INITIALIZED'
         self.code = [7,9,13,22,24,28,32]
@@ -158,7 +157,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        #self.pushTask(self.task_skinsensor.name)
+        self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -241,6 +240,7 @@ class SOTInterface:
         return self.task_posture.name
     
     def defineCollisionAvoidance(self):
+        '''
         self.collisionAvoidance = sc.SotCollision("sc")
         self.collisionAvoidance.createcollisionlink("lfaa","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
         self.collisionAvoidance.createcollisionlink("lfab","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
@@ -276,15 +276,16 @@ class SOTInterface:
         plug(self.robot.dynamic.l_forearm_roll_joint,self.collisionAvoidance.hand)
         self.collisionAvoidance.Jhand.value = ((1,0,0,0),(0,1,0,10),(0,0,1,0),(0,0,0,1))
         plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
+        '''
         self.task_skinsensor=TaskInequality('taskskinsensor')
         self.sensor_feature = FeatureGeneric('sensorfeature')
-        plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
-        plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)
+        plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
+        plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
         self.task_skinsensor.add(self.sensor_feature.name)
-        self.task_skinsensor.referenceInf.value = (0.85,)*7
-        self.task_skinsensor.referenceSup.value = (1.0,)*7
+        self.task_skinsensor.referenceInf.value = (0.04,)*8
+        self.task_skinsensor.referenceSup.value = (1.0,)*8
         self.task_skinsensor.dt.value=0.5
-        self.task_skinsensor.controlSelec.value = '110001000000000000000000000000000000000'
+        self.task_skinsensor.controlSelec.value = '11111111'
         '''
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
@@ -320,6 +321,7 @@ class SOTInterface:
     def initializeSkin(self):
         self.ros.rosSubscribe.add('vector','dC','collision_distance')
         self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
+        self.defineCollisionAvoidance()
         
     # robot control procedures    
     def initializeRobot(self):

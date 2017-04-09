@@ -22,7 +22,8 @@
 
 
 	 <!-- Load hardware interface -->
-	  <node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen" launch-prefix="$(arg launch_prefix)">
+	  <node name="ur_driver" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen" launch-prefix="$(arg launch_prefix)">
+	  <!--node name="ur_hardware_interface" pkg="ur_modern_driver" type="ur_driver" args="'192.168.0.202' '50001'" output="screen" launch-prefix="$(arg launch_prefix)"-->
 	    <param name="min_payload" type="double" value="$(arg min_payload)"/>
 	    <param name="max_payload" type="double" value="$(arg max_payload)"/>
 	    <param name="max_velocity" type="double" value="$(arg max_velocity)"/>
@@ -32,7 +33,6 @@
 	    <param name="base_frame" type="str" value="$(arg base_frame)"/>
 	    <param name="tool_frame" type="str" value="$(arg tool_frame)"/>
 	</node>
-
     <rosparam file="$(find sot_robot)/robot/ur_sot_controller.yaml" command="load"/>
 
 	  <!--node name="ur_driver" pkg="ur_modern_driver" type="ur_driver" args="'localhost' '50001'" output="screen"/-->
