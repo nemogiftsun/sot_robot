@@ -10,7 +10,7 @@ PYTHON_INSTALL("dynamic_graph/sot/ur" "prologue.py" "${PYTHON_SITELIB}")
 PYTHON_INSTALL("dynamic_graph/sot/ur" "sot_interface_v3.py" "${PYTHON_SITELIB}")
 PYTHON_INSTALL("dynamic_graph/sot/ur" "trajectories.py" "${PYTHON_SITELIB}")
 PYTHON_INSTALL("dynamic_graph/sot/ur" "derivative_filters.py" "${PYTHON_SITELIB}")
-
+PYTHON_INSTALL("dynamic_graph/sot/ur" "robot_wrapper.py" "${PYTHON_SITELIB}")
 
 
 

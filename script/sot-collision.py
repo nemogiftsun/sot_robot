@@ -13,7 +13,7 @@ import pinocchio as se3
 from numpy.matlib import zeros
 from pinocchio.utils import skew
 from control_msgs.msg import JointTrajectoryControllerState
-from pinocchio_inv_dyn.robot_wrapper import RobotWrapper
+from dynamic_graph.sot.ur.robot_wrapper import RobotWrapper
 
 from dynamic_graph_bridge_msgs.msg import Vector
 from dynamic_graph_bridge_msgs.msg import Matrix
