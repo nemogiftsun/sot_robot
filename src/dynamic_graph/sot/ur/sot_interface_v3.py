@@ -95,7 +95,6 @@ class SOTInterface:
         self.status = 'NOT_INITIALIZED'
         self.code = [7,9,13,22,24,28,32]
         self.initializeRobot()
-	rospy.Subscriber("command", JointTrajectory, self.callback)
         self.d = 0
         '''
         # file upload
@@ -297,10 +296,13 @@ class SOTInterface:
 
 
     def reWireControl(self):
+        #self.stopRobot()
         self.posture_feature.posture.unplug()
+        #self.startRobot()
         self.ros.rosSubscribe.add('vector','pc','posture_command')
         plug(self.ros.rosSubscribe.pc,self.posture_feature.posture)
-        
+        #self.ros.rosSubscribe.pc.recompute(self.posture_feature.posture.time)
+  
 
     def setRobotPosture(self,posture):
         #self.ps.resetPath()
@@ -314,17 +316,18 @@ class SOTInterface:
         #self.ps.configuration.recompute(self.ps.configuration.time)
         #plug(self.ps.configuration,self.posture_feature.posture)         
         #self.ps.start()        
-        
+    
+    def initializeSkin(self):
+        self.ros.rosSubscribe.add('vector','dC','collision_distance')
+        self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
         
     # robot control procedures    
     def initializeRobot(self):
         self.connectDeviceWithSolver(False)
-        if self.status == 'NOT_INITIALIZED':
+        self.initializeSkin();
+        if self.status == 'NOT_INITIALIZED':            
             try:
-                self.pushBasicTasks()
-                #self.ps = PathSampler ('ps')
-                #self.ps.createJointReference('l_wrist_roll_joint')
-                #self.ps.loadRobotModel ('sot_robot', 'planar', 'Ur5_sot')                
+                self.pushBasicTasks()              
                 self.status = 'INITIALIZED'
             except ValueError:
                 self.status = 'NOT_INITIALIZED'
