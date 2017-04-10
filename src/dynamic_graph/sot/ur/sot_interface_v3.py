@@ -125,7 +125,7 @@ class SOTInterface:
         self.jltaskname = self.defineJointLimitsTask(ll,ul)
 
         # 2. DEFINE BASE/WAIST POSITIONING TASK
-        position = [0,0,0,0,0,-0.785]
+        position = [0,0,0,0,0,0]
         self.waisttaskname = self.defineWaistPositionTask(position)
         
         # 3. DEFINE ROBOT POSTURE TASK
@@ -157,7 +157,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        self.pushTask(self.task_skinsensor.name)
+        #self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -181,8 +181,8 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf[0:6] = [-3,-3,-3,-3,-3,-3]
-        sup[0:6] = [3,3,3,3,3,3]
+        inf = [0,0,0,0,0,0,-0.349,-2.443,-1.919,-2.967,-1.7453,0]
+        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,-0.0872,1.57]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
@@ -282,10 +282,10 @@ class SOTInterface:
         plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
         plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
         self.task_skinsensor.add(self.sensor_feature.name)
-        self.task_skinsensor.referenceInf.value = (0.04,)*8
-        self.task_skinsensor.referenceSup.value = (1.0,)*8
-        self.task_skinsensor.dt.value=0.5
-        self.task_skinsensor.controlSelec.value = '11111111'
+        self.task_skinsensor.referenceInf.value = (0.04,)*10
+        self.task_skinsensor.referenceSup.value = (1.0,)*10
+        self.task_skinsensor.dt.value=0.01
+        self.task_skinsensor.controlSelec.value = '111000'
         '''
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
@@ -293,7 +293,7 @@ class SOTInterface:
         plug(self.task_skinsensor.error,gainPosition.error)
         plug(gainPosition.gain,self.task_skinsensor.controlGain)
         '''
-        self.task_skinsensor.controlGain.value = 0.5
+        self.task_skinsensor.controlGain.value = 0.
 
 
     def reWireControl(self):
