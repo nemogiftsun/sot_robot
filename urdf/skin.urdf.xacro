@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+	<!--Common definitions -->
+	<xacro:include filename="$(find tom_description)/urdf/common.xacro"/>
+	<!-- xacro sensors  -->
+	<xacro:macro name="skin" params="name">
+<link name="forerarm_skin_root_cell_link">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.000001"/>
+	      </geometry>
+        <material name="white">
+           <color rgba="1 1 1 1"/>
+        </material>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.00000001"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_root_cell_joint" type="fixed">
+	  <parent link="forearm_link"/>
+	  <child link="forerarm_skin_root_cell_link"/>
+	  <origin xyz="-0.003 -0.05 0.32" rpy="1.57  1.57  0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_0">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_0" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_0"/>
+<!--  <origin xyz="0.122545 0.0452926 -0.0396807" rpy="1.46  0.01 -0."/> -->
+	  <origin xyz="0.122545 0.0452926 -0.0396807" rpy="4.79  0.07 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_1">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_1" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_1"/>
+<!-- <origin xyz="0.122971 0.0347329 -0.0140614" rpy="0.88  0.03 -0."/> -->
+	  <origin xyz="0.122971 0.0347329 -0.0140614" rpy="5.35  0.07 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_2">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_2" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_2"/>
+	  <origin xyz="0.121427 0.0122404 -0.00364349" rpy="0.25  0.05  0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_3">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_3" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_3"/>
+	  <origin xyz="0.120852 -0.0153018 -0.00418709" rpy="0.3   0.05  0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_4">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_4" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_4"/>
+	  <origin xyz="0.119741 -0.0385305 -0.0190389" rpy="0.83 -0.04 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_5">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_5" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_5"/>
+	  <origin xyz="0.119756 -0.0512256 -0.0430332" rpy="1.52  0.   -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_6">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_6" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_6"/>
+	  <origin xyz="0.118712 -0.0446355 -0.0687232" rpy="2.02  0.    0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_7">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_7" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_7"/>
+	  <origin xyz="0.119505 -0.0267679 -0.0889594" rpy="2.55 -0.02 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_8">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_8" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_8"/>
+	  <origin xyz="0.119639 -0.00112243 -0.0964335" rpy="3.11  0.07 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_9">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_9" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_9"/>
+<!--  <origin xyz="0.120033 0.0253832 -0.088699" rpy="2.48  0.02 -0."/>-->
+	  <origin xyz="0.120033 0.0253832 -0.088699" rpy="3.67  0.07 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<link name="forerarm_skin_link_10">
+ 	<visual>
+	      <geometry>
+		<sphere radius="0.005"/>
+	      </geometry>
+	      <material name="white"/>
+	</visual>
+	<collision>
+  	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry>
+    	    <sphere radius="0.005"/>
+        </geometry>
+  </collision>
+</link>
+<joint name="forerarm_skin_cell_joint_10" type="revolute">
+	  <parent link="forerarm_skin_root_cell_link"/>
+	  <child link="forerarm_skin_link_10"/>
+<!--  <o<origin xyz="0.122276 0.0426263 -0.0664088" rpy="1.97  0.   -0."/> -->
+	  <origin xyz="0.122276 0.0426263 -0.0664088" rpy="4.23  0.07 -0."/>
+          <axis xyz="0 0 1" />
+          <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="3.15"/>
+</joint>
+<!--Finishers-->		
+  </xacro:macro>	
+</robot>
