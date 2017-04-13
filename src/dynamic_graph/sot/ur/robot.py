@@ -51,9 +51,7 @@ class Ur5(AbstractMobileRobot):
         self.OperationalPoints.append('forerarm_skin_cell_joint_5')
         self.OperationalPoints.append('forerarm_skin_cell_joint_6')
         self.OperationalPoints.append('forerarm_skin_cell_joint_7')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_8')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_9')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_10')
+
 
         # device and dynamic model assignment
         self.device = device

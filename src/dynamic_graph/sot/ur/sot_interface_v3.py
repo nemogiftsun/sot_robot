@@ -13,6 +13,7 @@ import numpy as np
 
 from dynamic_graph.ros import Ros
 from dynamic_graph.entity import PyEntityFactoryClass
+import dynamic_graph.sotcollision as sc
 
 # trajectory interpolator
 #from dynamic_graph.sot.hpp import PathSampler 
@@ -82,6 +83,7 @@ class SOTInterface:
         #self.r = rospy.Rate(10) # 10hz
         self.robot.device.resize (self.dimension)
         self.ros = Ros(self.robot)
+        self.ros.rosSubscribe.add('vector','proximity','proximity_data') 
         
         # define SOT solver
         self.solver = SolverKine('sot_solver')
@@ -138,9 +140,9 @@ class SOTInterface:
     def changeDefaultStackToRPP(self):
         self.connectDeviceWithSolver(False)
         self.solver.clear()
-        self.pushTask(self.jltaskname)
+        #self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        self.pushTask(self.task_skinsensor.name)        
+        #self.pushTask(self.task_skinsensor.name)        
         self.pushTask(self.posturetaskname)
         #self.pushTask(self.posetaskname)
 
@@ -157,7 +159,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        #self.pushTask(self.task_skinsensor.name)
+        self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -240,6 +242,7 @@ class SOTInterface:
         return self.task_posture.name
     
     def defineCollisionAvoidance(self):
+        self.collisionAvoidance = sc.SotCollision("sc")
         '''
         self.collisionAvoidance = sc.SotCollision("sc")
         self.collisionAvoidance.createcollisionlink("lfaa","box","internal",(0.25,0.09,0.09,0.22,0.0,-0.0,0,0,0))
@@ -277,15 +280,58 @@ class SOTInterface:
         self.collisionAvoidance.Jhand.value = ((1,0,0,0),(0,1,0,10),(0,0,1,0),(0,0,0,1))
         plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
         '''
+        self.collisionAvoidance.createcollisionlink("skin_0","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_1","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_2","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_3","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_4","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_5","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_6","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_7","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+
+        # hand
+        self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.22,-1000,-1000.0,1000,0,0))
+        self.collisionAvoidance.createcollisionpair("skin_0","hand")
+        self.collisionAvoidance.createcollisionpair("skin_1","hand")
+        self.collisionAvoidance.createcollisionpair("skin_2","hand")
+        self.collisionAvoidance.createcollisionpair("skin_3","hand")
+        self.collisionAvoidance.createcollisionpair("skin_4","hand")
+        self.collisionAvoidance.createcollisionpair("skin_5","hand")
+        self.collisionAvoidance.createcollisionpair("skin_6","hand")
+        self.collisionAvoidance.createcollisionpair("skin_7","hand")
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_0,self.collisionAvoidance.skin_0)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_1,self.collisionAvoidance.skin_1)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_2,self.collisionAvoidance.skin_2)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_3,self.collisionAvoidance.skin_3)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_4,self.collisionAvoidance.skin_4)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_5,self.collisionAvoidance.skin_5)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_6,self.collisionAvoidance.skin_6)
+        plug(self.robot.dynamic.forerarm_skin_cell_joint_7,self.collisionAvoidance.skin_7)
+
+        
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_0,self.collisionAvoidance.Jskin_0)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_1,self.collisionAvoidance.Jskin_1)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_2,self.collisionAvoidance.Jskin_2)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_3,self.collisionAvoidance.Jskin_3)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_4,self.collisionAvoidance.Jskin_4)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_5,self.collisionAvoidance.Jskin_5)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_6,self.collisionAvoidance.Jskin_6)
+        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_7,self.collisionAvoidance.Jskin_7)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.hand)
+        self.collisionAvoidance.Jhand.value = ((1,0,0,10000),(0,1,0,10000),(0,0,1,10000),(0,0,0,1))             
+        plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
+        
         self.task_skinsensor=TaskInequality('taskskinsensor')
         self.sensor_feature = FeatureGeneric('sensorfeature')
-        plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
-        plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
+        #plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
+        #plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
+        plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
+        plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)        
         self.task_skinsensor.add(self.sensor_feature.name)
         self.task_skinsensor.referenceInf.value = (0.04,)*10
         self.task_skinsensor.referenceSup.value = (1.0,)*10
-        self.task_skinsensor.dt.value=0.01
-        self.task_skinsensor.controlSelec.value = '111000'
+        self.task_skinsensor.dt.value=0.5
+        self.task_skinsensor.controlSelec.value = '00000011100000000000'
         '''
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
@@ -293,7 +339,7 @@ class SOTInterface:
         plug(self.task_skinsensor.error,gainPosition.error)
         plug(gainPosition.gain,self.task_skinsensor.controlGain)
         '''
-        self.task_skinsensor.controlGain.value = 0.
+        self.task_skinsensor.controlGain.value = 0.1
 
 
     def reWireControl(self):
@@ -319,8 +365,9 @@ class SOTInterface:
         #self.ps.start()        
     
     def initializeSkin(self):
-        self.ros.rosSubscribe.add('vector','dC','collision_distance')
-        self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
+        #self.ros.rosSubscribe.add('vector','dC','collision_distance')
+        #self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
+        print 'heyr'
         self.defineCollisionAvoidance()
         
     # robot control procedures    

@@ -143,7 +143,7 @@ class SOTInterface:
         #self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
         self.pushTask(self.task_skinsensor.name)        
-        self.pushTask(self.posturetaskname)
+        #self.pushTask(self.posturetaskname)
         #self.pushTask(self.posetaskname)
 
 
@@ -157,7 +157,7 @@ class SOTInterface:
 
 
     def pushBasicTasks(self):
-        self.pushTask(self.jltaskname)
+        #self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
         self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
@@ -223,7 +223,10 @@ class SOTInterface:
         # sot.posture_feature.posture.feature.value = self.robot.device.state
         if (len(posture) != self.dimension):
             posture = self.robot.device.state.value
-        self.posture_feature.posture.value = self.robot.device.state.value
+        self.posture = list(self.robot.device.state.value)
+        self.posture[9:17]= [0,0,0,0,0,0,0,0]
+        self.posture_feature.posture.value = tuple(self.posture)
+ 
 
         postureTaskDofs = [True]*(self.robot.dimension)
         for dof,isEnabled in enumerate(postureTaskDofs):
@@ -256,17 +259,15 @@ class SOTInterface:
         self.collisionAvoidance.createcollisionlink("skin_9","box","internal",(0.25,0.09,0.09,0,0,0,-0.467, 0.590, 2.678))
         self.collisionAvoidance.createcollisionlink("skin_10","box","internal",(0.25,0.09,0.09,0,0,0,0.093, 0.590, 2.678))
         '''
-        self.collisionAvoidance.createcollisionlink("skin_0","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_1","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_2","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_3","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_4","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_5","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_6","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_7","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_8","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))      
-        self.collisionAvoidance.createcollisionlink("skin_9","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
-        self.collisionAvoidance.createcollisionlink("skin_10","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("skin_0","box","internal",(0.25,0.09,0.09,0,0,0,2.83297311,-1.54208643,2.44288303))
+        self.collisionAvoidance.createcollisionlink("skin_1","box","internal",(0.25,0.09,0.09,0,0,0,1.06341521,-1.48901494,-0.78506072))
+        self.collisionAvoidance.createcollisionlink("skin_2","box","internal",(0.25,0.09,0.09,0,0,0,2.262972,-1.487026,-1.356827))
+        self.collisionAvoidance.createcollisionlink("skin_3","box","internal",(0.25,0.09,0.09,0,0,0,0.2035706,-1.5367411,1.35411575))
+        self.collisionAvoidance.createcollisionlink("skin_4","box","internal",(0.25,0.09,0.09,0,0,0,-2.34960077,-1.49847097,-1.75719079))
+        self.collisionAvoidance.createcollisionlink("skin_5","box","internal",(0.25,0.09,0.09,0,0,0,-2.16054646,-1.50515821,-1.31557256))
+        self.collisionAvoidance.createcollisionlink("skin_6","box","internal",(0.25,0.09,0.09,0,0,0,-2.17682483,-1.51293455,-0.67460558))
+        self.collisionAvoidance.createcollisionlink("skin_7","box","internal",(0.25,0.09,0.09,0,0,0,0.99763746,-1.51906704,3.11362853))
+
 
         # hand
         self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.22,-1000,-1000.0,1000,0,0))
@@ -278,9 +279,7 @@ class SOTInterface:
         self.collisionAvoidance.createcollisionpair("skin_5","hand")
         self.collisionAvoidance.createcollisionpair("skin_6","hand")
         self.collisionAvoidance.createcollisionpair("skin_7","hand")
-        self.collisionAvoidance.createcollisionpair("skin_8","hand")
-        self.collisionAvoidance.createcollisionpair("skin_9","hand")
-        self.collisionAvoidance.createcollisionpair("skin_10","hand")
+
 
         plug(self.robot.dynamic.forerarm_skin_cell_joint_0,self.collisionAvoidance.skin_0)
         plug(self.robot.dynamic.forerarm_skin_cell_joint_1,self.collisionAvoidance.skin_1)
@@ -290,9 +289,7 @@ class SOTInterface:
         plug(self.robot.dynamic.forerarm_skin_cell_joint_5,self.collisionAvoidance.skin_5)
         plug(self.robot.dynamic.forerarm_skin_cell_joint_6,self.collisionAvoidance.skin_6)
         plug(self.robot.dynamic.forerarm_skin_cell_joint_7,self.collisionAvoidance.skin_7)
-        plug(self.robot.dynamic.forerarm_skin_cell_joint_8,self.collisionAvoidance.skin_8)
-        plug(self.robot.dynamic.forerarm_skin_cell_joint_9,self.collisionAvoidance.skin_9)
-        plug(self.robot.dynamic.forerarm_skin_cell_joint_10,self.collisionAvoidance.skin_10)  
+
         
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_0,self.collisionAvoidance.Jskin_0)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_1,self.collisionAvoidance.Jskin_1)
@@ -302,9 +299,7 @@ class SOTInterface:
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_5,self.collisionAvoidance.Jskin_5)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_6,self.collisionAvoidance.Jskin_6)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_7,self.collisionAvoidance.Jskin_7)
-        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_8,self.collisionAvoidance.Jskin_8)
-        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_9,self.collisionAvoidance.Jskin_9)
-        plug(self.robot.dynamic.Jforerarm_skin_cell_joint_10,self.collisionAvoidance.Jskin_10)  
+
 
         plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.hand)
         self.collisionAvoidance.Jhand.value = ((1,0,0,10000),(0,1,0,10000),(0,0,1,10000),(0,0,0,1))             
@@ -326,7 +321,7 @@ class SOTInterface:
         plug(self.task_skinsensor.error,gainPosition.error)
         plug(gainPosition.gain,self.task_skinsensor.controlGain)
         '''
-        self.task_skinsensor.controlGain.value = 0.
+        self.task_skinsensor.controlGain.value = 0.11
 
 
     def reWireControl(self):
