@@ -410,8 +410,8 @@ void RobotControllerPlugin::starting(const ros::Time& time) {
     std::ofstream aof(LOG_PYTHON.c_str());
     //runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
 //
-    //runPython (aof, "sot.startRobot()",true, *interpreter_); 
-    //runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
+    runPython (aof, "sot.startRobot()",true, *interpreter_); 
+    runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
 }
 
