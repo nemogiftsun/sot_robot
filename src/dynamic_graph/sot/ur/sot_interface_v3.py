@@ -183,8 +183,8 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf = [0,0,0,0,0,0,-0.349,-2.443,-1.919,-2.967,-1.7453,0]
-        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,-0.0872,1.57]
+        inf = [0,0,0,0,0,0,-0.349,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
+        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,-0.0872,1.57]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
@@ -280,6 +280,47 @@ class SOTInterface:
         self.collisionAvoidance.Jhand.value = ((1,0,0,0),(0,1,0,10),(0,0,1,0),(0,0,0,1))
         plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
         '''
+        '''
+        #WORKING MOTION FOR RING5
+        self.collisionAvoidance.createcollisionlink("skin_0","box","internal",(0.25,0.09,0.09,-0.0231346992553,0.0335281423454,0.236743641253,2.83297311,-1.54208643, 2.44288303))
+        self.collisionAvoidance.createcollisionlink("skin_1","box","internal",(0.25,0.09,0.09,-0.0403226855115,-0.0151291795719,0.236960121029,1.06341521,-1.48901494,-0.78506072))
+        self.collisionAvoidance.createcollisionlink("skin_2","box","internal",(0.25,0.09,0.09,-0.02549,-0.03394,,0.23586,2.262972,-1.48702,-1.35682))
+        self.collisionAvoidance.createcollisionlink("skin_3","box","internal",(0.25,0.09,0.09,0.0004,-0.044,0.2351,0.20357,1.5367,1.35411))
+        self.collisionAvoidance.createcollisionlink("skin_4","box","internal",(0.25,0.09,0.09,0.02608,-0.0367,0.23527,-2.3496,-1.4984,-1.7571))
+        self.collisionAvoidance.createcollisionlink("skin_5","box","internal",(0.25,0.09,0.09,0.0427,-0.0148,0.2370,-2.160,-1.505,1.315))
+        self.collisionAvoidance.createcollisionlink("skin_6","box","internal",(0.25,0.09,0.09,0.04285,0.01209,0.2382,-2.17682,-1.51293,-0.67460))
+        self.collisionAvoidance.createcollisionlink("skin_7","box","internal",(0.25,0.09,0.09,0.0266,0.0350,0.2351,0.9976,-1.5190,3.1136))
+
+        # hand
+        self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.22,-1000,-1000.0,1000,0,0))
+        self.collisionAvoidance.createcollisionpair("skin_0","hand")
+        self.collisionAvoidance.createcollisionpair("skin_1","hand")
+        self.collisionAvoidance.createcollisionpair("skin_2","hand")
+        self.collisionAvoidance.createcollisionpair("skin_3","hand")
+        self.collisionAvoidance.createcollisionpair("skin_4","hand")
+        self.collisionAvoidance.createcollisionpair("skin_5","hand")
+        self.collisionAvoidance.createcollisionpair("skin_6","hand")
+        self.collisionAvoidance.createcollisionpair("skin_7","hand")
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_0)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_1)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_2)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_3)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_4)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_5)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_6)
+        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.skin_7)
+
+        
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_0)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_1)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_2)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_3)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_4)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_5)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_6)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jskin_7)
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.hand)
+        '''
         self.collisionAvoidance.createcollisionlink("skin_0","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
         self.collisionAvoidance.createcollisionlink("skin_1","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
         self.collisionAvoidance.createcollisionlink("skin_2","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
@@ -308,7 +349,6 @@ class SOTInterface:
         plug(self.robot.dynamic.forerarm_skin_cell_joint_6,self.collisionAvoidance.skin_6)
         plug(self.robot.dynamic.forerarm_skin_cell_joint_7,self.collisionAvoidance.skin_7)
 
-        
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_0,self.collisionAvoidance.Jskin_0)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_1,self.collisionAvoidance.Jskin_1)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_2,self.collisionAvoidance.Jskin_2)
@@ -317,8 +357,8 @@ class SOTInterface:
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_5,self.collisionAvoidance.Jskin_5)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_6,self.collisionAvoidance.Jskin_6)
         plug(self.robot.dynamic.Jforerarm_skin_cell_joint_7,self.collisionAvoidance.Jskin_7)
-        plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.hand)
-        self.collisionAvoidance.Jhand.value = ((1,0,0,10000),(0,1,0,10000),(0,0,1,10000),(0,0,0,1))             
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jhand)        
+        self.collisionAvoidance.hand.value = ((1,0,0,10000),(0,1,0,10000),(0,0,1,10000),(0,0,0,1))             
         plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
         
         self.task_skinsensor=TaskInequality('taskskinsensor')
@@ -328,8 +368,8 @@ class SOTInterface:
         plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
         plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)        
         self.task_skinsensor.add(self.sensor_feature.name)
-        self.task_skinsensor.referenceInf.value = (0.04,)*10
-        self.task_skinsensor.referenceSup.value = (1.0,)*10
+        self.task_skinsensor.referenceInf.value = (0.04,)*8
+        self.task_skinsensor.referenceSup.value = (1.0,)*8
         self.task_skinsensor.dt.value=0.5
         self.task_skinsensor.controlSelec.value = '00000011100000000000'
         '''
