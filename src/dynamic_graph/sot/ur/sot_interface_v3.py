@@ -159,7 +159,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        #self.pushTask(self.task_skinsensor.name)
+        self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -183,8 +183,8 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
-        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,-0.0872,1.57]
+        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,-2.967,-1.7453,0]
+        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,-0.0872,1.57]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
@@ -240,7 +240,95 @@ class SOTInterface:
         plug(gainPosition.gain,self.task_posture.controlGain)
         #self.task_posture.controlGain.value = 1
         return self.task_posture.name
-    
+
+    def defineCollisionAvoidance1(self):
+        self.collisionAvoidance = sc.SotCollision("sc")
+ 
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_0","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_1","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_2","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_3","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_4","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_5","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_6","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_4_7","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_0","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_1","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_2","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_3","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_4","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_5","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_6","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))
+        self.collisionAvoidance.createcollisionlink("forearm_ring_5_7","box","internal",(0.25,0.09,0.09,0,0,0,0,0,0))  
+        self.collisionAvoidance.createcollisionlink("hand","box","external",(0.25,0.01,0.01,0.22,-1000,-1000.0,1000,0,0))        
+        # collision pairs       
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_0","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_1","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_2","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_3","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_4","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_5","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_6","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_4_7","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_0","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_1","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_2","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_3","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_4","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_5","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_6","hand")
+        self.collisionAvoidance.createcollisionpair("forearm_ring_5_7","hand")  
+
+        plug(self.robot.dynamic.forearm_ring_4_joint_0,self.collisionAvoidance.forearm_ring_4_0)
+        plug(self.robot.dynamic.forearm_ring_4_joint_1,self.collisionAvoidance.forearm_ring_4_1)
+        plug(self.robot.dynamic.forearm_ring_4_joint_2,self.collisionAvoidance.forearm_ring_4_2)
+        plug(self.robot.dynamic.forearm_ring_4_joint_3,self.collisionAvoidance.forearm_ring_4_3)
+        plug(self.robot.dynamic.forearm_ring_4_joint_4,self.collisionAvoidance.forearm_ring_4_4)
+        plug(self.robot.dynamic.forearm_ring_4_joint_5,self.collisionAvoidance.forearm_ring_4_5)
+        plug(self.robot.dynamic.forearm_ring_4_joint_6,self.collisionAvoidance.forearm_ring_4_6)
+        plug(self.robot.dynamic.forearm_ring_4_joint_7,self.collisionAvoidance.forearm_ring_4_7)
+        plug(self.robot.dynamic.forearm_ring_5_joint_0,self.collisionAvoidance.forearm_ring_5_0)
+        plug(self.robot.dynamic.forearm_ring_5_joint_1,self.collisionAvoidance.forearm_ring_5_1)
+        plug(self.robot.dynamic.forearm_ring_5_joint_2,self.collisionAvoidance.forearm_ring_5_2)
+        plug(self.robot.dynamic.forearm_ring_5_joint_3,self.collisionAvoidance.forearm_ring_5_3)
+        plug(self.robot.dynamic.forearm_ring_5_joint_4,self.collisionAvoidance.forearm_ring_5_4)
+        plug(self.robot.dynamic.forearm_ring_5_joint_5,self.collisionAvoidance.forearm_ring_5_5)
+        plug(self.robot.dynamic.forearm_ring_5_joint_6,self.collisionAvoidance.forearm_ring_5_6)
+        plug(self.robot.dynamic.forearm_ring_5_joint_7,self.collisionAvoidance.forearm_ring_5_7)    
+
+	plug(self.robot.dynamic.Jforearm_ring_4_joint_0,self.collisionAvoidance.Jforearm_ring_4_0)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_1,self.collisionAvoidance.Jforearm_ring_4_1)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_2,self.collisionAvoidance.Jforearm_ring_4_2)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_3,self.collisionAvoidance.Jforearm_ring_4_3)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_4,self.collisionAvoidance.Jforearm_ring_4_4)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_5,self.collisionAvoidance.Jforearm_ring_4_5)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_6,self.collisionAvoidance.Jforearm_ring_4_6)
+        plug(self.robot.dynamic.Jforearm_ring_4_joint_7,self.collisionAvoidance.Jforearm_ring_4_7)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_0,self.collisionAvoidance.Jforearm_ring_5_0)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_1,self.collisionAvoidance.Jforearm_ring_5_1)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_2,self.collisionAvoidance.Jforearm_ring_5_2)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_3,self.collisionAvoidance.Jforearm_ring_5_3)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_4,self.collisionAvoidance.Jforearm_ring_5_4)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_5,self.collisionAvoidance.Jforearm_ring_5_5)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_6,self.collisionAvoidance.Jforearm_ring_5_6)
+        plug(self.robot.dynamic.Jforearm_ring_5_joint_7,self.collisionAvoidance.Jforearm_ring_5_7)   
+        plug(self.robot.dynamic.Jelbow_joint,self.collisionAvoidance.Jhand)        
+        self.collisionAvoidance.hand.value = ((1,0,0,10000),(0,1,0,10000),(0,0,1,10000),(0,0,0,1))             
+        plug(self.ros.rosSubscribe.proximity,self.collisionAvoidance.proximitySensor)
+        self.task_skinsensor=TaskInequality('taskskinsensor')
+        self.sensor_feature = FeatureGeneric('sensorfeature')
+        #plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
+        #plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
+        plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
+        plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)   
+        self.task_skinsensor.add(self.sensor_feature.name)
+        self.task_skinsensor.referenceInf.value = (0.04,)*16
+        self.task_skinsensor.referenceSup.value = (1.0,)*16
+        self.task_skinsensor.dt.value=0.5
+        self.task_skinsensor.controlSelec.value = '00000011100000000000'  
+	self.task_skinsensor.controlGain.value = 0.05      
+  
+  
     def defineCollisionAvoidance(self):
         self.collisionAvoidance = sc.SotCollision("sc")
         '''
@@ -407,8 +495,7 @@ class SOTInterface:
     def initializeSkin(self):
         #self.ros.rosSubscribe.add('vector','dC','collision_distance')
         #self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
-        print 'heyr'
-        self.defineCollisionAvoidance()
+        self.defineCollisionAvoidance1()
         
     # robot control procedures    
     def initializeRobot(self):

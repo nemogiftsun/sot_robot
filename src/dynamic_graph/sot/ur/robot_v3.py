@@ -44,15 +44,24 @@ class Ur5(AbstractMobileRobot):
         self.OperationalPoints.append('wrist_1_joint')
         self.OperationalPoints.append('wrist_2_joint')
         self.OperationalPoints.append('wrist_3_joint')
-        self.OperationalPoints.append('forerarm_skin_root_cell_joint')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_0')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_1')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_2')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_3')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_4')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_5')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_6')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_7')        
+        
+        # skin cells
+        self.OperationalPoints.append('forearm_ring_5_joint_0')
+        self.OperationalPoints.append('forearm_ring_5_joint_1')
+        self.OperationalPoints.append('forearm_ring_5_joint_2')
+        self.OperationalPoints.append('forearm_ring_5_joint_3')
+        self.OperationalPoints.append('forearm_ring_5_joint_4')
+        self.OperationalPoints.append('forearm_ring_5_joint_5')
+        self.OperationalPoints.append('forearm_ring_5_joint_6')
+        self.OperationalPoints.append('forearm_ring_5_joint_7')        
+        self.OperationalPoints.append('forearm_ring_4_joint_0')
+        self.OperationalPoints.append('forearm_ring_4_joint_1')
+        self.OperationalPoints.append('forearm_ring_4_joint_2')
+        self.OperationalPoints.append('forearm_ring_4_joint_3')
+        self.OperationalPoints.append('forearm_ring_4_joint_4')
+        self.OperationalPoints.append('forearm_ring_4_joint_5')
+        self.OperationalPoints.append('forearm_ring_4_joint_6')
+        self.OperationalPoints.append('forearm_ring_4_joint_7')  
 
         # device and dynamic model assignment
         self.device = device

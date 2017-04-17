@@ -4,27 +4,8 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="ur5" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:xacro="http://ros.org/wiki/xacro">
-  <!-- common stuff -->
-  <gazebo>
-    <plugin filename="libgazebo_ros_control.so" name="ros_control">
-      <!--robotNamespace>/</robotNamespace-->
-      <!--robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType-->
-    </plugin>
-    <!--
-    <plugin name="gazebo_ros_power_monitor_controller" filename="libgazebo_ros_power_monitor.so">
-      <alwaysOn>true</alwaysOn>
-      <updateRate>1.0</updateRate>
-      <timeout>5</timeout>
-      <powerStateTopic>power_state</powerStateTopic>
-      <powerStateRate>10.0</powerStateRate>
-      <fullChargeCapacity>87.78</fullChargeCapacity>     
-      <dischargeRate>-474</dischargeRate>
-      <chargeRate>525</chargeRate>
-      <dischargeVoltage>15.52</dischargeVoltage>
-      <chargeVoltage>16.41</chargeVoltage>
-    </plugin>
--->
-  </gazebo>
+  <!-- common stuff 
+  <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />-->
   <!-- ur5 -->
   <!-- Inertia parameters -->
   <!-- This mass might be incorrect -->
@@ -347,7 +328,8 @@
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
   </joint>
   <!-- Skin -->
-  <link name="forerarm_skin_root_cell_link">
+  <!-- FOREARM -->
+  <link name="forearm_skin_root_cell_link">
     <visual>
       <geometry>
         <sphere radius="0.000001"/>
@@ -363,14 +345,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_root_cell_joint" type="fixed">
+  <joint name="forearm_skin_root_cell_joint" type="fixed">
     <parent link="forearm_link"/>
-    <child link="forerarm_skin_root_cell_link"/>
+    <child link="forearm_skin_root_cell_link"/>
     <origin rpy="0.  0.  0." xyz="0.0 0.0 0.0"/>
     <axis xyz="0 0 1"/>
     <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_0">
+  <link name="forearm_ring_5_link_0">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -384,14 +366,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_0" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_0"/>
+  <joint name="forearm_ring_5_joint_0" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_0"/>
     <origin rpy="2.83297311  -1.54208643 2.44288303" xyz="-0.02313 0.03352 0.23674"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_1">
+  <link name="forearm_ring_5_link_1">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -405,14 +387,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_1" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_1"/>
+  <joint name="forearm_ring_5_joint_1" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_1"/>
     <origin rpy="1.06341521  -1.48901494 -0.78506072" xyz="-0.04032 -0.015129 0.23696"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_2">
+  <link name="forearm_ring_5_link_2">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -426,14 +408,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_2" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_2"/>
+  <joint name="forearm_ring_5_joint_2" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_2"/>
     <origin rpy="2.262972 -1.487026 -1.356827" xyz="-0.0254929 -0.0339481 0.2358651"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_3">
+  <link name="forearm_ring_5_link_3">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -447,14 +429,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_3" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_3"/>
+  <joint name="forearm_ring_5_joint_3" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_3"/>
     <origin rpy="0.2035706 -1.5367411 1.35411575" xyz="0.0004 -0.0441 0.23518"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_4">
+  <link name="forearm_ring_5_link_4">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -468,14 +450,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_4" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_4"/>
-    <origin rpy="-2.34960077 -1.49847097 -1.75719079" xyz="0.026086 0.03677 0.23527"/>
+  <joint name="forearm_ring_5_joint_4" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_4"/>
+    <origin rpy="-2.34960077 -1.49847097 -1.75719079" xyz="0.026086 -0.03677 0.23527"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_5">
+  <link name="forearm_ring_5_link_5">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -489,14 +471,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_5" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_5"/>
+  <joint name="forearm_ring_5_joint_5" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_5"/>
     <origin rpy="-2.16054646 -1.50515821 -1.31557256" xyz="0.04277 -0.01486 0.23704"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_6">
+  <link name="forearm_ring_5_link_6">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -510,14 +492,14 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_6" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_6"/>
+  <joint name="forearm_ring_5_joint_6" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_6"/>
     <origin rpy="-2.17682483 -1.51293455 -0.67460558" xyz="0.04285 0.01209 0.2382"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
   </joint>
-  <link name="forerarm_skin_link_7">
+  <link name="forearm_ring_5_link_7">
     <visual>
       <geometry>
         <sphere radius="0.005"/>
@@ -531,12 +513,175 @@
       </geometry>
     </collision>
   </link>
-  <joint name="forerarm_skin_cell_joint_7" type="revolute">
-    <parent link="forerarm_skin_root_cell_link"/>
-    <child link="forerarm_skin_link_7"/>
+  <joint name="forearm_ring_5_joint_7" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_5_link_7"/>
     <origin rpy="0.99763746 -1.51906704 3.11362853" xyz="0.02665 0.03505 0.23515"/>
     <axis xyz="0 0 1"/>
-    <limit effort="150.0" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <!-- NEW INFO-->
+  <link name="forearm_ring_4_link_0">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_0" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_0"/>
+    <origin rpy="-0.2630 -1.4924 -1.5854" xyz="0.0147 0.0418 0.211"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <link name="forearm_ring_4_link_1">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_1" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_1"/>
+    <origin rpy="0.8048 -1.5595 2.9517" xyz="0.0349 0.0252 0.2104"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <link name="forearm_ring_4_link_2">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_2" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_2"/>
+    <origin rpy="0.9567 -1.542 2.211" xyz=" 0.0439 -0.0003 0.2101"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <link name="forearm_ring_4_link_3">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_3" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_3"/>
+    <origin rpy="-1.6695 -1.4976 -2.1060" xyz="0.0365 -0.0255 0.2122"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <link name="forearm_ring_4_link_4">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_4" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_4"/>
+    <origin rpy="0.1949 -1.5010 1.7227" xyz="0.014 -0.043 0.211"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="0" upper="0" velocity="3.15"/>
+  </joint>
+  <link name="forearm_ring_4_link_5">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_5" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_5"/>
+    <origin rpy="2.2710 -1.5265 -1.0597" xyz="-0.0127 -0.0445 0.2117"/>
+  </joint>
+  <link name="forearm_ring_4_link_6">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_6" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_6"/>
+    <origin rpy="0.6104 -1.539 -0.6458" xyz="-0.0423 -0.001 0.2124"/>
+  </joint>
+  <link name="forearm_ring_4_link_7">
+    <visual>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="forearm_ring_4_joint_7" type="fixed">
+    <parent link="forearm_skin_root_cell_link"/>
+    <child link="forearm_ring_4_link_7"/>
+    <origin rpy="-1.270 -1.540 1.899" xyz="-0.0348 -0.0271 0.2127"/>
   </joint>
   <!--Finishers-->
 </robot>
