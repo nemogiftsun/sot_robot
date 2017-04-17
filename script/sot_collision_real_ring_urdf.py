@@ -14,11 +14,11 @@ from numpy.matlib import zeros
 from pinocchio.utils import skew
 from control_msgs.msg import JointTrajectoryControllerState
 from dynamic_graph.sot.ur.robot_wrapper import RobotWrapper
-
 from dynamic_graph_bridge_msgs.msg import Vector
 from dynamic_graph_bridge_msgs.msg import Matrix
 
 #visualizer
+from giftbot_skin_driver.msg import giftbot_sot_data
 from visualization_msgs.msg import Marker,MarkerArray
 from geometry_msgs.msg import Point
 
@@ -33,9 +33,11 @@ class SotCollision:
         rospy.Subscriber("giftbot/ring5_data", giftbot_sot_data, self.callback_skin)
 
     def callback_skin(self,data):
-        self.num_cells = len(data.data)
-        self.proximity_range  = data.data
-		self.pub_proximity.publish(self.proximity_range)
+        self.num_cells = len(data.proximities)
+        self.proximity_range = data.proximities
+        #self.proximity_range[1]  = data.proximities[1]
+        #self.proximity_range[5]  = data.proximities[5]
+	self.pub_proximity.publish(tuple(self.proximity_range))
        
              
 if __name__ == '__main__':

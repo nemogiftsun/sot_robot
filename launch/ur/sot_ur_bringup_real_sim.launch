@@ -11,7 +11,7 @@
 	</node>
 
 	<!-- send ur urdf to param server -->
-	<include file="$(find sot_robot)/launch/ur/upload_ur.launch" />
+	<include file="$(find sot_robot)/launch/ur/upload_ur_ring_forearm.launch" />
 	  <arg name="min_payload"  default="0.0"/>
 	  <arg name="max_payload"  default="3.0"/>
 	  <arg name="prefix" default="" />  

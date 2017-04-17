@@ -159,7 +159,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        self.pushTask(self.task_skinsensor.name)
+        #self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -183,7 +183,7 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf = [0,0,0,0,0,0,-0.349,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
+        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
         sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,-0.0872,1.57]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
@@ -379,7 +379,7 @@ class SOTInterface:
         plug(self.task_skinsensor.error,gainPosition.error)
         plug(gainPosition.gain,self.task_skinsensor.controlGain)
         '''
-        self.task_skinsensor.controlGain.value = 0.1
+        self.task_skinsensor.controlGain.value = 0.0
 
 
     def reWireControl(self):

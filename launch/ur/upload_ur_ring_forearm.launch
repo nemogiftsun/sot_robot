@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 
- <param name="robot_description" command="$(find xacro)/xacro.py '$(find sot_robot)/urdf/ur5_robot_with_ring_forearm.urdf.xacro'" />
+ <param name="robot_description" command="$(find xacro)/xacro.py '$(find sot_robot)/urdf/ur5_robot_with_ring_forearm.urdf.xacro'"/>
 
-<param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find sot_robot)/urdf/ur5_robot_with_ring_forearm.urdf.xacro'" />
+ <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find sot_robot)/urdf/ur5_robot_with_ring_forearm.urdf.xacro'"/>
+
 </launch>
