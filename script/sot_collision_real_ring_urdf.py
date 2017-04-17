@@ -24,21 +24,19 @@ from geometry_msgs.msg import Point
 
 class SotCollision:
     def __init__(self,name):
-        #self.urdfDir = rospack.get_path('sot_robot') + '/urdf/'
-        #self.urdfName = 'ur5_robot_with_ring_forearm.urdf'
-        #self.r = RobotWrapper(self.urdfDir + self.urdfName,'/home/fiad1/ros/skin_sot_ws/src/universal_robot/', root_joint = se3.JointModelFreeFlyer());
-        #rospy.Subscriber("sot_robot/state", JointTrajectoryControllerState, self.callback)
-        self.pub_proximity = rospy.Publisher('proximity_data', Vector, queue_size=10)
-        #self.count = 0
-        rospy.Subscriber("giftbot/ring5_data", giftbot_sot_data, self.callback_skin)
+        self.pub_proximity = rospy.Publisher('proximity_data_1', Vector, queue_size=10)
+	self.r = rospy.Rate(50)
+	self.proximity_range = [0.06,]*16
+        rospy.Subscriber("giftbot/ring5_data", giftbot_sot_data, self.callback_skin_5)
+        rospy.Subscriber("giftbot/ring4_data", giftbot_sot_data, self.callback_skin_4)
 
-    def callback_skin(self,data):
-        self.num_cells = len(data.proximities)
-        self.proximity_range = data.proximities
-        #self.proximity_range[1]  = data.proximities[1]
-        #self.proximity_range[5]  = data.proximities[5]
+    def callback_skin_5(self,data):
+        self.proximity_range[8:16] = data.proximities
 	self.pub_proximity.publish(tuple(self.proximity_range))
-       
+
+    def callback_skin_4(self,data):
+        self.proximity_range[0:8] = data.proximities
+	self.pub_proximity.publish(tuple(self.proximity_range))	     
              
 if __name__ == '__main__':
      rospy.init_node('sot_collision')
