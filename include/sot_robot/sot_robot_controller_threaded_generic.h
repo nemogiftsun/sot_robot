@@ -98,8 +98,6 @@ public:
 private:
     void fillSensors();
     void readControl(const ros::Time& time,const ros::Duration& period);
-
-private:
     // python interactor methods
     void runPython(std::ostream &file,
                    const std::string &command,
@@ -107,6 +105,8 @@ private:
                    dynamicgraph::Interpreter &interpreter);
 
     virtual void startupPython();
+
+    void callbackControlJointNameList(const sensor_msgs::JointState& msg);
 
     // sot sensor and control map
     SensorMap sensorsIn_;
@@ -127,6 +127,7 @@ private:
     std::vector<double> error_vel_last;
     std::vector<double> error_vel_sum;
 
+    std::vector<std::string> joint_names_control;
     // Controller Parameters
     int loop_count_;
     ros::Time last_time_;
@@ -144,6 +145,7 @@ private:
         realtime_tools::RealtimePublisher<control_msgs::JointTrajectoryControllerState> > controller_state_publisher_;
 
     //ros::Publisher cmd_vel_pub_ ;
+    ros::Subscriber js_sub_; 
 
     //tf::TransformListener listener_;
 
