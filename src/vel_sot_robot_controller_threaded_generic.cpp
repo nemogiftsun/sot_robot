@@ -164,6 +164,7 @@ bool RobotControllerPlugin::init(hardware_interface::VelocityJointInterface *rob
 	node_ = n;
 
     //cmd_vel_pub_ = node_.advertise<geometry_msgs::Twist>("/base_controller/command", 1);
+    
 
 	std::string device_name;
     if (!node_.getParam("robot", device_name)) {
@@ -290,6 +291,15 @@ bool RobotControllerPlugin::init(hardware_interface::VelocityJointInterface *rob
 
 }
 
+void RobotControllerPlugin::callbackControlJointNameList(const sensor_msgs::JointState& msg) {
+    joint_names_control.resize(msg.name.size());   
+    joint_names_control = msg.name;
+    std::cout << "Subscribed" << std::endl;
+    js_sub_.shutdown();
+
+}
+
+
 void RobotControllerPlugin::fillSensors() {
     // Joint values/
     sensorsIn_["joints"].setName("position");
@@ -323,63 +333,68 @@ void RobotControllerPlugin::fillSensors() {
 }
 
 void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duration& period) {
-
     //ros::Time time = robot_->getTime();
-    //ros::Duration dt_ = time - last_time_;
-    
+    //ros::Duration dt_ = time - last_time_;    
     //  Arm controller
     joint_positionsOUT_ = controlValues_["joints"].getValues();
     joint_velocityOUT_ = controlValues_["velocities"].getValues();
 
-    
-    /* arm velocity control*/
 
     for (unsigned int i=0; i<joints_.size(); ++i) {
-        double errord = joint_velocityOUT_[i]-joints_[i].getVelocity() ;
-    	if(urdf_joints[i]->type == urdf::Joint::REVOLUTE)
-        {
-          angles::shortest_angular_distance_with_limits(joint_positionsOUT_[i], joints_[i].getPosition(), urdf_joints[i]->limits->lower, urdf_joints[i]->limits->upper,error[i]);
+        if (joint_names_control.size() > 0){
+            int index = 6;
+            while (joints_[i].getName() != joint_names_control[index]){
+                    index +=1;
+            }
 
+            double errord = joint_velocityOUT_[index-6]-joints_[i].getVelocity() ;
+            if(urdf_joints[i]->type == urdf::Joint::REVOLUTE)
+            {
+            angles::shortest_angular_distance_with_limits(joint_positionsOUT_[index-6], joints_[i].getPosition(), urdf_joints[i]->limits->lower, urdf_joints[i]->limits->upper,error[i]);
+
+            }
+            else if(urdf_joints[i]->type == urdf::Joint::CONTINUOUS)
+            {
+            error[i] = angles::shortest_angular_distance(joint_positionsOUT_[index-6], joints_[i].getPosition());
+            }
+            else //prismatic
+            {
+            error[i] = joints_[i].getPosition() - joint_positionsOUT_[index-6];
+            }
+            joints_[i].setCommand(pids_[i].updatePid(angles::normalize_angle(error[i]), errord, period));
         }
-        else if(urdf_joints[i]->type == urdf::Joint::CONTINUOUS)
-        {
-          error[i] = angles::shortest_angular_distance(joint_positionsOUT_[i], joints_[i].getPosition());
+        else{
+            joints_[i].setCommand(pids_[i].updatePid(angles::normalize_angle(0), 0, period));
         }
-        else //prismatic
-        {
-          error[i] = joints_[i].getPosition() - joint_positionsOUT_[i];
         }
-
-       
-        joints_[i].setCommand(pids_[i].updatePid(angles::normalize_angle(error[i]), errord, period));
-
-        }
-
-/*
-    // Base controller
-    geometry_msgs::Twist base_cmd;
-    std::vector<double> vel = controlValues_["ffvelocity"].getValues();
-    base_cmd.linear.x = base_cmd.linear.y = base_cmd.linear.z = 0;
-    base_cmd.angular.x = base_cmd.angular.y = base_cmd.angular.z = 0;
-    base_cmd.linear.x = vel[0];
-    base_cmd.linear.y = vel[1];
-    base_cmd.linear.z = vel[2];
-    base_cmd.angular.x = vel[3];
-    base_cmd.angular.y = vel[4];
-    base_cmd.angular.z = vel[5];
-
-    cmd_vel_pub_.publish(base_cmd);*/
 
     // State publishing
     if (loop_count_ % 10 == 0) {
         if (controller_state_publisher_ && controller_state_publisher_->trylock()) {
             controller_state_publisher_->msg_.header.stamp = time;
-            for (size_t j=0; j<joints_.size(); ++j) {
-                controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[j];
+            //int offset = 6;
+            //int index = offset; 
+            for (int j=0; j<joints_.size(); ++j) {        
+                //std::cout << index <<std::endl; 
+                if (joint_names_control.size() > 0){ 
+                //std::cout << joint_names_control[index] << std::endl; 
+                //std::cout << joints_[j].getName()  << std::endl;
+                //std::cout << "----------------"<< std::endl; }
+                int index = 6;
+                while (joints_[j].getName() != joint_names_control[index]){
+                    index +=1;
+                }
+                //std::cout << joint_names_control[index] << std::endl; 
+                //std::cout << joints_[j].getName()  << std::endl;
+                //std::cout << "----------------"<< std::endl; }
+                controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[index-6];
+                //std::cout << index << std::endl;
+                //std::cout << joint_positionsOUT_[index] << std::endl; 
                 controller_state_publisher_->msg_.actual.positions[j] = angles::normalize_angle(joints_[j].getPosition());
                 controller_state_publisher_->msg_.actual.velocities[j] = angles::normalize_angle(joints_[j].getVelocity());
                 controller_state_publisher_->msg_.actual.time_from_start= ros::Duration(timeFromStart_);
-                controller_state_publisher_->msg_.error.positions[j] = error[j];
+                controller_state_publisher_->msg_.error.positions[j] = error[j];     
+             }
             }
             controller_state_publisher_->unlockAndPublish();
         }
@@ -409,14 +424,16 @@ void RobotControllerPlugin::starting(const ros::Time& time) {
 		//readControl();
     std::ofstream aof(LOG_PYTHON.c_str());
     //runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
-//
     runPython (aof, "sot.startRobot()",true, *interpreter_); 
     runPython (aof, "plug(sot.robot.device.state,sot.posture_feature.posture) ",true, *interpreter_); 
     std::cout << "UPDATE CYCLE IN LOOP" << std::endl; 
+    js_sub_ =  node_.subscribe("/joint_states", 1, &RobotControllerPlugin::callbackControlJointNameList, this);
+
 }
 
 void RobotControllerPlugin::update(const ros::Time& time, const ros::Duration& period) {
-
+    //for(int i=0; i<joint_names_control.size(); ++i)
+    //    std::cout << joint_names_control[i] << std::endl;
     fillSensors();
     try {  
 		  {
