@@ -131,7 +131,7 @@
 <joint name="forerarm_skin_cell_joint_4" type="revolute">
 	  <parent link="forerarm_skin_root_cell_link"/>
 	  <child link="forerarm_skin_link_4"/>
-	  <origin xyz="0.026086 0.03677 0.23527" rpy="-2.34960077 -1.49847097 -1.75719079"/>
+	  <origin xyz="0.026086 -0.03677 0.23527" rpy="-2.34960077 -1.49847097 -1.75719079"/>
           <axis xyz="0 0 1" />
           <limit lower="0" upper="0" effort="150.0" velocity="3.15"/>
 </joint>

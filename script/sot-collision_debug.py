@@ -57,7 +57,7 @@ class SotCollision:
         self.pub_dCollision = rospy.Publisher('collision_distance', Vector, queue_size=10)
         self.count = 0
         #rospy.Subscriber("giftbot/ring5_data", giftbot_sot_data, self.callback_skin)
-        self.marker_publisher = rospy.Publisher('visualization_marker_array', MarkerArray)
+        self.marker_publisher = rospy.Publisher('visualization_marker_array_1', MarkerArray)
         self.markerArray = MarkerArray()
         self.updateMarkerState()
 
@@ -78,7 +78,7 @@ class SotCollision:
             print 'Why am I here?'
             self.markerArray.markers.pop();
 
-        for i in range(10):
+        for i in range(self.num_cells):
             marker = Marker()
             marker.header.frame_id = "/base_link"
             marker.type = marker.SPHERE
@@ -91,9 +91,9 @@ class SotCollision:
             marker.color.g = 1.0
             marker.color.b = 0.0
             marker.pose.orientation.w = 1.0
-            marker.pose.position.x = 0.1
-            marker.pose.position.y = 0.1
-            marker.pose.position.z = 0.1+i
+            marker.pose.position.x = self.proximity_cell_pose[:,i][0]
+            marker.pose.position.y = self.proximity_cell_pose[:,i][1]
+            marker.pose.position.z = self.proximity_cell_pose[:,i][2]
             self.markerArray.markers.append( marker)
 
 
@@ -113,7 +113,7 @@ class SotCollision:
         self.r.forwardKinematics(self.q)
         frameJacobian = self.r.frameJacobian(self.q,11,True,False)
         #print se3.utils.se3ToXYZQUAT(self.r.framePosition(11))
-        #self.compute_collision_constraints()
+        self.compute_collision_constraints()
         jc = Matrix();
         #jc.data = se3.utils.npToTuple(self.jacobianCollision.ravel())
         jc.data = (0.0,)*8*12
