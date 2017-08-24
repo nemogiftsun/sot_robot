@@ -8,6 +8,20 @@ from giftbot_action_server.msg import *
 import numpy as np
 from trajectory_msgs.msg import JointTrajectoryPoint
 
+
+from moveit_msgs.msg import *
+from yaml import load, dump
+
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+import numpy as np    
+
+def convert(point):
+    point_modified = [0,]*6+point[0:3]+[0,]*8+point[3:6]
+    return point_modified
+
 wps = np.zeros((10,20))
 wps[0,:] = [0,0,0,0,0,0, 0, -1.5700, 0.0002, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.5705, 0.0002, 0]
 wps[1,:]  = [0,0,0,0,0,0, 0.1633, -1.5600, 0.2168, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.6216, -0.1742, 0]
