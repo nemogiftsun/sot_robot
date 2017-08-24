@@ -1,4 +1,8 @@
 import rospy
+import rospkg
+rospack = rospkg.RosPack()
+yaml_file = rospack.get_path('sot_robot')
+
 import actionlib
 from giftbot_action_server.msg import *
 import numpy as np
@@ -17,7 +21,26 @@ wps[8,:] = [0,0,0,0,0,0, 1.3066, -1.4900, 1.7333,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 wps[9,:] = [0,0,0,0,0,0, 1.4699, -1.4800, 1.9499, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-2.0299, -1.5700, 0]
 
 
-def send_waypoints(client):  
+def get_waypoints(yaml_file):
+    data = load(file(yaml_file, 'r'), Loader=Loader)
+    print 'Loaded ' + str(yaml_file)
+    if type(data) == dict:
+        joint_names = data['trajectory']['joint_names']
+        points = data['trajectory']['points']
+        waypoints = np.zeros((len(points),20))
+        for it in range(len(points)):
+            waypoints[it,:] = np.array(convert(points[it]['positions'])) 
+    if type(data) == RobotTrajectory:
+        joint_names =  data.joint_trajectory.joint_names
+        points = data.joint_trajectory.points
+        waypoints = np.zeros((len(points),20))
+        it = 0
+        for it in range(len(points)):
+            waypoints[it,:] = np.array(convert(list(points[it].positions))) 
+    return waypoints 
+
+def send_waypoints(client,yaml_file): 
+    wps = get_waypoints(yaml_file) 
     goal = giftbot_action_serverGoal()
     for i in range(wps.shape[0]):
         point = JointTrajectoryPoint()
