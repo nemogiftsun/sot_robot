@@ -67,6 +67,31 @@ def listener():
     rospy.spin()
 
 '''
+# Implementing trajectory control by accessing waypoints from yaml file.
+import rospkg
+rospack = rospkg.RosPack()
+
+def get_waypoints(pkg_name, yaml_file_path, yaml_file_name):
+    yaml_file = rospack.get_path(pkg_name)+'/'+yaml_file_path+yaml_file_name+'.yaml'
+    data = load(file(yaml_file, 'r'), Loader=Loader)
+    print 'Loaded ' + str(yaml_file)
+    if type(data) == dict:
+        joint_names = data['trajectory']['joint_names']
+        points = data['trajectory']['points']
+        waypoints = np.zeros((len(points),20))
+        for it in range(len(points)):
+            waypoints[it,:] = np.array(convert(points[it]['positions'])) 
+    if type(data) == RobotTrajectory:
+        joint_names =  data.joint_trajectory.joint_names
+        points = data.joint_trajectory.points
+        waypoints = np.zeros((len(points),20))
+        it = 0
+        for it in range(len(points)):
+            waypoints[it,:] = np.array(convert(list(points[it].positions))) 
+    return waypoints
+
+#get_waypoints(pkg_name, yaml_file_path, 'pick2_out')
+
 class SOTInterface:
     def __init__(self,device_type='simu'): 
         if device_type =='simu':
@@ -147,8 +172,6 @@ class SOTInterface:
         #self.pushTask(self.posetaskname)
 
 
-
-
     def changeRPPToDefaultStack(self):
         self.connectDeviceWithSolver(False)
         self.solver.clear()
@@ -159,7 +182,7 @@ class SOTInterface:
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
-        #self.pushTask(self.task_skinsensor.name)
+        self.pushTask(self.task_skinsensor.name)
         self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
@@ -184,7 +207,7 @@ class SOTInterface:
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
         inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
-        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,-0.0872,1.57]
+        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,2.0872,1.57]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
@@ -369,17 +392,16 @@ class SOTInterface:
         plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)        
         self.task_skinsensor.add(self.sensor_feature.name)
         self.task_skinsensor.referenceInf.value = (0.04,)*8
-        self.task_skinsensor.referenceSup.value = (1.0,)*8
+        self.task_skinsensor.referenceSup.value = (10.0,)*8
         self.task_skinsensor.dt.value=0.5
-        self.task_skinsensor.controlSelec.value = '00000011100000000000'
-        '''
-        gainPosition = GainAdaptive('gainPosition')
-        gainPosition.set(0.1,0.1,125e3)
-        gainPosition.gain.value = 0.15
-        plug(self.task_skinsensor.error,gainPosition.error)
-        plug(gainPosition.gain,self.task_skinsensor.controlGain)
-        '''
-        self.task_skinsensor.controlGain.value = 0.0
+        #self.task_skinsensor.controlSelec.value = '00000011100000000000'
+        self.gainPosition = GainAdaptive('gainPosition')
+        self.gainPosition.set(0.1,1,125e3)
+        #gainPosition.gain.value = 0.15
+        plug(self.task_skinsensor.error,self.gainPosition.error)
+        plug(self.gainPosition.gain,self.task_skinsensor.controlGain)
+        
+        #self.task_skinsensor.controlGain.value = 1
 
 
     def reWireControl(self):
@@ -390,7 +412,6 @@ class SOTInterface:
         plug(self.ros.rosSubscribe.pc,self.posture_feature.posture)
         #self.ros.rosSubscribe.pc.recompute(self.posture_feature.posture.time)
   
-
     def setRobotPosture(self,posture):
         #self.ps.resetPath()
         #self.ps.setTimeStep (0.01)
@@ -407,7 +428,7 @@ class SOTInterface:
     def initializeSkin(self):
         #self.ros.rosSubscribe.add('vector','dC','collision_distance')
         #self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
-        print 'heyr'
+        print 'Initialized skin'
         self.defineCollisionAvoidance()
         
     # robot control procedures    
