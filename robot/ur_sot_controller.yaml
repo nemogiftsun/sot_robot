@@ -23,11 +23,11 @@ sot_robot:
         - wrist_2_joint
         - wrist_3_joint
     gains:
-        shoulder_pan_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
-        shoulder_lift_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
-        elbow_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
-        wrist_1_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
-        wrist_2_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
-        wrist_3_joint: {p: 1, i: 0, d: 0.0, i_clamp: 0}
+        shoulder_pan_joint: {p: 72, i: 0.15, d: 0.0375, i_clamp: 0}
+        shoulder_lift_joint: {p: 72, i: 0.15, d: 0.0375, i_clamp: 0}
+        elbow_joint: {p: 43.2, i: 0.1925, d: 0.048125, i_clamp: 0}
+        wrist_1_joint: {p: 48, i: 0.15, d: 0.0375, i_clamp: 0}
+        wrist_2_joint: {p: 48, i: 0.15, d: 0.0375, i_clamp: 0}
+        wrist_3_joint: {p: 48, i: 0.15, d: 0.0375, i_clamp: 0}
 
 
