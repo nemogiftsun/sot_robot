@@ -110,6 +110,10 @@ install(DIRECTORY urdf
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+install(DIRECTORY srdf
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 install(FILES
   robot/ur_sot_controller.yaml
 #   # myfile2

@@ -29,7 +29,7 @@ file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc
 
 #usage
 '''
-from dynamic_graph.sot.ur.sot_interface import SOTInterface
+from dynamic_graph.sot.ur.sot_interface_v3 import SOTInterface
 test = SOTInterface()
 test.initializeRobot()
 test.startRobot()
@@ -183,8 +183,11 @@ class SOTInterface:
         taskjl = TaskJointLimits('Joint Limits Task')
         plug(self.robot.dynamic.position,taskjl.position)
         taskjl.controlGain.value = 5
-        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
-        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,-0.0872,1.57]
+        #wrists in the last three joints
+        #inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
+        #sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,2.0,1.57]
+        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,-2.967,-1.7453,0,0,0,0,0,0,0,0,0]
+        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,2.0,1.57,0,0,0,0,0,0,0,0]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
@@ -232,13 +235,15 @@ class SOTInterface:
 
         self.task_posture=Task('Posture Task')
         self.task_posture.add(self.posture_feature.name)
+        '''
         # featurePosition.selec.value = toFlags((6,24))
         gainPosition = GainAdaptive('gainPosition')
         gainPosition.set(0.1,0.1,125e3)
         gainPosition.gain.value = 1
         plug(self.task_posture.error,gainPosition.error)
-        plug(gainPosition.gain,self.task_posture.controlGain)
-        #self.task_posture.controlGain.value = 1
+        #plug(gainPosition.gain,self.task_posture.controlGain)
+        '''
+        self.task_posture.controlGain.value = 1
         return self.task_posture.name
     
     def defineCollisionAvoidance(self):
@@ -368,29 +373,29 @@ class SOTInterface:
         plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
         plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)        
         self.task_skinsensor.add(self.sensor_feature.name)
-        self.task_skinsensor.referenceInf.value = (0.04,)*8
-        self.task_skinsensor.referenceSup.value = (1.0,)*8
+        self.task_skinsensor.referenceInf.value = (0.05,)*8
+        self.task_skinsensor.referenceSup.value = (10.0,)*8
         self.task_skinsensor.dt.value=0.5
-        self.task_skinsensor.controlSelec.value = '00000011100000000000'
+        #self.task_skinsensor.controlSelec.value = '00000011100000000000'
         '''
-        gainPosition = GainAdaptive('gainPosition')
-        gainPosition.set(0.1,0.1,125e3)
-        gainPosition.gain.value = 0.15
-        plug(self.task_skinsensor.error,gainPosition.error)
-        plug(gainPosition.gain,self.task_skinsensor.controlGain)
+        self.gainPosition = GainAdaptive('gainPosition')
+        self.gainPosition.set(0.1,0.1,125e3)
+        self.gainPosition.gain.value = 0.5
+        plug(self.task_skinsensor.error,self.gainPosition.error)
+        plug(self.gainPosition.gain,self.task_skinsensor.controlGain)        
         '''
-        self.task_skinsensor.controlGain.value = 0.0
-
-
-    def reWireControl(self):
-        #self.stopRobot()
+        self.task_skinsensor.controlGain.value = 0.04
+          
+    def reWireControl(self):        
         self.posture_feature.posture.unplug()
-        #self.startRobot()
         self.ros.rosSubscribe.add('vector','pc','posture_command')
+        self.ros.rosSubscribe.pc.recompute(self.posture_feature.posture.time)
+        # time to update the posture signal
+        # need to minimize the delay
+        time.sleep(0.2)
         plug(self.ros.rosSubscribe.pc,self.posture_feature.posture)
-        #self.ros.rosSubscribe.pc.recompute(self.posture_feature.posture.time)
-  
 
+  
     def setRobotPosture(self,posture):
         #self.ps.resetPath()
         #self.ps.setTimeStep (0.01)
@@ -407,7 +412,6 @@ class SOTInterface:
     def initializeSkin(self):
         #self.ros.rosSubscribe.add('vector','dC','collision_distance')
         #self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
-        print 'heyr'
         self.defineCollisionAvoidance()
         
     # robot control procedures    

@@ -340,23 +340,23 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
     joint_velocityOUT_ = controlValues_["velocities"].getValues();
     for (unsigned int i=0; i<joints_.size(); ++i) {
         if (joint_names_control.size() > 0){
-            int index = 0;
+            /*int index = 0;
             while (joints_[i].getName() != joint_names_control[index]){
                     index +=1;
-            }
-            double errord = joint_velocityOUT_[index]-joints_[i].getVelocity() ;
+            }*/
+            double errord = joint_velocityOUT_[i]-joints_[i].getVelocity() ;
             if(urdf_joints[i]->type == urdf::Joint::REVOLUTE)
             {
-            angles::shortest_angular_distance_with_limits(joint_positionsOUT_[index], joints_[i].getPosition(), urdf_joints[i]->limits->lower, urdf_joints[i]->limits->upper,error[i]);
+            angles::shortest_angular_distance_with_limits(joint_positionsOUT_[i], joints_[i].getPosition(), urdf_joints[i]->limits->lower, urdf_joints[i]->limits->upper,error[i]);
 
             }
             else if(urdf_joints[i]->type == urdf::Joint::CONTINUOUS)
             {
-            error[i] = angles::shortest_angular_distance(joint_positionsOUT_[index], joints_[i].getPosition());
+            error[i] = angles::shortest_angular_distance(joint_positionsOUT_[i], joints_[i].getPosition());
             }
             else //prismatic
             {
-            error[i] = joints_[i].getPosition() - joint_positionsOUT_[index];
+            error[i] = joints_[i].getPosition() - joint_positionsOUT_[i];
             }
             joints_[i].setCommand(pids_[i].updatePid(angles::normalize_angle(error[i]), errord, period));
 		
@@ -372,12 +372,12 @@ void RobotControllerPlugin::readControl(const ros::Time& time,const ros::Duratio
             controller_state_publisher_->msg_.header.stamp = time;
             for (int j=0; j<joints_.size(); ++j) {        
                 if (joint_names_control.size() > 0){ 
-                int index = 0;
+                /*int index = 0;
                 while (joints_[j].getName() != joint_names_control[index]){
                     index +=1;
-                }
-                controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[index];
-                controller_state_publisher_->msg_.desired.velocities[j] = joint_velocityOUT_[index];
+                }*/
+                controller_state_publisher_->msg_.desired.positions[j] = joint_positionsOUT_[j];
+                controller_state_publisher_->msg_.desired.velocities[j] = joint_velocityOUT_[j];
                 controller_state_publisher_->msg_.actual.positions[j] = angles::normalize_angle(joints_[j].getPosition());
                 controller_state_publisher_->msg_.actual.velocities[j] = angles::normalize_angle(joints_[j].getVelocity());
                 controller_state_publisher_->msg_.actual.time_from_start= ros::Duration(timeFromStart_);

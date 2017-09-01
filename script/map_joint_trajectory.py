@@ -16,17 +16,17 @@ from dynamic_graph.sot.hpp import PathSampler
 
 rospack = RosPack()
 
-wps = np.zeros((10,12))
-wps[0,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,-9.433983580109384e-06, -1.570015140892183, 0.00020204444625893103, -1.5705694895909812, 0.0002106347369460476, -9.722773326359402e-05]
-wps[1,:]  = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.1633176366759521, -1.5600189530879482, 0.2168396535558358, -1.621612282371775, -0.1742658433075767, -8.654260453899447e-05]
-wps[2,:]  = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.3266447073354843, -1.5500227652837135, 0.43347726266541264, -1.6726550751525684, -0.3487423213520994, -7.58574758143949e-05]
-wps[3,:]  = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.48997177799501646, -1.540026577479479, 0.6501148717749895, -1.723697867933362, -0.5232187993966222, -6.517234708979535e-05]
-wps[4,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.6532988486545487, -1.5300303896752443, 0.8667524808845664, -1.7747406607141558, -0.6976952774411449, -5.448721836519579e-05]
-wps[5,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.8166259193140809, -1.5200342018710096, 1.0833900899941433, -1.8257834534949495, -0.8721717554856678, -4.380208964059622e-05]
-wps[6,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,0.979952989973613, -1.5100380140667748, 1.30002769910372, -1.876826246275743, -1.0466482335301903, -3.3116960915996675e-05]
-wps[7,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,1.1432800606331452, -1.5000418262625403, 1.516665308213297, -1.9278690390565367, -1.2211247115747133, -2.2431832191397108e-05]
-wps[8,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,1.3066071312926775, -1.4900456384583056, 1.7333029173228738, -1.9789118318373302, -1.3956011896192357, -1.1746703466797555e-05]
-wps[9,:] = [-5e-324, 1e-323, 5e-324, 2.1967674151942275e-22, 3.457799446190768e-23, -0.7849992794352644,1.4699342019522097, -1.480049450654071, 1.9499405264324507, -2.029954624618124, -1.5700776676637587, -1.061574742197989e-06]
+wps = np.zeros((10,20))
+wps[0,:] = [0,0,0,0,0,0, 0, -1.5700, 0.0002, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.5705, 0.0002, 0]
+wps[1,:]  = [0,0,0,0,0,0, 0.1633, -1.5600, 0.2168, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.6216, -0.1742, 0]
+wps[2,:]  = [0,0,0,0,0,0, 0.3266, -1.5500, 0.4334,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.6726, -0.3487, 0]
+wps[3,:]  = [0,0,0,0,0,0, 0.4899, -1.5400, 0.6501, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.7236, -0.5232, 0]
+wps[4,:] = [0,0,0,0,0,0, 0.6532, -1.5300, 0.8667, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.7747, -0.6976, 0]
+wps[5,:] = [0,0,0,0,0,0, 0.8166, -1.5200, 1.0833,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.8257, -0.8721, 0]
+wps[6,:] = [0,0,0,0,0,0, 0.9799, -1.5100, 1.3000,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.8768, -1.0466, 0]
+wps[7,:] = [0,0,0,0,0,0, 1.1432, -1.5000, 1.5166,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.9278, -1.2211, 0]
+wps[8,:] = [0,0,0,0,0,0, 1.3066, -1.4900, 1.7333,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1.9789, -1.3956, 0]
+wps[9,:] = [0,0,0,0,0,0, 1.4699, -1.4800, 1.9499, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-2.0299, -1.5700, 0]
 
 '''
 ps = PathSampler ('ps')
@@ -40,8 +40,8 @@ class JointTrajectorySequencer:
     _result = giftbot_action_server.msg.giftbot_action_serverResult()
     _goalReached = False
     def __init__(self,name):
-        self.urdfDir = rospack.get_path('ur_description') + '/urdf/'
-        self.urdfName = 'ur5_robot.urdf'
+        self.urdfDir = rospack.get_path('sot_robot') + '/urdf/'
+        self.urdfName = 'ur5_robot_with_ring_forearm.urdf'
         self.pinocchioModel = se3.buildModelFromUrdf(self.urdfDir + self.urdfName, se3.JointModelFreeFlyer())
         self.pinocchioData = self.pinocchioModel.createData()
         self._action_name = name
@@ -50,14 +50,15 @@ class JointTrajectorySequencer:
         self._preempted = False
         self.pub_pc = rospy.Publisher('posture_command', Vector, queue_size=10)
         rospy.Subscriber("sot_robot/state", JointTrajectoryControllerState, self.callback)
-        self.rate = rospy.Rate(10) # 10hz
+        self.rate = rospy.Rate(1000) # 10hz
         self.joint_states = None
         self.ps = PathSampler ('ps')
-        self.ps.loadRobotModel ('ur_description', 'anchor', 'ur5_robot')
+        self.ps.loadRobotModel ('sot_robot', 'anchor', 'ur5_robot_with_ring_forearm')
         self.posture_command = None
         self.joint_positions_actual = None
         self._as.start()
         self.count = 'INIT'
+        self.allow_publish = True
         print 'Initialized'         
         
         
@@ -68,19 +69,23 @@ class JointTrajectorySequencer:
         self.joint_velocities_actual = data.actual.velocities
 
     def process_trajectory(self,data,dt=0.01):
+        print 'processing'
         self.ps.resetPath ()
-        self.ps.setTimeStep(0.01)
-        self.ps.position.value = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
-        self.ps.addWaypoint(tuple(self.joint_positions_actual))
+        self.ps.setTimeStep(dt)
+        self.ps.position.value = (0,0,0,0,0,0)+tuple(self.joint_positions_actual)+(0,)*8
+        #self.ps.addWaypoint(tuple(self.joint_positions_actual[0:3])+(0,)*8+tuple(self.joint_positions_actual[3:6]))
+        self.ps.addWaypoint(self.posture_command[6:])
         self.num_wps = len(data.points)
-        self.wps = np.zeros((self.num_wps,12))
+        print 'Number of Way Points = '+str(self.num_wps)
+        self.wps = np.zeros((self.num_wps,20))
         for i in range(self.num_wps):
-            self.wps[i,0:6] = [0.,0., 0., 0., 0.,-0.785]
+            self.wps[i,0:6] = [0.,0., 0., 0., 0.,0]
             self.wps[i,6:] = data.points[i].positions
         for i in range(self.num_wps):
-            self.ps.addWaypoint(tuple(self.wps[i,6:12])) 
+            self.ps.addWaypoint(tuple(self.wps[i,6:20])) 
         self.ps.configuration.recompute(0)   
         self.ps.start()
+        self.allow_publish = True
         '''    
         for j in range(num_wps-1):
             init = data.points[j].time_from_start.secs + (data.points[j].time_from_start.nsecs/1e9)
@@ -92,7 +97,7 @@ class JointTrajectorySequencer:
         #self.dt
         '''   
     def set_posture_command(self):
-        current_state = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
+        current_state = (0,0,0,0,0,0)+tuple(self.joint_positions_actual)+(0,)*8
         self.ps.position.value = current_state; 
         self.ps.configuration.recompute(1)
         self.posture_command = self.ps.configuration.value
@@ -100,39 +105,45 @@ class JointTrajectorySequencer:
             self.goalStatusCallback()
         self.rate.sleep()
         velocity_norm = np.linalg.norm(self.joint_velocities_actual)
+        #print self.posture_command
         if (velocity_norm > 0) and (self.count == 'INIT'):
             print 'Initial State passed'
             self.count = 'NOT_INIT'
-        
-       
+               
     def run(self):
         while not rospy.is_shutdown():
             if self.joint_positions_actual != None and self.posture_command == None:
-                current_state = (0,0,0,0,0,-0.785)+tuple(self.joint_positions_actual)
+                current_state = (0,0,0,0,0,0)+tuple(self.joint_positions_desired)+(0,)*8
                 self.posture_command = current_state
-            if self.posture_command != None:                
+            if self.posture_command != None and self.allow_publish:                
                 self.pub_pc.publish(self.posture_command)   
             self.rate.sleep()
         
     def goalStatusCallback(self):
-            print 'feedback'
+            #print 'feedback'
             velocity_norm = np.linalg.norm(self.joint_velocities_actual)   
-            print velocity_norm
-            goal_error =  np.linalg.norm(np.array(self.wps[self.num_wps-1,6:12]) - np.array(self.joint_positions_actual))
-            print goal_error
+            #print velocity_norm
+            #wps_final = np.hstack((self.wps[self.num_wps-1,6:9],self.wps[self.num_wps-1,17:20])) 
+            wps_final = self.wps[self.num_wps-1,6:12]
+            #print wps_final
+            #print np.array(self.joint_positions_actual)
+            #print wps_final - np.array(self.joint_positions_actual)
+            goal_error =  np.linalg.norm(wps_final - np.array(self.joint_positions_actual))
             if (velocity_norm < 1e-5) and (goal_error< 1e-3):                   
                 self._goalReached = True
             else:                    
                 self._goalReached = False
+                print (velocity_norm,goal_error)
 
     def execute_cb(self, goal): 
         print 'trying...'
+        self.allow_publish = False
         self.process_trajectory(goal.goal_pose.joint_trajectory)
         print('R1:Goal received')
         self._preempted = False
         self._goalReached = False
         self.count = 'INIT'
-
+    
         while (self._preempted == False) and (self._goalReached == False):
             self.set_posture_command()
             
@@ -152,13 +163,18 @@ class JointTrajectorySequencer:
 
 
 if __name__ == '__main__':
-     rospy.init_node('JTS')
-     JTS = JointTrajectorySequencer(rospy.get_name())
-     JTS.run()
-     rospy.spin()
+    try:
+        rospy.init_node('JTS')
+        JTS = JointTrajectorySequencer(rospy.get_name())
+        JTS.run()
+        #rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
+
      #rospy.spin()
      #wps_ref = wps[0:2,6:].T 
      #posture_traj = SmoothedNdTrajectory("posture_traj", wps_ref,0.2,3);
      #JTS.run()
  
  
+
