@@ -30,6 +30,7 @@ file = '/home/nemogiftsun/RobotSoftware/laas/devel/ros/src/sot_robot/src/rqt_rpc
 #usage
 '''
 from dynamic_graph.sot.ur.sot_interface_v3 import SOTInterface
+from dynamic_graph import plug, writeGraph
 test = SOTInterface()
 test.initializeRobot()
 test.startRobot()
@@ -145,8 +146,6 @@ class SOTInterface:
         #self.pushTask(self.task_skinsensor.name)        
         self.pushTask(self.posturetaskname)
         #self.pushTask(self.posetaskname)
-
-
 
 
     def changeRPPToDefaultStack(self):
@@ -418,6 +417,20 @@ class SOTInterface:
     def initializeRobot(self):
         self.connectDeviceWithSolver(False)
         self.initializeSkin();
+        self.ros.rosPublish.add('vector','cD','ca/cD')
+        self.ros.rosPublish.add('matrix','cJ','ca/cJ')
+        self.ros.rosPublish.add('vector','qdot','qdot')
+        self.ros.rosPublish.add('vector','dmin','ca/dmin')
+        self.ros.rosPublish.add('vector','dmax','ca/dmax')
+        self.ros.rosPublish.add('double','controlGain','ca/controlGain')
+        self.ros.rosPublish.add('double','dt','ca/dt')
+        plug(self.task_skinsensor.controlGain,self.ros.rosPublish.controlGain) 
+        plug(self.task_skinsensor.dt,self.ros.rosPublish.dt)         
+        plug(self.task_skinsensor.referenceInf,self.ros.rosPublish.dmin) 
+        #plug(self.task_skinsensor.referenceSup,self.ros.rosPublish.dmax)       
+        plug(self.collisionAvoidance.collisionDistance,self.ros.rosPublish.cD) 
+        plug(self.collisionAvoidance.collisionJacobian,self.ros.rosPublish.cJ) 
+        plug(self.solver.control,self.ros.rosPublish.qdot)        
         if self.status == 'NOT_INITIALIZED':            
             try:
                 self.pushBasicTasks()              
@@ -439,8 +452,6 @@ class SOTInterface:
     def stopRobot(self): 
         self.connectDeviceWithSolver(False) 
         self.status = 'STOPPED'
-
-
 
 
 
