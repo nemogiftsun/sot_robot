@@ -172,6 +172,11 @@ bool RobotControllerPlugin::init(hardware_interface::VelocityJointInterface *rob
         return false;
     }
 
+    if (!node_.getParam("version", version)) {
+        ROS_ERROR("No version name given. (namespace: %s)", node_.getNamespace().c_str());
+        return false;
+    }
+
     // Check initialization
     if (!robot) {
         ROS_ERROR_STREAM("NULL robot pointer");
@@ -455,7 +460,17 @@ void RobotControllerPlugin::startupPython()
                     "    path.append(p)",true, *interpreter_);
     runPython (aof, "path.extend(sys.path)",true, *interpreter_);
     runPython (aof, "sys.path = path",true, *interpreter_);
-    runPython (aof, "from dynamic_graph.sot.ur.prologue import sot",true, *interpreter_);
+    if (version == "latest")
+    {
+        std::cout << "Choosing sot_interface_v3" << std::endl;
+    	runPython (aof, "from dynamic_graph.sot.ur.prologue import sot",true, *interpreter_);
+    }
+    else if (version == "development")
+    {
+        std::cout << "Choosing sot_interface_v3_development" << std::endl;
+    	runPython (aof, "from dynamic_graph.sot.ur.prologue_development import sot",true, *interpreter_);
+    }
+
     runPython (aof, "from dynamic_graph import plug, writeGraph",true, *interpreter_);
 
     dynamicgraph::rosInit(true);

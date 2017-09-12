@@ -15,7 +15,7 @@ hardware_interface:
 sot_robot:  
     type: sot_robot/RobotControllerPlugin
     robot: "Ur_device"
-    version: "latest"
+    version: "development"
     joints:
         - shoulder_pan_joint
         - shoulder_lift_joint

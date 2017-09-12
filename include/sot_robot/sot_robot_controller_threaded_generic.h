@@ -151,6 +151,7 @@ private:
 
     // SoT device
     RobotDevice *device_;
+    std::string version;
 
     double timeFromStart_;
 
