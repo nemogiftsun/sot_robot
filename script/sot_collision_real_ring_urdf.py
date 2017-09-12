@@ -29,17 +29,26 @@ class SotCollision:
         #self.r = RobotWrapper(self.urdfDir + self.urdfName,'/home/fiad1/ros/skin_sot_ws/src/universal_robot/', root_joint = se3.JointModelFreeFlyer());
         #rospy.Subscriber("sot_robot/state", JointTrajectoryControllerState, self.callback)
         self.pub_proximity = rospy.Publisher('proximity_data', Vector, queue_size=10)
+        self.pub_proximity_pose = rospy.Publisher('proximity_pose', Matrix, queue_size=10)
+        self.proximity_pose = Matrix()
+        self.proximity_pose.data = [0,]*56
+        self.proximity_pose.width = 7
         #self.count = 0
         rospy.Subscriber("giftbot/ring5_data", giftbot_sot_data, self.callback_skin)
 
     def callback_skin(self,data):
         self.num_cells = len(data.proximities)
         self.proximity_range = data.proximities
-        #self.proximity_range[1]  = data.proximities[1]
-        #self.proximity_range[5]  = data.proximities[5]
-	self.pub_proximity.publish(tuple(self.proximity_range))
-       
-             
+        self.proximity_poses_unlisted = data.cellPoses
+        l = []
+        for cell in self.proximity_poses_unlisted:
+            lc = [cell.position.x,cell.position.y,cell.position.z,cell.orientation.x,orientation.y,orientation.z,orientation.w]
+            l.append(lc)
+        self.proximity_pose.data = l
+        self.pub_proximity.publish(tuple(self.proximity_range))
+        self.pub_proximity_pose.publish(self.proximity_pose)  
+
+
 if __name__ == '__main__':
      rospy.init_node('sot_collision')
      sc = SotCollision(rospy.get_name())
