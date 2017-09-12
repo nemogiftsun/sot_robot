@@ -44,22 +44,13 @@ class Ur5(AbstractMobileRobot):
         self.OperationalPoints.append('wrist_1_joint')
         self.OperationalPoints.append('wrist_2_joint')
         self.OperationalPoints.append('wrist_3_joint')
-        self.OperationalPoints.append('forerarm_skin_root_cell_joint')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_0')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_1')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_2')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_3')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_4')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_5')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_6')
-        self.OperationalPoints.append('forerarm_skin_cell_joint_7')        
-
+    
         # device and dynamic model assignment
         self.device = device
         rospack = RosPack()
-	self.urdfDir = rospack.get_path('sot_robot') + '/urdf/'
+	self.urdfDir = rospack.get_path('ur_description') + '/urdf/'
         print "Loaded model...."
-        self.urdfName = 'ur5_robot_with_ring_forearm.urdf'
+        self.urdfName = 'ur5_robot.urdf'
         self.pinocchioModel = se3.buildModelFromUrdf(self.urdfDir + self.urdfName,
                                                      se3.JointModelFreeFlyer())
         self.pinocchioData = self.pinocchioModel.createData()
