@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <launch>
 
- <param name="robot_description" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_lacquey_with_objects.urdf.xacro" />
-
- <param name="robot_description_sot" command="$(find xacro)/xacro.py '$(find tom_description)/robots/tom_sot.urdf.xacro'" />
+	<include file="$(find sot_robot)/launch/ur/upload_ur_ring_forearm_fixed.launch" />
+	  <arg name="min_payload"  default="0.0"/>
+	  <arg name="max_payload"  default="3.0"/>
+	  <arg name="prefix" default="" />  
+	  <arg name="max_velocity" default="10.0"/> <!-- [rad/s] -->
+	  <arg name="base_frame" default="$(arg prefix)base" />
+	  <arg name="tool_frame" default="$(arg prefix)tool0_controller" />
+      <arg name="launch_prefix" value="" />
 
 
     <param name="use_gui" value="false"/>
@@ -18,9 +23,9 @@
 	<env name="ROS_NAMESPACE" value=""/>
     </node>
 
-    <node name="robot_pose_publisher" pkg="dynamic_graph_bridge" type="robot_pose_publisher" args="_frame:=$(arg frame) _child_frame:=$(arg child_frame)">
-        <env name="ROS_NAMESPACE" value="" />
-    </node>
+     <!-- <node name="robot_pose_publisher" pkg="dynamic_graph_bridge" type="robot_pose_publisher" args="_frame:=$(arg frame) _child_frame:=$(arg child_frame)">
+        <env name="ROS_NAMESPACE" value="" />!>
+    </node>-->
 
 </launch>
 

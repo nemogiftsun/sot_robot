@@ -160,7 +160,7 @@ class SOTInterface:
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
         self.pushTask(self.task_skinsensor.name)
-        #self.pushTask(self.posturetaskname)
+        self.pushTask(self.posturetaskname)
         #self.connectDeviceWithSolver(False)
 
     def pushTask(self,taskname):
@@ -245,7 +245,7 @@ class SOTInterface:
         '''
         self.task_posture.controlGain.value = 1
         return self.task_posture.name
-    
+
     def defineCollisionAvoidance(self):
         self.collisionAvoidance = sc.SotCollision("sc")             
         self.collisionAvoidance.setNumSkinSensors(8)
@@ -253,18 +253,13 @@ class SOTInterface:
         plug(self.ros.rosSubscribe.proximity_pose,self.collisionAvoidance.proximitySensorPose)   
         plug(self.robot.dynamic.elbow_joint,self.collisionAvoidance.jointTransformation)
         self.robot.dynamic.createJacobian('Jgen_elbow_joint','elbow_joint')
-        plug(self.robot.dynamic.Jgen_elbow_joint,self.collisionAvoidance.jointJacobian)           
+        plug(self.robot.dynamic.Jgen_elbow_joint,self.collisionAvoidance.jointJacobian)  
+        # skin task       
         self.task_skinsensor=TaskInequality('taskskinsensor')
         self.sensor_feature = FeatureGeneric('sensorfeature')
-        #plug(self.ros.rosSubscribe.jC,self.sensor_feature.jacobianIN)
-        #plug(self.ros.rosSubscribe.dC,self.sensor_feature.errorIN)
         plug(self.collisionAvoidance.collisionJacobian,self.sensor_feature.jacobianIN)
         plug(self.collisionAvoidance.collisionDistance,self.sensor_feature.errorIN)        
         self.task_skinsensor.add(self.sensor_feature.name)
-        self.task_skinsensor.referenceInf.value = (0.058,)*8
-        #self.task_skinsensor.referenceSup.value = (0.06,)*8
-        self.task_skinsensor.dt.value=0.5
-        #self.task_skinsensor.controlSelec.value = '111111111000'
         '''
         self.gainPosition = GainAdaptive('gainPosition')
         self.gainPosition.set(0.1,0.1,125e3)
@@ -272,8 +267,12 @@ class SOTInterface:
         plug(self.task_skinsensor.error,self.gainPosition.error)
         plug(self.gainPosition.gain,self.task_skinsensor.controlGain)        
         '''
-        self.task_skinsensor.controlGain.value = 0.04
-          
+        self.task_skinsensor.referenceInf.value = (0.058,)*8
+        #self.task_skinsensor.referenceSup.value = (0.06,)*8
+        self.task_skinsensor.dt.value=0.001
+        #self.task_skinsensor.controlSelec.value = '11111111'
+        self.task_skinsensor.controlGain.value = 0.01
+
     def reWireControl(self):        
         self.posture_feature.posture.unplug()
         self.ros.rosSubscribe.add('vector','pc','posture_command')
@@ -301,7 +300,6 @@ class SOTInterface:
         #self.ros.rosSubscribe.add('vector','dC','collision_distance')
         #self.ros.rosSubscribe.add('matrix','jC','collision_jacobian')
         self.defineCollisionAvoidance()
-        '''
         self.ros.rosPublish.add('vector','cD','ca/cD')
         self.ros.rosPublish.add('matrix','cJ','ca/cJ')        
         self.ros.rosPublish.add('vector','dmin','ca/dmin')
@@ -316,7 +314,6 @@ class SOTInterface:
         plug(self.collisionAvoidance.collisionDistance,self.ros.rosPublish.cD) 
         plug(self.collisionAvoidance.collisionJacobian,self.ros.rosPublish.cJ) 
         plug(self.collisionAvoidance.closestPoints,self.ros.rosPublish.closestPoints)
-        '''
 
 
     # robot control procedures    

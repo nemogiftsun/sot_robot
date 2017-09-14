@@ -1,4 +1,4 @@
-from dynamic_graph.sot.ur.sot_interface_v3 import SOTInterface
+from dynamic_graph.sot.ur.sot_interface_v3_development import SOTInterface
 from dynamic_graph import plug, writeGraph
 test = SOTInterface()
 test.startRobot()
