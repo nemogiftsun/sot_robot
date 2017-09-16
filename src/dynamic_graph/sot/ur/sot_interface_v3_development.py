@@ -139,23 +139,6 @@ class SOTInterface:
         self.posturetaskname = self.defineRobotPostureTask(posture)
     
 
-    def changeDefaultStackToRPP(self):
-        self.connectDeviceWithSolver(False)
-        self.solver.clear()
-        #self.pushTask(self.jltaskname)
-        self.pushTask(self.waisttaskname)
-        #self.pushTask(self.task_skinsensor.name)        
-        self.pushTask(self.posturetaskname)
-        #self.pushTask(self.posetaskname)
-
-
-    def changeRPPToDefaultStack(self):
-        self.connectDeviceWithSolver(False)
-        self.solver.clear()
-        self.pushBasicTasks()
-        self.connectDeviceWithSolver(True)
-
-
     def pushBasicTasks(self):
         self.pushTask(self.jltaskname)
         self.pushTask(self.waisttaskname)
@@ -186,8 +169,8 @@ class SOTInterface:
         #wrists in the last three joints
         #inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,0,0,0,0,0,0,0,0,-2.967,-1.7453,0]
         #sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,0,0,0,0,0,0,0,0,2.0,1.57]
-        inf = [0,0,0,0,0,0,-3.,-2.443,-1.919,-2.967,-1.7453,0,0,0,0,0,0,0,0,0]
-        sup = [0,0,0,0,0,0,3.84,-0.3141,2.094,0,2.0,1.57,0,0,0,0,0,0,0,0]
+        inf = [0,0,0,0,0,0,-6.28,-2.443,-3.14,-2.967,-2.5,0,0,0,0,0,0,0,0,0]
+        sup = [0,0,0,0,0,0,6.28,1.3141,2.094,0,3.14,2.0,0,0,0,0,0,0,0,0]
 	taskjl.referenceInf.value = inf
 	taskjl.referenceSup.value = sup
         taskjl.dt.value = 1
